@@ -22,6 +22,7 @@
 | 主入口 | `ming.sh` |
 | 安装路径 | `/usr/local/bin/m` |
 | 遥测与统计 | 永久禁用，`send_stats` 为本地 no-op |
+| 开发用远程翻译 | 默认禁用，需显式设置 `ALLOW_REMOTE_TRANSLATION=true` |
 | 项目自更新 | 禁用 |
 | 自动更新 cron | 禁用 |
 | GitHub 代理 | 留空，直接访问 |
@@ -42,6 +43,9 @@
 
 这些普通功能仍会按用户选择访问其软件上游、下载依赖或修改系统。项目自更新和
 使用统计与这些功能相互独立，并已禁用。
+
+开发用翻译脚本会把待翻译源码片段发送给 Google Translate，因此默认拒绝运行；
+仅在审阅输入后显式设置 `ALLOW_REMOTE_TRANSLATION=true`。
 
 ## 审阅后安装
 
@@ -109,6 +113,7 @@ bash -n ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
 shellcheck ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
 bash tests/tests_project_safety_defaults.sh
 bash tests/tests_openclaw_config_path_resolution_smoke.sh
+bash tests/tests_translation_privacy_defaults.sh
 git diff --check
 ```
 

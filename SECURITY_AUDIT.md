@@ -33,12 +33,13 @@ the user, or pulling an application image.
 
 ## Privacy-relevant development tooling
 
-The scheduled translation workflow has been removed. However, manually running
-`translate.py` or a locale-specific `to-*.py` script sends Chinese source-text
-fragments to Google Translate through `deep_translator`. This is not telemetry
-and it is never invoked by the main entrypoint, but it can disclose source text
-to a third party. Do not run the translators on files containing secrets or
-private operational data.
+The scheduled translation workflow has been removed. The manual `translate.py`
+and locale-specific `to-*.py` tools now refuse to run unless
+`ALLOW_REMOTE_TRANSLATION=true` is set explicitly. When enabled, they send
+Chinese source-text fragments to Google Translate through `deep_translator`.
+This is not telemetry and it is never invoked by the main entrypoint, but the
+opt-in can still disclose source text to a third party. Review the input before
+enabling remote translation.
 
 ## Architecture and trust boundaries
 
@@ -135,6 +136,7 @@ shellcheck <changed shell files>
 bash tests/tests_project_safety_defaults.sh
 bash tests/tests_command_construction_safety.sh
 bash tests/tests_openclaw_config_path_resolution_smoke.sh
+bash tests/tests_translation_privacy_defaults.sh
 bash tests_openclaw_manager_smoke.sh
 for test_file in tests/openclaw/*.sh; do bash "$test_file"; done
 bash cn/tests/openclaw/tests_openclaw_memory_menu_smoke.sh

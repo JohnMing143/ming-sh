@@ -1,9 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from deep_translator import GoogleTranslator
 import re
 import os
 import sys
+
+REMOTE_TRANSLATION_ENV = 'ALLOW_REMOTE_TRANSLATION'
+
+def require_remote_translation_opt_in():
+    if os.environ.get(REMOTE_TRANSLATION_ENV, '').lower() == 'true':
+        return
+    print(
+        'Remote translation sends source text to Google Translate and is disabled by default.',
+        file=sys.stderr,
+    )
+    print(
+        f'Review the source, then set {REMOTE_TRANSLATION_ENV}=true to continue.',
+        file=sys.stderr,
+    )
+    raise SystemExit(2)
 
 def is_chinese(text):
     return bool(re.search(r'[\u4e00-\u9fff]', text))
@@ -11,7 +25,9 @@ def is_chinese(text):
 def translate_text(text, target_lang):
     if not text.strip() or not is_chinese(text):
         return text
+    require_remote_translation_opt_in()
     try:
+        from deep_translator import GoogleTranslator
         # 过滤掉一些不该翻译的特殊符号
         clean_text = text.strip()
         result = GoogleTranslator(source='zh-CN', target=target_lang).translate(clean_text)
@@ -86,6 +102,7 @@ def translate_file(input_file, output_file, target_lang):
     return True
 
 if __name__ == "__main__":
+    require_remote_translation_opt_in()
     input_file = 'ming.sh'
     langs = {'en': 'en', 'tw': 'zh-TW', 'kr': 'ko', 'jp': 'ja'}
     for dir_name, lang_code in langs.items():
