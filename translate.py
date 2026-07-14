@@ -86,7 +86,7 @@ def translate_file(input_file, output_file, target_lang):
     return True
 
 if __name__ == "__main__":
-    input_file = 'kejilion.sh'
+    input_file = 'ming.sh'
     langs = {'en': 'en', 'tw': 'zh-TW', 'kr': 'ko', 'jp': 'ja'}
     for dir_name, lang_code in langs.items():
-        translate_file(input_file, f'{dir_name}/kejilion.sh', lang_code)
+        translate_file(input_file, f'{dir_name}/ming.sh', lang_code)

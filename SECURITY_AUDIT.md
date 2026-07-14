@@ -1,40 +1,168 @@
-# Security Audit
+# Security audit
 
-## Scope
+Audit date: 2026-07-14
 
-This is an incremental audit. The first pass covers privacy reporting and the
-high-risk commands encountered while tracing that behavior. It is not a
-complete security review of the project.
+## Scope and method
 
-The localized `kejilion.sh` copies generally repeat the same command patterns.
-Line references below use the root `kejilion.sh` unless another file is named.
+This audit covers every tracked repository file, including the root and
+localized entrypoints, helper scripts, configuration templates, translation
+tools, tests, and GitHub Actions. Repository logic was reviewed statically;
+only the validation commands documented below were intentionally run. The main
+installer, Docker matrix, privileged commands, and real system-service,
+firewall, networking, cron, or Docker operations were not run.
 
-## Step 1 result
+The localized `ming.sh` implementations largely duplicate the root script.
+Unless noted otherwise, line references below use the root `ming.sh`.
 
-- Usage statistics are disabled by default in every shipped language entry
-  point.
-- Statistics are sent only when `ENABLE_STATS` is explicitly set to `true`.
-- No new endpoint or remote service was added.
+## Current privacy and update posture
+
+- `ENABLE_TELEMETRY="false"` is the canonical default.
+- Every shell `send_stats` implementation is a local `return 0` no-op.
+- The embedded OpenClaw Python compatibility hook is also a no-op and has no
+  reporting endpoint.
+- The former telemetry endpoint and remote user-agreement URL are absent.
+- `PROJECT_UPDATE_URL` and `PROJECT_UPDATE_LOG_URL` are empty.
+- `project_update` contains no download, cron, Git, or replacement operation.
+- Helper-script self-update options only direct users to manual review.
+- The scheduled translation workflow, write permission, commit, and push logic
+  have been removed.
+
+These controls do not disable network access required by an explicitly chosen
+ordinary feature, such as downloading a package, querying an API configured by
+the user, or pulling an application image.
+
+## Privacy-relevant development tooling
+
+The scheduled translation workflow has been removed. However, manually running
+`translate.py` or a locale-specific `to-*.py` script sends Chinese source-text
+fragments to Google Translate through `deep_translator`. This is not telemetry
+and it is never invoked by the main entrypoint, but it can disclose source text
+to a third party. Do not run the translators on files containing secrets or
+private operational data.
+
+## Architecture and trust boundaries
+
+| Component | Role | Trust boundary |
+| --- | --- | --- |
+| `ming.sh` | Primary monolithic implementation | Runs high-privilege system functions and installs command links at startup |
+| `cn/en/jp/kr/tw/ming.sh` | Localized implementations | Same risk profile as the root implementation |
+| `kejilion.sh` and localized copies | Legacy wrappers | Execute only an adjacent local `ming.sh`; do not download a replacement |
+| `config/project.conf` | Canonical identity, paths, policy, and upstream sources | Sourced as shell code; only trusted local edits should be used |
+| `mc.sh`, `palworld.sh`, `ldnmp.sh`, `hermes_manager.sh` | Standalone feature installers/managers | Perform system writes and execute external tools or installers |
+| `tests/` | Static extraction and smoke harnesses | Most use temporary homes and stubs; exceptions are listed below |
 
 ## Open high-risk command findings
 
-| ID | Risk | Evidence | Impact | Status |
+| ID | Risk | Current evidence | Impact | Status |
 | --- | --- | --- | --- | --- |
-| CMD-001 | Critical | `kejilion.sh:507` executes the contents of `$dockername` as a command after interactive input. `kejilion.sh:19616-19617` similarly accepts an arbitrary command for a background tmux session. | Anyone controlling the input can execute arbitrary commands with the script's privileges. | Recorded; not changed in step 1. |
-| CMD-002 | Critical | Remote scripts are executed directly, for example `kejilion.sh:6451`, `kejilion.sh:7933`, `hermes_manager.sh:964`, `ldnmp.sh:15`, `mc.sh:92`, and `palworld.sh:79`. | A compromised host, DNS path, proxy, or upstream script can become immediate code execution, commonly as root. | Recorded; not changed in step 1. |
-| CMD-003 | Critical | TLS verification is disabled while downloading executable code at `kejilion.sh:16415`, `kejilion.sh:16426`, `kejilion.sh:16908`, and `kejilion.sh:17951`. | A network attacker can replace installer content before it is executed. | Recorded; not changed in step 1. |
-| CMD-004 | High | String-built commands are passed to `eval` at `kejilion.sh:8305` and `kejilion.sh:15277`. | Insufficiently validated values can break command boundaries and inject additional shell syntax. | Recorded; not changed in step 1. |
-| CMD-005 | High | Destructive deletion includes user-selected paths (`kejilion.sh:21351`) and broad fixed paths such as `/home/docker` (`kejilion.sh:2837`) and `/tmp/*` (`kejilion.sh:4742`). Standalone backup scripts also use `rm -rf`, for example `mc_backup.sh:6` and `pal_backup.sh:6`. | A wrong, empty, or manipulated path can cause irreversible data loss. | Recorded; not changed in step 1. |
-| CMD-006 | High | The updater accepts a downloaded script after checking only that its first line is `#!/bin/bash` (`kejilion.sh:21813`, `kejilion.sh:21853`). | The check confirms file shape, not authenticity or integrity; a substituted payload can be installed and later executed. | Recorded; not changed in step 1. |
-| CMD-007 | High | SSH/SCP calls disable host-key verification, including `kejilion.sh:7069`, `kejilion.sh:8343`, and `kejilion.sh:21461`. | Connections are vulnerable to machine-in-the-middle interception and credential or file theft. | Recorded; not changed in step 1. |
-| CMD-008 | High | Passwordless unrestricted sudo rules are written at `kejilion.sh:20118` and `kejilion.sh:20532`. | Compromise of the affected account becomes immediate unrestricted root access. | Recorded; not changed in step 1. |
+| CMD-001 | Critical: arbitrary command execution | `ming.sh:602` executes interactive input in `$dockername`; `ming.sh:3265` passes `$tmuxd` as a tmux command; `ming.sh:15347` evaluates a constructed command. | Untrusted or mistaken input can execute arbitrary commands with the script's privileges. | Open; behavior preserved and recorded. |
+| CMD-002 | Critical: remote code is executed without review or integrity verification | Examples include `ming.sh:529`, `ming.sh:6545`, `ming.sh:8026`, `ming.sh:8836`, `ming.sh:10285`, `ming.sh:10292`, `ming.sh:19435`, `hermes_manager.sh:964`, `ldnmp.sh:25`, `mc.sh:111`, and `palworld.sh:99`. | Compromise of an upstream, DNS path, proxy, or release can become immediate code execution, often as root. | Open. |
+| CMD-003 | Critical: TLS verification is disabled for executable downloads | `ming.sh:5367`, `ming.sh:16485`, `ming.sh:16496`, `ming.sh:16978`, `ming.sh:18021`, and `upgrade_openssh9.8p1.sh:56`. | A network attacker may replace executable content. | Open. |
+| CMD-004 | High: string-built commands use `eval` | `ming.sh:8398` builds a Docker command from strings; `ming.sh:15347` evaluates `$cmd`. | Values that cross quoting boundaries can inject additional shell syntax. | Open. |
+| CMD-005 | Critical: broad deletion and filesystem formatting | Examples include `ming.sh:2932`, `ming.sh:4837`, `ming.sh:5001`, `ming.sh:7375`, `ming.sh:9987`, `mc.sh:303`, `palworld.sh:293`, `mc_backup.sh:6`, and `pal_backup.sh:6`. | A wrong, empty, or manipulated path can irreversibly destroy system or user data. | Open. |
+| CMD-006 | High: SSH host verification is disabled | `ming.sh:7163`, `ming.sh:7179`, `ming.sh:7553`, `ming.sh:8436`, `ming.sh:19459`, `ming.sh:21495`, `ming.sh:21549`, and `beifen.sh:7`. | SSH/SCP traffic and credentials are exposed to machine-in-the-middle attacks. | Open. |
+| CMD-007 | Critical: unrestricted passwordless sudo is written | `ming.sh:20190` and `ming.sh:20604` create `NOPASSWD:ALL` rules. | Compromise of the selected account becomes unrestricted root access. | Open. |
+| CMD-008 | High: firewall and network policy can be broadly cleared | `ming.sh:933`, `ming.sh:1223`, `ldnmp.sh:45`, and `auto_cert_renewal-1.sh:45` flush iptables; many menu functions add broad allow rules. | Services may become publicly reachable and existing protection can be lost. | Open. |
+| CMD-009 | High: world-writable permissions are applied recursively | Examples include `ming.sh:15901`, `ming.sh:17639`, `ming.sh:18350`, and `palworld.sh:304`. | Local users or compromised services can modify application data or executable content. | Open. |
+| CMD-010 | High: credentials are stored or displayed in plaintext | Cluster passwords are written to `~/cluster/servers.py`; `PandoraNext/config.json` ships `setup_password: webgptpasswd`; `PandoraNext/tokens.json` includes example password `12345`; several application definitions expose fixed initial passwords. | Secrets may leak through backups, process output, shell history, or permissive files. | Open. The token strings are examples, not verified live credentials. |
+| CMD-011 | High: startup performs persistent installation writes | `ming.sh:183-208` edits shell startup files, copies itself to the user directory and `/usr/local/bin/m`, and creates legacy links including `/usr/bin/k`. | Merely running the main entrypoint changes persistent host state. | Open and prominently documented; not executed during development. |
+| CMD-012 | High: cron is rewritten in many feature paths | Representative writes occur at `ming.sh:919-920`, `ming.sh:1494-1495`, `ming.sh:7625`, `ming.sh:9949-9954`, `ming.sh:20874-20896`, and `ming.sh:21003-21057`. Some commands originate from interactive input. | Incorrect filters can delete unrelated jobs; arbitrary scheduled commands persist with the user's privileges. | Open. Project auto-update cron creation itself is removed. |
+| CMD-013 | High: dependencies are mutable and usually unpinned | Installers use `latest`, branch heads, short domains, mutable images, and remote application definitions. | A future upstream change can alter behavior without a repository change. | Open. Project-owned and upstream URLs are centralized, but not integrity-pinned. |
+| CMD-014 | High: command aliases can target arbitrary names under system bin directories | `ming.sh:20267-20271` uses an interactive shortcut name to create links in `/usr/local/bin` and `/usr/bin`. | A crafted or conflicting name can overwrite command paths or create unexpected links. | Open. |
+| CMD-015 | Medium: test harnesses have unequal isolation | `tests_openclaw_manager_smoke.sh:123-124` writes `/home/web`; `run_openclaw_manager_matrix.sh:32` starts Docker containers and may pull images. | Running the wrong test can modify the host or require network access. | Excluded from the safe default test set. |
 
-## Suggested order for later passes
+## Project and upstream remote sources
 
-1. Replace remote-script pipelines with download, pinned integrity verification,
-   inspection, and explicit execution.
-2. Remove `--insecure`/`-k` from executable downloads.
-3. Replace arbitrary command execution and `eval` with argument arrays and
-   strict allowlists.
-4. Add path guards and confirmations around destructive deletion.
-5. Restore SSH host-key verification and narrow sudo privileges.
+Project-owned resources use `PROJECT_DOWNLOAD_BASE`, which defaults to the Raw
+URL for `JohnMing143/ming-sh`. Ordinary features still depend on explicitly
+named upstream sources:
+
+- `UPSTREAM_CONFIG_*`: fail2ban and Prometheus templates.
+- `UPSTREAM_NGINX_*`: Nginx site templates.
+- `UPSTREAM_DOCKER_*`: Docker Compose definitions.
+- `UPSTREAM_APPS_*`: executable third-party application definitions.
+- `UPSTREAM_WEBSITE_SOURCE_*`: site archives and templates.
+- `UPSTREAM_*_IMAGE`: `kjlion` container images needed for compatibility.
+- `UPSTREAM_PALWORLD_SETTINGS_URL`: a Palworld configuration file that is not
+  present in this repository.
+
+`GITHUB_PROXY_BASE` is empty by default. Configuring a proxy explicitly adds
+that service to the trust chain; no proxy service is enabled by this fork.
+
+Many additional third-party URLs remain embedded in feature modules. They are
+functional dependencies, not reporting endpoints, but remote execution and
+pinning risks remain covered by CMD-002, CMD-003, and CMD-013.
+
+## Persistent write locations
+
+The audit found code that writes to all of the following classes of locations:
+
+- Commands: `/usr/local/bin/m`, optional `/usr/bin` links, and legacy `k` paths.
+- User files: `~/ming.sh`, legacy links, shell startup files, application
+  repositories, OpenClaw configuration, SSH data, and cluster credentials.
+- Application data: primarily `/home/docker`, `/home/web`, and `/home/game`.
+- System configuration: `/etc/ssh`, `/etc/sudoers.d`, `/etc/sysctl.d`,
+  `/etc/security/limits.conf`, package repositories, firewall rules, and
+  service definitions.
+- Schedulers: the current user's crontab and service enablement through
+  systemd or OpenRC.
+
+Centralizing these paths does not make the operations safe; it only makes the
+defaults discoverable and future migration reviewable.
+
+## Compatibility consequences
+
+- `m` is the primary command. `k` remains a compatibility link while
+  `KEEP_LEGACY_K="true"`.
+- Legacy filename wrappers require a neighboring `ming.sh`. Downloading a
+  wrapper alone no longer triggers a network fallback.
+- `KEEP_LEGACY_PATHS="true"` keeps existing optimizer filenames and markers so
+  previous system state remains discoverable.
+- Persian and Russian implementations and documentation were removed. Calls to
+  those paths now fail instead of silently running an outdated script.
+- Project self-update and scheduled auto-update are intentionally unavailable.
+  Existing installations may still have old cron entries; administrators must
+  inspect and remove those entries manually.
+
+## Validation boundaries
+
+Safe, local checks used for this change:
+
+```bash
+bash -n <changed shell files>
+shellcheck <changed shell files>
+bash tests/tests_project_safety_defaults.sh
+bash tests/tests_openclaw_config_path_resolution_smoke.sh
+for test_file in tests/openclaw/*.sh; do bash "$test_file"; done
+bash cn/tests/openclaw/tests_openclaw_memory_menu_smoke.sh
+python3 -m py_compile translate.py en/to-en.py jp/to-jp.py kr/to-kr.py tw/to-tw.py
+git diff --check
+```
+
+The OpenClaw smoke tests use repository-local temporary directories and command
+stubs. In particular, the memory auto-setup harness now restricts `PATH` and
+stubs `npm`/`qmd` so it cannot install a real global package during validation.
+
+The following are not part of the safe default run:
+
+- `ming.sh` or any localized main entrypoint.
+- `tests_openclaw_manager_smoke.sh`, because it writes a real `/home/web` path.
+- `run_openclaw_manager_matrix.sh`, because it runs Docker and can pull images.
+- Any test or helper requiring a real service, network, package manager, or
+  privileged host path.
+
+## Recommended remediation order
+
+1. Replace remote-script pipelines with download, inspection, pinned digest or
+   signature verification, then explicit execution.
+2. Remove insecure TLS flags from every executable download.
+3. Replace arbitrary command strings and `eval` with arrays and strict
+   allowlists.
+4. Add canonical-path guards, mount checks, and explicit confirmations before
+   deletion or formatting.
+5. Restore SSH host-key verification and replace plaintext password automation
+   with keys or an approved secret store.
+6. Replace unrestricted sudo rules and world-writable paths with least
+   privilege.
+7. Isolate all tests under temporary directories or disposable containers
+   before enabling them in automation.

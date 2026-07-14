@@ -71,6 +71,6 @@ def translate_file(input_file, output_file):
     print(f"Translated file size: {os.path.getsize(output_file)} bytes")
 
 if __name__ == "__main__":
-    input_file = 'kejilion.sh'
-    output_file = 'kejilion_jp.sh'
+    input_file = 'ming.sh'
+    output_file = 'ming_jp.sh'
     translate_file(input_file, output_file)

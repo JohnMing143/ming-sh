@@ -1,152 +1,122 @@
-<br><br><br>
-<div align="center">
-  <img src="https://kejilion.sh/kejilionsh_logo.webp?v=2" alt="logo" width="650">
-</div>
+# ming.sh
 
-<div align="center" style="margin-top:-200px;">
-  <h1 style="font-size:150px;">KEJILION.SH - 科技lion一键脚本工具</h1>
-</div>
+个人使用的 Linux 服务器管理工具箱，基于
+[kejilion/sh](https://github.com/kejilion/sh) 按 Apache License 2.0
+进行定制。
 
+[繁體中文](README.tw.md) · [日本語](README.ja.md) · [한국어](README.kr.md)
 
-<p align="center">
-  <a href="/README.md">
-    <img src="https://img.shields.io/badge/简体中文-2F4F4F?style=for-the-badge&logo=google-chrome&logoColor=white" alt="简体中文" style="margin: 5px;">
-  </a> 
-  <a href="/README.tw.md">
-    <img src="https://img.shields.io/badge/繁體中文-2F4F4F?style=for-the-badge&logo=google-chrome&logoColor=white" alt="繁體中文" style="margin: 5px;">
-  </a>
-  <a href="/README.md">
-    <img src="https://img.shields.io/badge/English-2F4F4F?style=for-the-badge&logo=google-chrome&logoColor=white" alt="English" style="margin: 5px;">
-  </a>
-  <a href="/README.kr.md">
-    <img src="https://img.shields.io/badge/한국어-2F4F4F?style=for-the-badge&logo=google-chrome&logoColor=white" alt="한국어" style="margin: 5px;">
-  </a>
-  <a href="/README.ja.md">
-    <img src="https://img.shields.io/badge/日本語-2F4F4F?style=for-the-badge&logo=google-chrome&logoColor=white" alt="日本語" style="margin: 5px;">
-  </a>
-  <a href="/README.ru.md">
-    <img src="https://img.shields.io/badge/Русский-2F4F4F?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Русский" style="margin: 5px;">
-  </a>  
-  <a href="/README.fa.md">
-    <img src="https://img.shields.io/badge/فارسی-2F4F4F?style=for-the-badge&logo=google-chrome&logoColor=white" alt="فارسی" style="margin: 5px;">
-  </a>
-</p>
+> [!WARNING]
+> 本项目包含修改防火墙、网络、SSH、cron、Docker、systemd、软件包和
+> `/etc`、`/usr`、`/home` 下文件的高权限功能。请先审阅代码，在测试机验证，
+> 再以适当权限运行。不要把远程脚本直接传给 shell。
 
+## 当前个性化默认值
 
+| 项目 | 默认值 |
+| --- | --- |
+| 项目名 | `ming.sh` |
+| 主命令 | `m` |
+| 兼容命令 | `k` |
+| 仓库 | `JohnMing143/ming-sh` |
+| 主入口 | `ming.sh` |
+| 安装路径 | `/usr/local/bin/m` |
+| 遥测与统计 | 永久禁用，`send_stats` 为本地 no-op |
+| 项目自更新 | 禁用 |
+| 自动更新 cron | 禁用 |
+| GitHub 代理 | 留空，直接访问 |
+| 波斯语、俄语入口 | 已移除 |
 
-<br><br><br>
+项目身份、仓库地址、安装路径、更新策略、隐私开关、兼容路径和上游依赖统一在
+[`config/project.conf`](config/project.conf) 中维护。独立下载的入口脚本包含相同的
+安全回退值，因此不依赖配置文件也不会重新启用遥测或项目自更新。
 
+## 主要功能
 
-## 📜 介绍 (Introduction)
-科技Lion 的 Shell 脚本工具是一款全能脚本工具箱，专为 Linux 监控、测试和管理而设计。无论您是初学者还是经验丰富的用户，该工具都能为您提供便捷的解决方案。集成了独创的 Docker 管理功能，让您轻松管理容器化应用；LNMP建站解决方案能帮助您快速搭建网站，站点优化、防御、备份还原迁移一应俱全；并且整合了各类系统工具面板的安装及使用，使系统维护变得更加简单。我们的目标是成为全网最优秀的 Linux 一键脚本工具，为用户提供高效、便捷的科技支持。
+- 系统信息、更新、清理和基础工具管理
+- Docker、容器、镜像和应用管理
+- LNMP、站点、证书、备份和迁移
+- BBR、内核、网络和防火墙管理
+- SSH、磁盘、rsync、集群和后台任务工具
+- OpenClaw、游戏服务器和其他辅助模块
 
-KejiLion's Shell script tool is an all-in-one script toolbox designed for Linux monitoring, testing, and management. Whether you are a beginner or an experienced user, this tool offers convenient solutions. It integrates unique Docker management features, enabling easy containerized application management. The LNMP site-building solution helps you quickly set up websites, covering optimization, defense, backup, restoration, and migration. It also includes the installation and use of various system tool panels, making system maintenance simpler. Our goal is to become the best Linux one-click script tool on the internet, providing users with efficient and convenient tech support.
+这些普通功能仍会按用户选择访问其软件上游、下载依赖或修改系统。项目自更新和
+使用统计与这些功能相互独立，并已禁用。
 
-<br><br>
+## 审阅后安装
 
+仓库上传到 GitHub 后，可先下载到本地文件，再检查并运行：
 
-## 🌐 支持系统 (Supported Systems)
-
-<p align="left">
-  <a href="#">
-    <img src="https://img.shields.io/badge/Ubuntu-FFB6C1?style=for-the-badge&logo=ubuntu&logoColor=black" alt="Ubuntu" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Debian-AFEEEE?style=for-the-badge&logo=debian&logoColor=black" alt="Debian" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/CentOS-98FB98?style=for-the-badge&logo=centos&logoColor=black" alt="CentOS" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/alpinelinux-ADD8E6?style=for-the-badge&logo=alpinelinux&logoColor=black" alt="alpinelinux" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Kali-D3D3D3?style=for-the-badge&logo=kali-linux&logoColor=black" alt="Kali" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Arch-FFFFE0?style=for-the-badge&logo=archlinux&logoColor=black" alt="Arch" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/RedHat-FFE4E1?style=for-the-badge&logo=redhat&logoColor=black" alt="RedHat" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Fedora-FFD700?style=for-the-badge&logo=fedora&logoColor=black" alt="Fedora" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/almalinux-FFEFD5?style=for-the-badge&logo=almalinux&logoColor=black" alt="almalinux" style="margin: 5px;">
-  </a>
-  <a href="#">
-    <img src="https://img.shields.io/badge/Rocky-FFFACD?style=for-the-badge&logo=rocky-linux&logoColor=black" alt="Rocky" style="margin: 5px;">
-  </a>
-</p>
-
-
-
-<br><br>
-
-## 🚀 一键安装 (One-Click Installation) CN
 ```bash
-bash <(curl -sL kejilion.sh)
+curl -fL --output ming.sh \
+  https://raw.githubusercontent.com/JohnMing143/ming-sh/main/ming.sh
+bash -n ming.sh
+shellcheck ming.sh
+less ming.sh
+bash ming.sh
 ```
 
-## 🚀 一键安装 (One-Click Installation) EN
-```bash
-bash <(curl -sL kejilion.sh) en
+不要使用 `curl ... | bash` 或 `bash <(curl ...)`。保留语言入口可将下载地址改为：
+
+```text
+cn/ming.sh
+en/ming.sh
+jp/ming.sh
+kr/ming.sh
+tw/ming.sh
 ```
 
-<br><br>
+首次运行会部署 `/usr/local/bin/m`。默认兼容策略还会保留 `k` 和旧文件路径，
+便于已有调用逐步迁移。新文档和新自动化应使用 `m`。
 
-## 🖼️ 效果图预览 (Preview)
-<p>
-  <img src="https://kejilion.sh/img/screenshots/kejilionsh.webp" alt="中文版" width="48%" style="display:inline-block; margin-right:10px;"/>
-  <img src="https://kejilion.sh/img/screenshots/kejilionsh_en.webp" alt="English Version" width="48%" style="display:inline-block;"/>
-</p>
+## 仓库结构
 
+```text
+ming.sh                         主实现与稳定入口
+kejilion.sh                     仅转发到本地 ming.sh 的兼容入口
+cn|en|jp|kr|tw/ming.sh          保留的语言实现
+cn|en|jp|kr|tw/kejilion.sh      对应的兼容入口
+config/project.conf             项目与上游配置的权威来源
+tests/                          安全回归与 OpenClaw 冒烟测试
+SECURITY_AUDIT.md               高风险命令和安全边界审计
+```
 
+大型入口仍是单体 Bash 文件。后续模块化应保持一个稳定入口，并分别拆分配置、
+系统、网络、Docker、站点和应用功能，避免把品牌替换、行为修改和重构混在一起。
 
+## 兼容策略
 
+- `m` 是新的主命令；`k` 作为兼容链接保留。
+- `ming.sh` 是权威实现；旧文件名只在完整仓库或完整发行包中本地转发，不联网补齐。
+- `KEEP_LEGACY_PATHS="true"` 时继续使用既有内核调优文件名和标记，避免遗留配置失联。
+- 旧项目的在线安装地址和自动更新任务不会继续使用。已有机器上的旧 cron 任务需要
+  管理员自行审阅并删除。
 
-<br><br>
-## 📦 核心功能 (Core Features)
+## 上游依赖
 
-- **系统信息概览**：快速展示 CPU、内存、磁盘、带宽等运行状态  
-  *System status overview: CPU, memory, disk, bandwidth and more*<br>
+为保持普通功能，部分 Nginx 模板、Docker Compose 文件、应用仓库、站点素材、
+Docker 镜像以及 Palworld 配置仍来自上游项目。所有这类地址和镜像名都集中为
+`UPSTREAM_*` 变量；它们不是遥测端点。完整清单见
+[`config/project.conf`](config/project.conf) 和
+[`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)。
 
-- **网络测试工具**：集成测速、回程、延迟、丢包检测等  
-  *Network tools: speed test, route trace, latency, packet loss test*<br>
+## 开发与验证
 
-- **Docker 容器管理**：独家容器可视化 + 容器控制增强命令  
-  *Advanced Docker management with enhanced commands and visualization*<br>
+不要直接执行主脚本进行开发验证。可运行：
 
-- **LNMP 一键部署**：轻松搭建 Nginx + MySQL + PHP 站点  
-  *One-click LNMP stack deployment (Nginx, MySQL, PHP)*<br>
+```bash
+bash -n ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
+shellcheck ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
+bash tests/tests_project_safety_defaults.sh
+bash tests/tests_openclaw_config_path_resolution_smoke.sh
+git diff --check
+```
 
-- **网站防御与优化**：防CC、防爬虫，自动配置防火墙与性能优化  
-  *Site defense and optimization: anti-CC, anti-crawler, firewall and tuning*<br>
+部分 OpenClaw 测试使用临时目录和 stub，详见
+[`tests/openclaw/README.md`](tests/openclaw/README.md)。Docker 矩阵和会写真实系统路径的
+测试不属于默认本地验证。
 
-- **备份与迁移**：站点与数据库一键备份/恢复/远程迁移  
-  *Backup & migration: one-click site/database backup and remote restore*<br>
+## 许可证与归属
 
-- **BBR 加速优化**：内核加速、网络拥塞控制智能切换  
-  *Network acceleration: BBR/tcp congestion control optimization*<br>
-
-- **应用市场集成**：内置主流工具与面板，支持一键安装常用服务  
-  *App Store integration: built-in panels and tools for one-click deployment*<br>
-
-- **自动更新机制**：定时检测脚本版本，保持最新最稳定  
-  *Auto-update engine: ensure you're always running the latest version*<br>
-
-
-<br><br>
-
-## 💖 支持我们 (Support Us)
-觉得脚本还可以 USTD TRC20 打赏
-
-Feel free to support us with USTD TRC20 donations.
-
-<strong style="color: navy;">TCP3PLGUTG9Z4z4tnHHSLbw5bgp8NXhTT3</strong>
-
-<br><br>
-
-## ⭐ Star History
-[![Star History Chart](https://api.star-history.com/svg?repos=kejilion/sh&type=Date)](https://star-history.com/#kejilion/sh&Date)
+本仓库保留 Apache License 2.0 的 [`LICENSE`](LICENSE) 文件和必要的上游归属。
+个性化名称不表示对原作者版权或许可证声明的移除。

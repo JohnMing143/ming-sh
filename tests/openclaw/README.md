@@ -1,6 +1,6 @@
 # OpenClaw tests
 
-这里的脚本用于对 `kejilion.sh` 中的 OpenClaw 相关功能做最小回归与冒烟测试，主要覆盖：
+这里的脚本用于对 `ming.sh` 中的 OpenClaw 相关功能做最小回归与冒烟测试，主要覆盖：
 
 - API 模型同步/协议探测
 - 记忆菜单

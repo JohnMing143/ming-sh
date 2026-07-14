@@ -1,4 +1,14 @@
 #!/bin/bash
+project_script_dir=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)
+if [ -r "$project_script_dir/config/project.conf" ]; then
+	# shellcheck disable=SC1091
+	. "$project_script_dir/config/project.conf"
+fi
+unset project_script_dir
+UPSTREAM_DOCKER_RAW_BASE="${UPSTREAM_DOCKER_RAW_BASE:-https://raw.githubusercontent.com/kejilion/docker/main}"
+UPSTREAM_DOCKER_DOWNLOAD_BASE="${UPSTREAM_DOCKER_DOWNLOAD_BASE:-$UPSTREAM_DOCKER_RAW_BASE}"
+UPSTREAM_DB_USER_PLACEHOLDER="${UPSTREAM_DB_USER_PLACEHOLDER:-kejilion}"
+UPSTREAM_DB_PASSWORD_PLACEHOLDER="${UPSTREAM_DB_PASSWORD_PLACEHOLDER:-kejilionYYDS}"
 
 # 获取用户输入，用于替换 docker-compose.yml 文件中的占位符
 read -p "请输入 数据库ROOT密码：" dbrootpasswd
@@ -21,13 +31,13 @@ curl -L "https://github.com/docker/compose/releases/latest/download/docker-compo
 cd /home && mkdir -p web/html web/mysql web/certs web/conf.d web/redis && touch web/docker-compose.yml
 
 # 下载 docker-compose.yml 文件并进行替换
-wget -O /home/web/docker-compose.yml https://raw.githubusercontent.com/kejilion/docker/main/LNMP-docker-compose-4.yml
+wget -O /home/web/docker-compose.yml "${UPSTREAM_DOCKER_DOWNLOAD_BASE}/LNMP-docker-compose-4.yml"
 
 
 # 在 docker-compose.yml 文件中进行替换
 sed -i "s/webroot/$dbrootpasswd/g" /home/web/docker-compose.yml
-sed -i "s/kejilionYYDS/$dbusepasswd/g" /home/web/docker-compose.yml
-sed -i "s/kejilion/$dbuse/g" /home/web/docker-compose.yml
+sed -i "s/${UPSTREAM_DB_PASSWORD_PLACEHOLDER}/$dbusepasswd/g" /home/web/docker-compose.yml
+sed -i "s/${UPSTREAM_DB_USER_PLACEHOLDER}/$dbuse/g" /home/web/docker-compose.yml
 
 iptables -P INPUT ACCEPT
 iptables -P FORWARD ACCEPT
@@ -56,4 +66,3 @@ docker exec php74 pecl install redis &&
 docker exec php74 sh -c 'echo "extension=redis.so" > /usr/local/etc/php/conf.d/docker-php-ext-redis.ini' &&
 docker exec php74 sh -c 'echo "upload_max_filesize=50M \n post_max_size=50M" > /usr/local/etc/php/conf.d/uploads.ini' &&
 docker exec php74 sh -c 'echo "memory_limit=256M" > /usr/local/etc/php/conf.d/memory.ini'
-

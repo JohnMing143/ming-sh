@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-SCRIPT="$REPO_ROOT/kejilion.sh"
+SCRIPT="$REPO_ROOT/ming.sh"
 WORKDIR="${TMPDIR:-/tmp}/openclaw-change-model-dual-probe-$$"
 mkdir -p "$WORKDIR/home/.openclaw"
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
@@ -52,6 +52,10 @@ run_case() {
   CASE_NAME="$case_name" WORKDIR="$WORKDIR" bash <<'EOF_CASE'
 set -euo pipefail
 source "$WORKDIR/harness.sh"
+
+openclaw_get_config_file() {
+  printf '%s\n' "$HOME/.openclaw/openclaw.json"
+}
 
 python3() {
   if [ "$1" != "-" ]; then

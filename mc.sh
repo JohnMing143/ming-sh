@@ -1,4 +1,23 @@
 #!/bin/bash
+project_script_dir=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)
+if [ -r "$project_script_dir/config/project.conf" ]; then
+	# shellcheck disable=SC1091
+	. "$project_script_dir/config/project.conf"
+fi
+unset project_script_dir
+PROJECT_COMMAND="${PROJECT_COMMAND:-m}"
+PROJECT_REPO="${PROJECT_REPO:-JohnMing143/ming-sh}"
+PROJECT_BRANCH="${PROJECT_BRANCH:-main}"
+PROJECT_REPO_URL="${PROJECT_REPO_URL:-https://github.com/${PROJECT_REPO}}"
+PROJECT_RAW_BASE="${PROJECT_RAW_BASE:-https://raw.githubusercontent.com/${PROJECT_REPO}/${PROJECT_BRANCH}}"
+GITHUB_PROXY_BASE="${GITHUB_PROXY_BASE:-}"
+if [ -n "$GITHUB_PROXY_BASE" ]; then
+	PROJECT_DOWNLOAD_BASE="${PROJECT_DOWNLOAD_BASE:-${GITHUB_PROXY_BASE%/}/${PROJECT_RAW_BASE#https://}}"
+else
+	PROJECT_DOWNLOAD_BASE="${PROJECT_DOWNLOAD_BASE:-$PROJECT_RAW_BASE}"
+fi
+ENABLE_SELF_UPDATE="${ENABLE_SELF_UPDATE:-false}"
+
 ln -sf ~/mc.sh /usr/local/bin/mcs
 
 ip_address() {
@@ -114,7 +133,7 @@ mc_start() {
 
 mc_backup() {
   cd ~
-  curl -sS -O https://kejilion.pro/mc_backup.sh && chmod +x mc_backup.sh
+  curl -sS -O "${PROJECT_DOWNLOAD_BASE}/mc_backup.sh" && chmod +x mc_backup.sh
 }
 
 mc_install_status() {
@@ -169,7 +188,7 @@ echo "------------------------"
 echo "11. 更新Minecraft服务"
 echo "12. 卸载Minecraft服务"
 echo "------------------------"
-echo "k. 科技lion脚本工具箱"
+echo "m. ming.sh 工具箱（k 兼容）"
 echo "------------------------"
 echo "00. 脚本更新"
 echo "------------------------"
@@ -411,21 +430,19 @@ case $choice in
       read -p "请输入 Minecraft Java 版档案名称:" mc_deop
       docker exec --user 1000 mcserver mc-send-to-console deop $mc_deop
       ;;
-  k)
+  m|k)
     cd ~
-    curl -sS -O https://kejilion.pro/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh
+    if command -v "$PROJECT_COMMAND" >/dev/null 2>&1; then
+      "$PROJECT_COMMAND"
+    else
+      echo "未找到 ${PROJECT_COMMAND} 命令，请先按 ${PROJECT_REPO_URL} 的说明安装 ming.sh。"
+    fi
     exit
     ;;
 
   00)
-    cd ~
-    curl -sS -O https://kejilion.pro/mc_log.sh && chmod +x mc_log.sh && ./mc_log.sh
-    rm mc_log.sh
-    echo ""
-    curl -sS -O https://kejilion.pro/mc.sh && chmod +x mc.sh
-    echo "脚本已更新到最新版本！"
-    break_end
-    mc
+    clear
+    echo "mc.sh 自更新已禁用。请从 ${PROJECT_REPO_URL} 审阅后手动更新。"
     ;;
 
 

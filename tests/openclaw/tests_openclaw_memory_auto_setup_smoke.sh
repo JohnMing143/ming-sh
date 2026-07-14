@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-SCRIPT="$REPO_ROOT/kejilion.sh"
+SCRIPT="$REPO_ROOT/ming.sh"
 WORKDIR="${TMPDIR:-/tmp}/openclaw-memory-auto-setup-test-$$"
 mkdir -p "$WORKDIR/bin"
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
@@ -14,6 +14,7 @@ cat > "$WORKDIR/harness.sh" <<'EOF_INNER'
 set -euo pipefail
 break_end() { return 0; }
 send_stats() { return 0; }
+gh_proxy="https://"
 EOF_INNER
 
 awk 'BEGIN{p=0} /openclaw_memory_config_file\(\) \{/{p=1} /openclaw_memory_menu\(\) \{/{p=0} p{print}' "$SCRIPT" >> "$WORKDIR/harness.sh"
@@ -43,6 +44,26 @@ if [[ "$cmd" == "config set"* ]]; then
   val="$4"
   file=$(key_file "$key")
   echo "$val" > "$file"
+  exit 0
+fi
+if [[ "$cmd" == "memory status --json" ]]; then
+  cat <<JSON
+[
+  {
+    "agentId": "main",
+    "status": {
+      "backend": "qmd",
+      "files": 0,
+      "chunks": 0,
+      "dirty": false,
+      "vector": {"enabled": true, "available": true},
+      "workspaceDir": "${HOME}/.openclaw/workspace",
+      "dbPath": "${HOME}/.openclaw/workspace/memory/index.sqlite"
+    },
+    "scan": {"issues": []}
+  }
+]
+JSON
   exit 0
 fi
 if [[ "$1" == "memory" && "$2" == "status" ]]; then
@@ -149,7 +170,30 @@ exit 0
 EOF_INNER
 chmod +x "$WORKDIR/bin/wget"
 
-export PATH="$WORKDIR/bin:$PATH"
+# Prevent the extracted installer from reaching the real global npm prefix.
+cat > "$WORKDIR/bin/npm" <<'EOF_INNER'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "$*" != "install -g @tobilu/qmd" ]]; then
+  echo "unexpected npm invocation: $*" >&2
+  exit 1
+fi
+bin_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+cat > "$bin_dir/qmd" <<'QMD'
+#!/usr/bin/env bash
+if [ "${1:-}" = "--version" ]; then
+  echo "qmd test stub"
+fi
+exit 0
+QMD
+chmod +x "$bin_dir/qmd"
+echo "$*" >> "$HOME/.openclaw/npm_calls"
+EOF_INNER
+chmod +x "$WORKDIR/bin/npm"
+
+# Use only the test stubs and platform base tools. In particular, do not expose
+# Homebrew/global npm or qmd to this isolation test.
+export PATH="$WORKDIR/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export TERM=xterm
 
 source "$WORKDIR/harness.sh"

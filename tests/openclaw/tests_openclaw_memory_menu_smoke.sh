@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-SCRIPT="$REPO_ROOT/kejilion.sh"
+SCRIPT="$REPO_ROOT/ming.sh"
 WORKDIR="${TMPDIR:-/tmp}/openclaw-memory-menu-test-$$"
 mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw/workspace/memory"
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
@@ -14,6 +14,14 @@ cat > "$WORKDIR/harness.sh" <<'EOF_INNER'
 set -euo pipefail
 break_end() { return 0; }
 send_stats() { return 0; }
+gh_proxy="https://"
+stat() {
+  if [ "$(uname -s)" = "Darwin" ] && [ "${1:-}" = "-c" ] && [ "${2:-}" = "%y" ]; then
+    printf '%s\n' '2026-01-01 00:00:00.000000000 +0000'
+    return 0
+  fi
+  command stat "$@"
+}
 EOF_INNER
 
 awk 'BEGIN{p=0} /openclaw_memory_config_file\(\) \{/{p=1} /openclaw_memory_menu\(\) \{/{p=0} p{print}' "$SCRIPT" >> "$WORKDIR/harness.sh"
@@ -57,6 +65,26 @@ if [[ "$cmd" == "config set"* ]]; then
   if [[ "$key" == "agents.defaults.memorySearch.provider" ]]; then
     echo "$val" > "${HOME}/.openclaw/provider"
   fi
+  exit 0
+fi
+if [[ "$cmd" == "memory status --json" ]]; then
+  cat <<JSON
+[
+  {
+    "agentId": "main",
+    "status": {
+      "backend": "qmd",
+      "files": 14,
+      "chunks": 23,
+      "dirty": false,
+      "vector": {"enabled": true, "available": true},
+      "workspaceDir": "${HOME}/.openclaw/workspace",
+      "dbPath": "${HOME}/.openclaw/workspace/memory/index.sqlite"
+    },
+    "scan": {"issues": []}
+  }
+]
+JSON
   exit 0
 fi
 if [[ "$1" == "memory" && "$2" == "status" ]]; then

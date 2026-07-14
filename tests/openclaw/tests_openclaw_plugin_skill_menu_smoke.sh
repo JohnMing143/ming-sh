@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-SCRIPT="$REPO_ROOT/kejilion.sh"
+SCRIPT="$REPO_ROOT/ming.sh"
 WORKDIR="${TMPDIR:-/tmp}/openclaw-plugin-skill-menu-test-$$"
 mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw/workspace/skills" "$WORKDIR/home/.openclaw"
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
@@ -14,6 +14,7 @@ set -euo pipefail
 break_end() { return 0; }
 send_stats() { return 0; }
 start_gateway() { openclaw gateway stop; openclaw gateway start; }
+openclaw_get_config_file() { printf '%s\n' "$HOME/.openclaw/openclaw.json"; }
 EOF_INNER
 
 # 抽取插件/技能管理实现

@@ -29,7 +29,7 @@ install_cmd() {
 for img in "${IMAGES[@]}"; do
   echo "===== $img ====="
   cmd=$(install_cmd "$img")
-  if docker run --rm -v "$PWD":/src -w /src "$img" bash -lc "$cmd && bash -n kejilion.sh && ./tests_openclaw_manager_smoke.sh"; then
+  if docker run --rm -v "$PWD":/src -w /src "$img" bash -lc "$cmd && bash -n ming.sh && ./tests_openclaw_manager_smoke.sh"; then
     echo "RESULT $img OK"
   else
     echo "RESULT $img FAIL"

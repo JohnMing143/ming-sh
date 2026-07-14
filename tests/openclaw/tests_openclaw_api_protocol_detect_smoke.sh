@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-SCRIPT="$REPO_ROOT/kejilion.sh"
+SCRIPT="$REPO_ROOT/ming.sh"
 WORKDIR="${TMPDIR:-/tmp}/openclaw-api-protocol-test-$$"
 mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw"
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
@@ -16,10 +16,11 @@ break_end() { return 0; }
 send_stats() { return 0; }
 start_gateway() { return 0; }
 install() { return 0; }
+openclaw_get_config_file() { printf '%s\n' "$HOME/.openclaw/openclaw.json"; }
 EOF_INNER
 
 awk 'BEGIN{p=0}
- /add-all-models-from-provider\(\) \{/{p=1}
+ /build-openclaw-provider-models-json\(\) \{/{p=1}
  /openclaw_api_manage_list\(\) \{/{p=0}
  p{print}
 ' "$SCRIPT" >> "$WORKDIR/harness.sh"
@@ -47,6 +48,25 @@ printf ""
 exit 0
 EOF_INNER
 chmod +x "$WORKDIR/bin/curl"
+
+# BSD grep has no -P. Keep the production function unchanged and provide the
+# one PCRE extraction used by this isolated test harness.
+cat > "$WORKDIR/bin/grep" <<'EOF_INNER'
+#!/usr/bin/env bash
+if [ -x /usr/bin/grep ]; then
+  system_grep=/usr/bin/grep
+else
+  system_grep=/bin/grep
+fi
+if [ "${1:-}" = "-oP" ] && [ "${2:-}" = '"id":\s*"\K[^"]+' ]; then
+  shift 2
+  "$system_grep" -oE '"id":[[:space:]]*"[^"]+"' "$@" |
+    sed -E 's/^"id":[[:space:]]*"//; s/"$//'
+  exit 0
+fi
+exec "$system_grep" "$@"
+EOF_INNER
+chmod +x "$WORKDIR/bin/grep"
 
 export HOME="$WORKDIR/home"
 export PATH="$WORKDIR/bin:$PATH"

@@ -2,7 +2,7 @@
 # ============================================================================
 # 自动网络性能检测与内核优化脚本
 # 适配：Debian/Ubuntu, CentOS/RHEL/Alma/Rocky, Alpine, Arch, Fedora
-# 作者：kejilion
+# Derived from the upstream kejilion/sh implementation; see LICENSE.
 # ============================================================================
 
 # ======================== 颜色定义 ========================

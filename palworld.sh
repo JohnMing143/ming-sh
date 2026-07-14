@@ -1,4 +1,24 @@
 #!/bin/bash
+project_script_dir=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)
+if [ -r "$project_script_dir/config/project.conf" ]; then
+	# shellcheck disable=SC1091
+	. "$project_script_dir/config/project.conf"
+fi
+unset project_script_dir
+PROJECT_COMMAND="${PROJECT_COMMAND:-m}"
+PROJECT_REPO="${PROJECT_REPO:-JohnMing143/ming-sh}"
+PROJECT_BRANCH="${PROJECT_BRANCH:-main}"
+PROJECT_REPO_URL="${PROJECT_REPO_URL:-https://github.com/${PROJECT_REPO}}"
+PROJECT_RAW_BASE="${PROJECT_RAW_BASE:-https://raw.githubusercontent.com/${PROJECT_REPO}/${PROJECT_BRANCH}}"
+GITHUB_PROXY_BASE="${GITHUB_PROXY_BASE:-}"
+if [ -n "$GITHUB_PROXY_BASE" ]; then
+	PROJECT_DOWNLOAD_BASE="${PROJECT_DOWNLOAD_BASE:-${GITHUB_PROXY_BASE%/}/${PROJECT_RAW_BASE#https://}}"
+else
+	PROJECT_DOWNLOAD_BASE="${PROJECT_DOWNLOAD_BASE:-$PROJECT_RAW_BASE}"
+fi
+UPSTREAM_PALWORLD_SETTINGS_URL="${UPSTREAM_PALWORLD_SETTINGS_URL:-https://kejilion.pro/PalWorldSettings.ini}"
+ENABLE_SELF_UPDATE="${ENABLE_SELF_UPDATE:-false}"
+
 ln -sf ~/palworld.sh /usr/local/bin/p
 
 ip_address() {
@@ -101,7 +121,7 @@ pal_start() {
 
 pal_backup() {
   cd ~
-  curl -sS -O https://kejilion.pro/pal_backup.sh && chmod +x pal_backup.sh
+  curl -sS -O "${PROJECT_DOWNLOAD_BASE}/pal_backup.sh" && chmod +x pal_backup.sh
 }
 
 pal_install_status() {
@@ -133,7 +153,7 @@ echo -e "\033[93m      .            .  ."
 echo "._  _.|.    , _ ._.| _|"
 echo "[_)(_]| \/\/ (_)[  |(_]"
 echo "|                      "
-echo -e "\033[96m幻兽帕鲁开服一键脚本工具v1.0.2  by KEJILION\033[0m"
+echo -e "\033[96m幻兽帕鲁开服一键脚本工具v1.0.2  by ming.sh\033[0m"
 echo -e "\033[96m-输入\033[93mp\033[96m可快速启动此脚本-\033[0m"
 echo -e "$container_status $tmux_status"
 echo "------------------------"
@@ -154,7 +174,7 @@ echo "------------------------"
 echo "11. 更新幻兽帕鲁服务"
 echo "12. 卸载幻兽帕鲁服务"
 echo "------------------------"
-echo "k. 科技lion脚本工具箱"
+echo "m. ming.sh 工具箱（k 兼容）"
 echo "------------------------"
 echo "00. 脚本更新"
 echo "------------------------"
@@ -323,7 +343,7 @@ case $choice in
   10)
     clear
     tmux kill-session -t my1
-    cd ~ && curl -sS -O https://kejilion.pro/PalWorldSettings.ini
+    cd ~ && curl -sS -O "$UPSTREAM_PALWORLD_SETTINGS_URL"
 
     echo "配置游戏参数"
     echo "------------------------"
@@ -414,21 +434,19 @@ case $choice in
     docker rmi -f cm2network/steamcmd
     ;;
 
-  k)
+  m|k)
     cd ~
-    curl -sS -O https://kejilion.pro/kejilion.sh && chmod +x kejilion.sh && ./kejilion.sh
+    if command -v "$PROJECT_COMMAND" >/dev/null 2>&1; then
+      "$PROJECT_COMMAND"
+    else
+      echo "未找到 ${PROJECT_COMMAND} 命令，请先按 ${PROJECT_REPO_URL} 的说明安装 ming.sh。"
+    fi
     exit
     ;;
 
   00)
-    cd ~
-    curl -sS -O https://kejilion.pro/pal_log.sh && chmod +x pal_log.sh && ./pal_log.sh
-    rm pal_log.sh
-    echo ""
-    curl -sS -O https://kejilion.pro/palworld.sh && chmod +x palworld.sh
-    echo "脚本已更新到最新版本！"
-    break_end
-    palworld
+    clear
+    echo "palworld.sh 自更新已禁用。请从 ${PROJECT_REPO_URL} 审阅后手动更新。"
     ;;
 
 

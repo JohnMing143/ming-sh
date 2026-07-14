@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo_root=$(cd "$(dirname "$0")/.." && pwd)
-script="$repo_root/kejilion.sh"
+script="$repo_root/ming.sh"
 
 workdir=$(mktemp -d)
 trap 'rm -rf "$workdir"' EXIT
