@@ -599,7 +599,15 @@ while true; do
 		1)
 			send_stats "新建容器"
 			read -e -p "请输入创建命令: " dockername
-			$dockername
+			local -a docker_command=()
+			read -r -a docker_command <<< "$dockername"
+			if [ "${#docker_command[@]}" -lt 2 ] ||
+			   [ "${docker_command[0]}" != "docker" ] ||
+			   { [ "${docker_command[1]}" != "run" ] && [ "${docker_command[1]}" != "create" ]; }; then
+				echo -e "${gl_hong}仅允许执行 docker run 或 docker create 命令。${gl_bai}"
+			else
+				"${docker_command[@]}"
+			fi
 			;;
 		2)
 			send_stats "启动指定容器"
@@ -8241,8 +8249,8 @@ docker_ssh_migration() {
 					echo "compose" > "${BACKUP_DIR}/backup_type_${project_name}"
 					echo "$project_dir" > "${BACKUP_DIR}/compose_path_${project_name}.txt"
 					tar -czf "${BACKUP_DIR}/compose_project_${project_name}.tar.gz" -C "$project_dir" .
-					echo "# docker-compose 恢复: $project_name" >> "$RESTORE_SCRIPT"
-					echo "cd \"$project_dir\" && docker compose up -d" >> "$RESTORE_SCRIPT"
+					printf '# docker-compose 恢复: %q\n' "$project_name" >> "$RESTORE_SCRIPT"
+					printf 'cd %q && docker compose up -d\n' "$project_dir" >> "$RESTORE_SCRIPT"
 					PACKED_COMPOSE_PATHS["$project_dir"]=1
 					echo -e "${gl_lv}Compose 项目 [$project_name] 已打包: ${project_dir}${gl_bai}"
 				else
@@ -8250,33 +8258,40 @@ docker_ssh_migration() {
 				fi
 			else
 				# 普通容器备份卷
-				local VOL_PATHS
-				VOL_PATHS=$(docker inspect "$c" --format '{{range .Mounts}}{{.Source}} {{end}}')
-				for path in $VOL_PATHS; do
+				local -a VOL_PATHS=()
+				mapfile -t VOL_PATHS < <(docker inspect "$c" --format '{{range .Mounts}}{{println .Source}}{{end}}')
+				for path in "${VOL_PATHS[@]}"; do
 					echo "打包卷: $path"
-					tar -czpf "${BACKUP_DIR}/${c}_$(basename $path).tar.gz" -C / "$(echo $path | sed 's/^\///')"
+					tar -czpf "${BACKUP_DIR}/${c}_$(basename "$path").tar.gz" -C / "${path#/}"
 				done
 
 				# 端口
-				local PORT_ARGS=""
-				mapfile -t PORTS < <(jq -r '.[0].HostConfig.PortBindings | to_entries[] | "\(.value[0].HostPort):\(.key | split("/")[0])"' "$inspect_file" 2>/dev/null)
-				for p in "${PORTS[@]}"; do PORT_ARGS+="-p $p "; done
+				local -a PORTS=()
+				mapfile -t PORTS < <(jq -r '.[0].HostConfig.PortBindings | to_entries[]? | "\(.value[0].HostPort):\(.key | split("/")[0])"' "$inspect_file" 2>/dev/null)
 
 				# 环境变量
-				local ENV_VARS=""
-				mapfile -t ENVS < <(jq -r '.[0].Config.Env[] | @sh' "$inspect_file")
-				for e in "${ENVS[@]}"; do ENV_VARS+="-e $e "; done
+				local -a ENVS=()
+				mapfile -t ENVS < <(jq -r '.[0].Config.Env[]?' "$inspect_file")
 
-				# 卷映射
-				local VOL_ARGS=""
-				for path in $VOL_PATHS; do VOL_ARGS+="-v $path:$path "; done
+				local -a docker_run_args=(docker run -d --name "$c")
+				for p in "${PORTS[@]}"; do
+					[[ -n "$p" ]] && docker_run_args+=(-p "$p")
+				done
+				for path in "${VOL_PATHS[@]}"; do
+					docker_run_args+=(-v "$path:$path")
+				done
+				for e in "${ENVS[@]}"; do
+					docker_run_args+=(-e "$e")
+				done
 
 				# 镜像
 				local IMAGE
 				IMAGE=$(jq -r '.[0].Config.Image' "$inspect_file")
+				docker_run_args+=("$IMAGE")
 
-				echo -e "\n# 还原容器: $c" >> "$RESTORE_SCRIPT"
-				echo "docker run -d --name $c $PORT_ARGS $VOL_ARGS $ENV_VARS $IMAGE" >> "$RESTORE_SCRIPT"
+				printf '\n# 还原容器: %q\n' "$c" >> "$RESTORE_SCRIPT"
+				printf '%q ' "${docker_run_args[@]}" >> "$RESTORE_SCRIPT"
+				printf '\n' >> "$RESTORE_SCRIPT"
 			fi
 		done
 
@@ -8356,36 +8371,35 @@ docker_ssh_migration() {
 
 			IMAGE=$(jq -r '.[0].Config.Image' "$json")
 			[[ -z "$IMAGE" || "$IMAGE" == "null" ]] && { echo -e "${gl_hong}未找到镜像信息，跳过: $container${gl_bai}"; continue; }
+			local -a docker_run_args=(docker run -d --name "$container")
 
 			# 端口映射
-			PORT_ARGS=""
+			local -a PORTS=()
 			mapfile -t PORTS < <(jq -r '.[0].HostConfig.PortBindings | to_entries[]? | "\(.value[0].HostPort):\(.key | split("/")[0])"' "$json")
 			for p in "${PORTS[@]}"; do
-				[[ -n "$p" ]] && PORT_ARGS="$PORT_ARGS -p $p"
+				[[ -n "$p" ]] && docker_run_args+=(-p "$p")
 			done
 
 			# 环境变量
-			ENV_ARGS=""
-			mapfile -t ENVS < <(jq -r '.[0].Config.Env[]' "$json")
+			local -a ENVS=()
+			mapfile -t ENVS < <(jq -r '.[0].Config.Env[]?' "$json")
 			for e in "${ENVS[@]}"; do
-				ENV_ARGS="$ENV_ARGS -e \"$e\""
+				docker_run_args+=(-e "$e")
 			done
 
 			# 卷映射 + 卷数据恢复
-			VOL_ARGS=""
-			mapfile -t VOLS < <(jq -r '.[0].Mounts[] | "\(.Source):\(.Destination)"' "$json")
-			for v in "${VOLS[@]}"; do
-				VOL_SRC=$(echo "$v" | cut -d':' -f1)
-				VOL_DST=$(echo "$v" | cut -d':' -f2)
+			while IFS=$'\t' read -r VOL_SRC VOL_DST; do
+				[[ -z "$VOL_SRC" || -z "$VOL_DST" ]] && continue
 				mkdir -p "$VOL_SRC"
-				VOL_ARGS="$VOL_ARGS -v $VOL_SRC:$VOL_DST"
+				docker_run_args+=(-v "$VOL_SRC:$VOL_DST")
 
-				VOL_FILE="$BACKUP_DIR/${container}_$(basename $VOL_SRC).tar.gz"
+				VOL_FILE="$BACKUP_DIR/${container}_$(basename "$VOL_SRC").tar.gz"
 				if [[ -f "$VOL_FILE" ]]; then
 					echo "恢复卷数据: $VOL_SRC"
 					tar -xzf "$VOL_FILE" -C /
 				fi
-			done
+			done < <(jq -r '.[0].Mounts[]? | [.Source, .Destination] | @tsv' "$json")
+			docker_run_args+=("$IMAGE")
 
 			# 删除已存在但未运行的容器
 			if docker ps -a --format '{{.Names}}' | grep -q "^${container}$"; then
@@ -8394,8 +8408,10 @@ docker_ssh_migration() {
 			fi
 
 			# 启动容器
-			echo "执行还原命令: docker run -d --name \"$container\" $PORT_ARGS $VOL_ARGS $ENV_ARGS \"$IMAGE\""
-			eval "docker run -d --name \"$container\" $PORT_ARGS $VOL_ARGS $ENV_ARGS \"$IMAGE\""
+			printf '执行还原命令:'
+			printf ' %q' "${docker_run_args[@]}"
+			printf '\n'
+			"${docker_run_args[@]}"
 		done
 
 		[[ "$has_container" == false ]] && echo -e "${gl_huang}未找到普通容器的备份信息${gl_bai}"
@@ -15336,15 +15352,15 @@ print("✅ 多智能体健康检查完成")
 		echo "修改选项（留空跳过）："
 		read -e -p "  新名称: " new_name
 		read -e -p "  新 Emoji: " new_emoji
-		local cmd="openclaw agents set-identity --agent $agent_id"
-		[ -n "$new_name" ] && cmd="$cmd --name $new_name"
-		[ -n "$new_emoji" ] && cmd="$cmd --emoji $new_emoji"
+		local -a cmd=(openclaw agents set-identity --agent "$agent_id")
+		[ -n "$new_name" ] && cmd+=(--name "$new_name")
+		[ -n "$new_emoji" ] && cmd+=(--emoji "$new_emoji")
 		echo "也可以从 IDENTITY.md 自动读取身份信息。"
 		read -e -p "是否从 IDENTITY.md 读取？(y/n): " from_id
 		if [ "$from_id" = "y" ]; then
-			cmd="openclaw agents set-identity --agent $agent_id --from-identity"
+			cmd=(openclaw agents set-identity --agent "$agent_id" --from-identity)
 		fi
-		eval "$cmd"
+		"${cmd[@]}"
 	}
 
 	openclaw_multiagent_cleanup_sessions() {
@@ -19683,7 +19699,7 @@ linux_work() {
 
 
 		  23)
-			  read -e -p "请输入你要后台执行的命令，如:curl -fsSL https://get.docker.com | sh: " tmuxd
+			  read -e -p "请输入你要后台执行的命令，例如 uptime: " tmuxd
 			  tmux_run_d
 			  send_stats "注入命令到后台工作区"
 			  ;;
@@ -20264,7 +20280,28 @@ linux_Settings() {
 					   break_end
 					   linux_Settings
 				  fi
-				  find /usr/local/bin/ -type l -exec bash -c 'link=$1; target=$2; [ "$(readlink -f "$link")" = "$target" ] && rm -f "$link"' _ {} "$PROJECT_INSTALL_PATH" \;
+				  if [[ ! "$kuaijiejian" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] || [[ "$kuaijiejian" == *..* ]]; then
+					  echo -e "${gl_hong}快捷命令名只能包含字母、数字、点、下划线和连字符，且不能包含连续的点。${gl_bai}"
+					  break_end
+					  continue
+				  fi
+				  local shortcut_path shortcut_target project_install_target shortcut_conflict="false"
+				  project_install_target=$(readlink -f "$PROJECT_INSTALL_PATH" 2>/dev/null || printf '%s\n' "$PROJECT_INSTALL_PATH")
+				  for shortcut_path in "/usr/local/bin/$kuaijiejian" "/usr/bin/$kuaijiejian"; do
+					  if [ -e "$shortcut_path" ] || [ -L "$shortcut_path" ]; then
+						  shortcut_target=$(readlink -f "$shortcut_path" 2>/dev/null || true)
+						  if [ "$shortcut_target" != "$project_install_target" ]; then
+							  echo -e "${gl_hong}拒绝覆盖现有命令: $shortcut_path${gl_bai}"
+							  shortcut_conflict="true"
+							  break
+						  fi
+					  fi
+				  done
+				  if [ "$shortcut_conflict" = "true" ]; then
+					  break_end
+					  continue
+				  fi
+				  find /usr/local/bin/ -type l -exec bash -c 'link=$1; target=$2; [ "$(readlink -f "$link")" = "$target" ] && rm -f "$link"' _ {} "$project_install_target" \;
 				  if [ "$kuaijiejian" != "$PROJECT_COMMAND" ] && [ "$kuaijiejian" != "$LEGACY_COMMAND" ]; then
 					  ln -sf "$PROJECT_INSTALL_PATH" "/usr/local/bin/$kuaijiejian"
 				  fi

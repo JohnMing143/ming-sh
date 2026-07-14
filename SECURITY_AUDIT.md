@@ -51,14 +51,14 @@ private operational data.
 | `mc.sh`, `palworld.sh`, `ldnmp.sh`, `hermes_manager.sh` | Standalone feature installers/managers | Perform system writes and execute external tools or installers |
 | `tests/` | Static extraction and smoke harnesses | Most use temporary homes and stubs; exceptions are listed below |
 
-## Open high-risk command findings
+## High-risk command findings
 
 | ID | Risk | Current evidence | Impact | Status |
 | --- | --- | --- | --- | --- |
-| CMD-001 | Critical: arbitrary command execution | `ming.sh:602` executes interactive input in `$dockername`; `ming.sh:3265` passes `$tmuxd` as a tmux command; `ming.sh:15347` evaluates a constructed command. | Untrusted or mistaken input can execute arbitrary commands with the script's privileges. | Open; behavior preserved and recorded. |
+| CMD-001 | Critical: arbitrary command execution | `ming.sh:19702` intentionally accepts a background command and `ming.sh:3273` passes it to tmux as a shell command. | Untrusted or mistaken input can execute arbitrary commands with the script's privileges. | Open by design. The Docker-create and OpenClaw `eval` paths were removed, and the prompt no longer recommends a remote-script pipeline. |
 | CMD-002 | Critical: remote code is executed without review or integrity verification | Examples include `ming.sh:529`, `ming.sh:6545`, `ming.sh:8026`, `ming.sh:8836`, `ming.sh:10285`, `ming.sh:10292`, `ming.sh:19435`, `hermes_manager.sh:964`, `ldnmp.sh:25`, `mc.sh:111`, and `palworld.sh:99`. | Compromise of an upstream, DNS path, proxy, or release can become immediate code execution, often as root. | Open. |
 | CMD-003 | Critical: TLS verification is disabled for executable downloads | `ming.sh:5367`, `ming.sh:16485`, `ming.sh:16496`, `ming.sh:16978`, `ming.sh:18021`, and `upgrade_openssh9.8p1.sh:56`. | A network attacker may replace executable content. | Open. |
-| CMD-004 | High: string-built commands use `eval` | `ming.sh:8398` builds a Docker command from strings; `ming.sh:15347` evaluates `$cmd`. | Values that cross quoting boundaries can inject additional shell syntax. | Open. |
+| CMD-004 | High: string-built commands use `eval` | Docker restore now builds `docker_run_args` arrays at `ming.sh:8374-8414`; OpenClaw identity updates use an array at `ming.sh:15355-15363`. | Values that cross quoting boundaries could inject additional shell syntax. | Resolved on 2026-07-14; static regression coverage prevents the former `eval` forms from returning. |
 | CMD-005 | Critical: broad deletion and filesystem formatting | Examples include `ming.sh:2932`, `ming.sh:4837`, `ming.sh:5001`, `ming.sh:7375`, `ming.sh:9987`, `mc.sh:303`, `palworld.sh:293`, `mc_backup.sh:6`, and `pal_backup.sh:6`. | A wrong, empty, or manipulated path can irreversibly destroy system or user data. | Open. |
 | CMD-006 | High: SSH host verification is disabled | `ming.sh:7163`, `ming.sh:7179`, `ming.sh:7553`, `ming.sh:8436`, `ming.sh:19459`, `ming.sh:21495`, `ming.sh:21549`, and `beifen.sh:7`. | SSH/SCP traffic and credentials are exposed to machine-in-the-middle attacks. | Open. |
 | CMD-007 | Critical: unrestricted passwordless sudo is written | `ming.sh:20190` and `ming.sh:20604` create `NOPASSWD:ALL` rules. | Compromise of the selected account becomes unrestricted root access. | Open. |
@@ -68,8 +68,9 @@ private operational data.
 | CMD-011 | High: startup performs persistent installation writes | `ming.sh:183-208` edits shell startup files, copies itself to the user directory and `/usr/local/bin/m`, and creates legacy links including `/usr/bin/k`. | Merely running the main entrypoint changes persistent host state. | Open and prominently documented; not executed during development. |
 | CMD-012 | High: cron is rewritten in many feature paths | Representative writes occur at `ming.sh:919-920`, `ming.sh:1494-1495`, `ming.sh:7625`, `ming.sh:9949-9954`, `ming.sh:20874-20896`, and `ming.sh:21003-21057`. Some commands originate from interactive input. | Incorrect filters can delete unrelated jobs; arbitrary scheduled commands persist with the user's privileges. | Open. Project auto-update cron creation itself is removed. |
 | CMD-013 | High: dependencies are mutable and usually unpinned | Installers use `latest`, branch heads, short domains, mutable images, and remote application definitions. | A future upstream change can alter behavior without a repository change. | Open. Project-owned and upstream URLs are centralized, but not integrity-pinned. |
-| CMD-014 | High: command aliases can target arbitrary names under system bin directories | `ming.sh:20267-20271` uses an interactive shortcut name to create links in `/usr/local/bin` and `/usr/bin`. | A crafted or conflicting name can overwrite command paths or create unexpected links. | Open. |
+| CMD-014 | High: command aliases can target arbitrary names under system bin directories | `ming.sh:20280-20310` applies a filename allowlist, rejects consecutive dots, and checks both destination paths before creating links. | A crafted or conflicting name could overwrite command paths or create unexpected links. | Resolved on 2026-07-14; existing commands not owned by this project are no longer overwritten. |
 | CMD-015 | Medium: test harnesses have unequal isolation | `tests_openclaw_manager_smoke.sh:123-124` writes `/home/web`; `run_openclaw_manager_matrix.sh:32` starts Docker containers and may pull images. | Running the wrong test can modify the host or require network access. | Excluded from the safe default test set. |
+| CMD-016 | High: generated Docker restore scripts concatenate untrusted metadata | The former generator embedded Compose paths, environment values, volume paths, names, and images directly in shell source. It now uses Bash `printf %q` at `ming.sh:8252-8294`. | Crafted container metadata or paths could add commands that run later when an administrator executes the generated restore script. | Resolved on 2026-07-14; each generated argument is shell-quoted and the live restore path uses arrays. |
 
 ## Project and upstream remote sources
 
@@ -132,6 +133,7 @@ Safe, local checks used for this change:
 bash -n <changed shell files>
 shellcheck <changed shell files>
 bash tests/tests_project_safety_defaults.sh
+bash tests/tests_command_construction_safety.sh
 bash tests/tests_openclaw_config_path_resolution_smoke.sh
 for test_file in tests/openclaw/*.sh; do bash "$test_file"; done
 bash cn/tests/openclaw/tests_openclaw_memory_menu_smoke.sh
@@ -156,7 +158,8 @@ The following are not part of the safe default run:
 1. Replace remote-script pipelines with download, inspection, pinned digest or
    signature verification, then explicit execution.
 2. Remove insecure TLS flags from every executable download.
-3. Replace arbitrary command strings and `eval` with arrays and strict
+3. Constrain or remove the intentionally arbitrary tmux background-command
+   feature; other reviewed dynamic command paths now use arrays and strict
    allowlists.
 4. Add canonical-path guards, mount checks, and explicit confirmations before
    deletion or formatting.
