@@ -49,7 +49,7 @@ private operational data.
 | `kejilion.sh` and localized copies | Legacy wrappers | Execute only an adjacent local `ming.sh`; do not download a replacement |
 | `config/project.conf` | Canonical identity, paths, policy, and upstream sources | Sourced as shell code; only trusted local edits should be used |
 | `mc.sh`, `palworld.sh`, `ldnmp.sh`, `hermes_manager.sh` | Standalone feature installers/managers | Perform system writes and execute external tools or installers |
-| `tests/` | Static extraction and smoke harnesses | Most use temporary homes and stubs; exceptions are listed below |
+| `tests/` | Static extraction and smoke harnesses | Use temporary homes and command stubs; the Docker matrix remains an explicit exception |
 
 ## High-risk command findings
 
@@ -69,7 +69,7 @@ private operational data.
 | CMD-012 | High: cron is rewritten in many feature paths | Representative writes occur at `ming.sh:919-920`, `ming.sh:1494-1495`, `ming.sh:7625`, `ming.sh:9949-9954`, `ming.sh:20874-20896`, and `ming.sh:21003-21057`. Some commands originate from interactive input. | Incorrect filters can delete unrelated jobs; arbitrary scheduled commands persist with the user's privileges. | Open. Project auto-update cron creation itself is removed. |
 | CMD-013 | High: dependencies are mutable and usually unpinned | Installers use `latest`, branch heads, short domains, mutable images, and remote application definitions. | A future upstream change can alter behavior without a repository change. | Open. Project-owned and upstream URLs are centralized, but not integrity-pinned. |
 | CMD-014 | High: command aliases can target arbitrary names under system bin directories | `ming.sh:20280-20310` applies a filename allowlist, rejects consecutive dots, and checks both destination paths before creating links. | A crafted or conflicting name could overwrite command paths or create unexpected links. | Resolved on 2026-07-14; existing commands not owned by this project are no longer overwritten. |
-| CMD-015 | Medium: test harnesses have unequal isolation | `tests_openclaw_manager_smoke.sh:123-124` writes `/home/web`; `run_openclaw_manager_matrix.sh:32` starts Docker containers and may pull images. | Running the wrong test can modify the host or require network access. | Excluded from the safe default test set. |
+| CMD-015 | Medium: test harnesses have unequal isolation | `tests_openclaw_manager_smoke.sh` now uses a repository-local temporary tree, extracted-function boundaries, and command stubs; `run_openclaw_manager_matrix.sh:32` still starts Docker containers and may pull images. | Running the Docker matrix can modify Docker state or require network access. | Partially resolved on 2026-07-14. The standalone manager smoke test is isolated; the Docker matrix remains excluded. |
 | CMD-016 | High: generated Docker restore scripts concatenate untrusted metadata | The former generator embedded Compose paths, environment values, volume paths, names, and images directly in shell source. It now uses Bash `printf %q` at `ming.sh:8252-8294`. | Crafted container metadata or paths could add commands that run later when an administrator executes the generated restore script. | Resolved on 2026-07-14; each generated argument is shell-quoted and the live restore path uses arrays. |
 
 ## Project and upstream remote sources
@@ -135,6 +135,7 @@ shellcheck <changed shell files>
 bash tests/tests_project_safety_defaults.sh
 bash tests/tests_command_construction_safety.sh
 bash tests/tests_openclaw_config_path_resolution_smoke.sh
+bash tests_openclaw_manager_smoke.sh
 for test_file in tests/openclaw/*.sh; do bash "$test_file"; done
 bash cn/tests/openclaw/tests_openclaw_memory_menu_smoke.sh
 python3 -m py_compile translate.py en/to-en.py jp/to-jp.py kr/to-kr.py tw/to-tw.py
@@ -148,7 +149,6 @@ stubs `npm`/`qmd` so it cannot install a real global package during validation.
 The following are not part of the safe default run:
 
 - `ming.sh` or any localized main entrypoint.
-- `tests_openclaw_manager_smoke.sh`, because it writes a real `/home/web` path.
 - `run_openclaw_manager_matrix.sh`, because it runs Docker and can pull images.
 - Any test or helper requiring a real service, network, package manager, or
   privileged host path.

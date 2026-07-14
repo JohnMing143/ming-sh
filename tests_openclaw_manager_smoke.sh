@@ -3,9 +3,35 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 SCRIPT="$REPO_DIR/ming.sh"
-WORKDIR="${TMPDIR:-/tmp}/openclaw-manager-test-$$"
-mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw"
-trap 'rm -rf "$WORKDIR"' EXIT
+WORKDIR=$(mktemp -d "$REPO_DIR/.openclaw-manager-test.XXXXXX")
+mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw" "$WORKDIR/web/conf.d"
+cleanup() {
+  [ "${BASH_SUBSHELL:-0}" -eq 0 ] || return 0
+  rm -rf -- "$WORKDIR"
+}
+trap cleanup EXIT
+
+extract_between() {
+  local start_marker="$1"
+  local end_marker="$2"
+  awk -v start_marker="$start_marker" -v end_marker="$end_marker" '
+    index($0, start_marker) {
+      found_start = 1
+    }
+    found_start && index($0, end_marker) {
+      found_end = 1
+      exit
+    }
+    found_start {
+      print
+    }
+    END {
+      if (!found_start || !found_end) {
+        exit 1
+      }
+    }
+  ' "$SCRIPT"
+}
 
 cat > "$WORKDIR/harness.sh" <<'EOF'
 #!/usr/bin/env bash
@@ -13,12 +39,22 @@ set -euo pipefail
 install() { return 0; }
 break_end() { :; }
 send_stats() { :; }
+openclaw_get_config_file() { printf '%s\n' "$HOME/.openclaw/openclaw.json"; }
+gh_proxy=""
+: "${OPENCLAW_TEST_WEB_CONF_DIR:?}"
 EOF
-sed -n '10597,10766p' "$SCRIPT" >> "$WORKDIR/harness.sh"
+extract_between \
+  'build-openclaw-provider-models-json() {' \
+  'add-default-model-only-to-provider() {' >> "$WORKDIR/harness.sh"
 printf '\n' >> "$WORKDIR/harness.sh"
-sed -n '12815,13534p' "$SCRIPT" >> "$WORKDIR/harness.sh"
+extract_between \
+  'openclaw_memory_config_file() {' \
+  'openclaw_memory_auto_setup_menu() {' >> "$WORKDIR/harness.sh"
 printf '\n' >> "$WORKDIR/harness.sh"
-sed -n '13781,13825p' "$SCRIPT" >> "$WORKDIR/harness.sh"
+extract_between \
+  'openclaw_find_webui_domain() {' \
+  'openclaw_domain_webui() {' |
+  sed 's#/home/web/conf.d/#"${OPENCLAW_TEST_WEB_CONF_DIR}"/#g' >> "$WORKDIR/harness.sh"
 printf '\n' >> "$WORKDIR/harness.sh"
 chmod +x "$WORKDIR/harness.sh"
 
@@ -38,6 +74,23 @@ else
 fi
 EOF
 chmod +x "$WORKDIR/bin/curl"
+
+cat > "$WORKDIR/bin/grep" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [ "${1:-}" = "-oP" ]; then
+  shift 2
+  /usr/bin/awk -F'"id"[[:space:]]*:[[:space:]]*"' '{
+    for (i = 2; i <= NF; i++) {
+      split($i, value, "\"")
+      print value[1]
+    }
+  }' "$@"
+  exit 0
+fi
+exec /usr/bin/grep "$@"
+EOF
+chmod +x "$WORKDIR/bin/grep"
 
 cat > "$WORKDIR/bin/openclaw" <<'EOF'
 #!/usr/bin/env bash
@@ -85,10 +138,30 @@ case "$cmd" in
     shift || true
     case "$sub" in
       status)
-        echo "Provider: builtin"
-        echo "Vector: ok"
-        echo "Indexed: 0/0"
-        echo "Workspace: $HOME/.openclaw/workspace"
+        if [ "${1:-}" = "--json" ]; then
+          cat <<JSON
+[
+  {
+    "agentId": "main",
+    "status": {
+      "backend": "builtin",
+      "files": 0,
+      "chunks": 0,
+      "dirty": false,
+      "vector": {"enabled": true, "available": true},
+      "workspaceDir": "$HOME/.openclaw/workspace",
+      "dbPath": "$HOME/.openclaw/workspace/memory/index.sqlite"
+    },
+    "scan": {"issues": []}
+  }
+]
+JSON
+        else
+          echo "Provider: builtin"
+          echo "Vector: ok"
+          echo "Indexed: 0/0"
+          echo "Workspace: $HOME/.openclaw/workspace"
+        fi
         ;;
       index)
         echo "mock memory index $*"
@@ -115,13 +188,20 @@ EOF
 chmod +x "$WORKDIR/bin/openclaw"
 
 export HOME="$WORKDIR/home"
-export PATH="$WORKDIR/bin:$PATH"
+export OPENCLAW_TEST_WEB_CONF_DIR="$WORKDIR/web/conf.d"
+for required_tool in jq python3; do
+  required_path=$(command -v "$required_tool") || {
+    echo "missing required test tool: $required_tool" >&2
+    exit 1
+  }
+  ln -s "$required_path" "$WORKDIR/bin/$required_tool"
+done
+export PATH="$WORKDIR/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 cat > "$HOME/.openclaw/openclaw.json" <<'JSON'
 {"models":{"mode":"merge","providers":{}}}
 JSON
 
-mkdir -p /home/web/conf.d
-cat > /home/web/conf.d/test-openclaw.conf <<'EOF'
+cat > "$OPENCLAW_TEST_WEB_CONF_DIR/test-openclaw.conf" <<'EOF'
 server {
   listen 443 ssl;
   server_name claw.example.com;
@@ -134,7 +214,7 @@ EOF
 source "$WORKDIR/harness.sh"
 
 echo '[TEST] add-all-models-from-provider'
-add-all-models-from-provider "cli-api" "https://example.com/v1" "dummy-token" >/tmp/add-models.out
+add-all-models-from-provider "cli-api" "https://example.com/v1" "dummy-token" >"$WORKDIR/add-models.out"
 jq -e '.models.providers["cli-api"].models | length == 3' "$HOME/.openclaw/openclaw.json" >/dev/null
 jq -r '.models.providers["cli-api"].models[].id' "$HOME/.openclaw/openclaw.json"
 
@@ -148,7 +228,7 @@ echo '[TEST] openclaw_memory_auto_setup_run local'
 mkdir -p "$HOME/.openclaw/models/embedding"
 touch "$HOME/.openclaw/models/embedding/embeddinggemma-300M-Q8_0.gguf"
 echo "memory.local=legacy" > "$HOME/.openclaw/mock_config.env"
-printf "yes\n" | openclaw_memory_auto_setup_run "local" >/tmp/memory-auto.out
+openclaw_memory_auto_setup_run "local" <<< "yes" >"$WORKDIR/memory-auto.out"
 
 grep -q '^memory.backend=builtin' "$HOME/.openclaw/mock_config.env"
 grep -q '^agents.defaults.memorySearch.provider=local' "$HOME/.openclaw/mock_config.env"
@@ -157,7 +237,7 @@ if grep -q '^memory.local=' "$HOME/.openclaw/mock_config.env"; then
   exit 1
 fi
 
-grep -q 'openclaw memory index --force' "$HOME/.openclaw/mock_openclaw.log"
+grep -Eq 'openclaw memory index .*--force' "$HOME/.openclaw/mock_openclaw.log"
 grep -q 'openclaw gateway restart' "$HOME/.openclaw/mock_openclaw.log"
 
 echo 'SMOKE_OK'
