@@ -3,10 +3,15 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SCRIPT="$REPO_ROOT/ming.sh"
-WORKDIR="${TMPDIR:-/tmp}/openclaw-api-protocol-test-$$"
-mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw"
+WORKDIR=$(mktemp -d "$REPO_ROOT/.openclaw-api-protocol-test.XXXXXX")
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
-trap '[ "$KEEP_WORKDIR" = "true" ] || rm -rf "$WORKDIR"' EXIT
+cleanup() {
+  if [ "$KEEP_WORKDIR" != "true" ] && [ "${BASH_SUBSHELL:-0}" -eq 0 ]; then
+    rm -rf -- "$WORKDIR"
+  fi
+}
+trap cleanup EXIT
+mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw"
 
 # 抽取 OpenClaw API 添加逻辑（只验证：不再做协议探测/自动纠正）
 cat > "$WORKDIR/harness.sh" <<'EOF_INNER'

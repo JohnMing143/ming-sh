@@ -3,10 +3,15 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SCRIPT="$REPO_ROOT/ming.sh"
-WORKDIR="${TMPDIR:-/tmp}/openclaw-change-model-dual-probe-$$"
-mkdir -p "$WORKDIR/home/.openclaw"
+WORKDIR=$(mktemp -d "$REPO_ROOT/.openclaw-change-model-test.XXXXXX")
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
-trap '[ "$KEEP_WORKDIR" = "true" ] || rm -rf "$WORKDIR"' EXIT
+cleanup() {
+  if [ "$KEEP_WORKDIR" != "true" ] && [ "${BASH_SUBSHELL:-0}" -eq 0 ]; then
+    rm -rf -- "$WORKDIR"
+  fi
+}
+trap cleanup EXIT
+mkdir -p "$WORKDIR/home/.openclaw"
 
 python3 - "$SCRIPT" "$WORKDIR" <<'PY'
 import json

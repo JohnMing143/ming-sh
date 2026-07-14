@@ -240,4 +240,6 @@ fi
 grep -Eq 'openclaw memory index .*--force' "$HOME/.openclaw/mock_openclaw.log"
 grep -q 'openclaw gateway restart' "$HOME/.openclaw/mock_openclaw.log"
 
+cleanup
+trap - EXIT
 echo 'SMOKE_OK'

@@ -71,4 +71,11 @@ done
 [ ! -e "$repo_root/ir" ] || fail "ir locale should be removed"
 [ ! -e "$repo_root/ru" ] || fail "ru locale should be removed"
 
+if grep -R --exclude='tests_project_safety_defaults.sh' -E 'TMPDIR|/tmp/' \
+	"$repo_root/tests" \
+	"$repo_root/cn/tests" \
+	"$repo_root/tests_openclaw_manager_smoke.sh"; then
+	fail "safe tests must keep temporary writes inside the repository"
+fi
+
 echo "PASS: project safety defaults"

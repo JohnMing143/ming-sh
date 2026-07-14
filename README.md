@@ -112,14 +112,17 @@ Docker 镜像以及 Palworld 配置仍来自上游项目。所有这类地址和
 bash -n ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
 shellcheck ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
 bash tests/tests_project_safety_defaults.sh
+bash tests/tests_command_construction_safety.sh
 bash tests/tests_openclaw_config_path_resolution_smoke.sh
 bash tests/tests_translation_privacy_defaults.sh
+bash tests_openclaw_manager_smoke.sh
+for test_file in tests/openclaw/*.sh; do bash "$test_file"; done
 git diff --check
 ```
 
-部分 OpenClaw 测试使用临时目录和 stub，详见
-[`tests/openclaw/README.md`](tests/openclaw/README.md)。Docker 矩阵和会写真实系统路径的
-测试不属于默认本地验证。
+OpenClaw 测试使用仓库内临时目录和 stub，详见
+[`tests/openclaw/README.md`](tests/openclaw/README.md)。会启动容器并可能拉取镜像的
+Docker 矩阵不属于默认本地验证。
 
 ## 许可证与归属
 

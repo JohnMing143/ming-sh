@@ -4,8 +4,12 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "$0")/.." && pwd)
 script="$repo_root/ming.sh"
 
-workdir=$(mktemp -d)
-trap 'rm -rf "$workdir"' EXIT
+workdir=$(mktemp -d "$repo_root/.openclaw-config-path-test.XXXXXX")
+cleanup() {
+	[ "${BASH_SUBSHELL:-0}" -eq 0 ] || return 0
+	rm -rf -- "$workdir"
+}
+trap cleanup EXIT
 export HOME="$workdir/home"
 mkdir -p "$HOME/.openclaw"
 

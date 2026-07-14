@@ -3,10 +3,15 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SCRIPT="$REPO_ROOT/ming.sh"
-WORKDIR="${TMPDIR:-/tmp}/openclaw-plugin-skill-menu-test-$$"
-mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw/workspace/skills" "$WORKDIR/home/.openclaw"
+WORKDIR=$(mktemp -d "$REPO_ROOT/.openclaw-plugin-skill-test.XXXXXX")
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
-trap '[ "$KEEP_WORKDIR" = "true" ] || rm -rf "$WORKDIR"' EXIT
+cleanup() {
+  if [ "$KEEP_WORKDIR" != "true" ] && [ "${BASH_SUBSHELL:-0}" -eq 0 ]; then
+    rm -rf -- "$WORKDIR"
+  fi
+}
+trap cleanup EXIT
+mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw/workspace/skills" "$WORKDIR/home/.openclaw"
 
 cat > "$WORKDIR/harness.sh" <<'EOF_INNER'
 #!/usr/bin/env bash
@@ -33,15 +38,15 @@ TXT
   exit 0
 fi
 if [[ "$cmd" == "plugins enable"* ]]; then
-  echo "enabled $*" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "enabled $*" >> "${TEST_LOG:?}"
   exit 0
 fi
 if [[ "$cmd" == "plugins install"* ]]; then
-  echo "install $*" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "install $*" >> "${TEST_LOG:?}"
   exit 0
 fi
 if [[ "$cmd" == "plugins disable"* ]]; then
-  echo "disable $*" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "disable $*" >> "${TEST_LOG:?}"
   exit 0
 fi
 if [[ "$cmd" == "plugins uninstall"* ]]; then
@@ -49,7 +54,7 @@ if [[ "$cmd" == "plugins uninstall"* ]]; then
   if [[ "$cmd" == *"feishu"* ]]; then
     exit 1
   fi
-  echo "uninstall $*" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "uninstall $*" >> "${TEST_LOG:?}"
   exit 0
 fi
 if [[ "$cmd" == "skills list" ]]; then
@@ -57,14 +62,14 @@ if [[ "$cmd" == "skills list" ]]; then
   exit 0
 fi
 if [[ "$cmd" == "gateway stop" ]]; then
-  echo "gateway stop" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "gateway stop" >> "${TEST_LOG:?}"
   exit 0
 fi
 if [[ "$cmd" == "gateway start" ]]; then
-  echo "gateway start" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "gateway start" >> "${TEST_LOG:?}"
   exit 0
 fi
-echo "mock openclaw $*" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+echo "mock openclaw $*" >> "${TEST_LOG:?}"
 EOF_INNER
 chmod +x "$WORKDIR/bin/openclaw"
 
@@ -72,11 +77,11 @@ chmod +x "$WORKDIR/bin/openclaw"
 cat > "$WORKDIR/bin/npx" <<'EOF_INNER'
 #!/usr/bin/env bash
 if [[ "$*" == *"clawhub uninstall"* ]]; then
-  echo "uninstall $*" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "uninstall $*" >> "${TEST_LOG:?}"
   exit 0
 fi
 if [[ "$*" == *"clawhub install"* ]]; then
-  echo "install $*" >> "${TEST_LOG:-/tmp/openclaw-plugin.log}"
+  echo "install $*" >> "${TEST_LOG:?}"
   exit 0
 fi
 exit 0

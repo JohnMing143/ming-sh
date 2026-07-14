@@ -3,10 +3,15 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SCRIPT="$REPO_ROOT/ming.sh"
-WORKDIR="${TMPDIR:-/tmp}/openclaw-api-sync-diff-test-$$"
-mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw"
+WORKDIR=$(mktemp -d "$REPO_ROOT/.openclaw-api-sync-test.XXXXXX")
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
-trap '[ "$KEEP_WORKDIR" = "true" ] || rm -rf "$WORKDIR"' EXIT
+cleanup() {
+  if [ "$KEEP_WORKDIR" != "true" ] && [ "${BASH_SUBSHELL:-0}" -eq 0 ]; then
+    rm -rf -- "$WORKDIR"
+  fi
+}
+trap cleanup EXIT
+mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw"
 
 cat > "$WORKDIR/harness.sh" <<'EOF_INNER'
 #!/usr/bin/env bash

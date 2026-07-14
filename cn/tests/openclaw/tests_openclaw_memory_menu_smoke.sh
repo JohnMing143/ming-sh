@@ -3,10 +3,15 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SCRIPT="$REPO_ROOT/ming.sh"
-WORKDIR="${TMPDIR:-/tmp}/openclaw-memory-menu-test-$$"
-mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw/workspace/memory"
+WORKDIR=$(mktemp -d "$REPO_ROOT/.openclaw-memory-menu-test.XXXXXX")
 KEEP_WORKDIR=${KEEP_WORKDIR:-false}
-trap '[ "$KEEP_WORKDIR" = "true" ] || rm -rf "$WORKDIR"' EXIT
+cleanup() {
+  if [ "$KEEP_WORKDIR" != "true" ] && [ "${BASH_SUBSHELL:-0}" -eq 0 ]; then
+    rm -rf -- "$WORKDIR"
+  fi
+}
+trap cleanup EXIT
+mkdir -p "$WORKDIR/bin" "$WORKDIR/home/.openclaw/workspace/memory"
 
 # 抽取 OpenClaw 记忆菜单实现
 cat > "$WORKDIR/harness.sh" <<'EOF_INNER'

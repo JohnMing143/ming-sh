@@ -27,7 +27,7 @@ bash tests/openclaw/tests_openclaw_api_color_align_min.sh
 
 ## 安全说明
 
-- 脚本会创建临时工作目录与临时 `HOME`（位于 `/tmp`），并在结束后自动清理（除非设置 `KEEP_WORKDIR=true`）。
+- 脚本会在仓库内创建隐藏的临时工作目录与临时 `HOME`，并在结束后自动清理（除非设置 `KEEP_WORKDIR=true`）。
 - 运行过程使用 stub/模拟命令，不会改动真实 OpenClaw 配置或系统状态。
 - 如需保留临时目录用于排查，请执行：
 
