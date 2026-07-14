@@ -50,6 +50,9 @@ done
 if grep -R -E 'api\.kejilion\.pro|SH_Update_task|ENABLE_STATS="true"' "${implementations[@]}"; then
 	fail "deprecated telemetry or updater code remains"
 fi
+if grep -R -i -E '科技[[:space:]]*lion|tech(nology)?[[:space:]]*lion' "${implementations[@]}"; then
+	fail "deprecated user-facing branding remains"
+fi
 
 wrappers=(
 	"$repo_root/kejilion.sh"
