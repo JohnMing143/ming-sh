@@ -23,7 +23,8 @@ CONFIG_FILE="$HOME/.hermes/config.yaml"
 
 run_reviewed_remote_script() {
     local script_url="$1"
-    local cache_dir script_path digest confirmation
+    shift
+    local cache_dir script_path exit_status
     case "$script_url" in https://*) ;; *) echo "拒绝非 HTTPS 脚本: $script_url"; return 1 ;; esac
     cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/ming-sh/remote-scripts"
     [ ! -L "$cache_dir" ] || { echo "拒绝符号链接缓存目录。"; return 1; }
@@ -31,14 +32,22 @@ run_reviewed_remote_script() {
     [ -O "$cache_dir" ] || { echo "缓存目录不属于当前用户。"; return 1; }
     script_path=$(mktemp "$cache_dir/review.XXXXXX.sh") || return 1
     chmod 0600 "$script_path"
-    curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 --output "$script_path" "$script_url" || return 1
-    bash -n "$script_path" || { echo "远程脚本语法检查失败: $script_path"; return 1; }
-    digest=$(sha256sum "$script_path" | awk '{print $1}') || return 1
-    printf '脚本尚未执行。\n来源: %s\n文件: %s\nSHA-256: %s\n' "$script_url" "$script_path" "$digest"
-    [ -t 0 ] || { echo "非交互环境拒绝执行未固定摘要的脚本。"; return 1; }
-    read -r -p "输入 RUN $digest 执行: " confirmation
-    [ "$confirmation" = "RUN $digest" ] || { echo "脚本未执行。"; return 1; }
-    bash "$script_path"
+    if command -v curl >/dev/null 2>&1; then
+        curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 --output "$script_path" "$script_url" || { rm -f -- "$script_path"; return 1; }
+    elif command -v wget >/dev/null 2>&1; then
+        wget --https-only --secure-protocol=TLSv1_2 -qO "$script_path" "$script_url" || { rm -f -- "$script_path"; return 1; }
+    else
+        echo "需要 curl 或 wget 才能下载脚本。"
+        rm -f -- "$script_path"
+        return 1
+    fi
+    [ -s "$script_path" ] || { echo "下载结果为空。"; rm -f -- "$script_path"; return 1; }
+    bash -n "$script_path" || { echo "远程脚本语法检查失败: $script_path"; rm -f -- "$script_path"; return 1; }
+    printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\n' "$script_url"
+    bash "$script_path" "$@"
+    exit_status=$?
+    rm -f -- "$script_path"
+    return "$exit_status"
 }
 
 config_tool() {

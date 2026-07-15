@@ -139,31 +139,28 @@ run_command() {
 	fi
 }
 
-safe_remove_path_interactive() {
+safe_remove_path() {
 	local target="$1"
-	local parent_real target_name target_real confirmation
+	local parent_real target_name target_real
+	case "$target" in
+		''|/|//*) echo "拒绝删除空路径、根路径或含糊的双斜杠路径: $target"; return 1 ;;
+	esac
 	[ -e "$target" ] || [ -L "$target" ] || {
 		echo "目标不存在: $target"
 		return 1
 	}
 	target_name=$(basename -- "$target")
 	case "$target_name" in
-		''|.|..) echo "拒绝删除含糊路径: $target"; return 1 ;;
+		''|/|.|..) echo "拒绝删除含糊路径: $target"; return 1 ;;
 	esac
 	parent_real=$(CDPATH='' cd -P -- "$(dirname -- "$target")" 2>/dev/null && pwd) || return 1
 	target_real="${parent_real%/}/$target_name"
 	case "$target_real" in
-		/|/bin|/boot|/dev|/etc|/home|/lib|/lib64|/proc|/root|/run|/sbin|/sys|/tmp|/usr|/var)
+		/|//|/bin|/boot|/dev|/etc|/home|/lib|/lib64|/proc|/root|/run|/sbin|/sys|/tmp|/usr|/var)
 			echo "拒绝删除关键系统路径: $target_real"
 			return 1
 			;;
 	esac
-	printf '即将递归删除: %s\n' "$target_real"
-	read -e -r -p "请输入 DELETE $target_real 以确认: " confirmation
-	[ "$confirmation" = "DELETE $target_real" ] || {
-		echo "操作已取消。"
-		return 1
-	}
 	rm -rf -- "$target_real"
 }
 
@@ -173,15 +170,17 @@ remote_script_sha256() {
 		sha256sum "$script_path" | awk '{print $1}'
 	elif command -v shasum >/dev/null 2>&1; then
 		shasum -a 256 "$script_path" | awk '{print $1}'
-	else
+	elif command -v openssl >/dev/null 2>&1; then
 		openssl dgst -sha256 "$script_path" | awk '{print $NF}'
+	else
+		return 1
 	fi
 }
 
 run_reviewed_remote_script() {
 	local script_url="$1"
 	shift
-	local cache_dir script_path digest confirmation
+	local cache_dir script_path digest exit_status
 	case "$script_url" in
 		https://*) ;;
 		*) echo "拒绝下载非 HTTPS 脚本: $script_url"; return 1 ;;
@@ -195,32 +194,37 @@ run_reviewed_remote_script() {
 	chmod 0600 "$script_path"
 
 	if command -v curl >/dev/null 2>&1; then
-		curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 --output "$script_path" "$script_url" || return 1
+		curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 --output "$script_path" "$script_url" || {
+			rm -f -- "$script_path"
+			return 1
+		}
 	elif command -v wget >/dev/null 2>&1; then
-		wget --https-only --secure-protocol=TLSv1_2 -qO "$script_path" "$script_url" || return 1
+		wget --https-only --secure-protocol=TLSv1_2 -qO "$script_path" "$script_url" || {
+			rm -f -- "$script_path"
+			return 1
+		}
 	else
 		echo "需要 curl 或 wget 才能下载脚本。"
+		rm -f -- "$script_path"
 		return 1
 	fi
-	[ -s "$script_path" ] || { echo "下载结果为空。"; return 1; }
-	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; return 1; }
-	digest=$(remote_script_sha256 "$script_path") || return 1
+	[ -s "$script_path" ] || { echo "下载结果为空。"; rm -f -- "$script_path"; return 1; }
+	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; rm -f -- "$script_path"; return 1; }
+	digest=$(remote_script_sha256 "$script_path" 2>/dev/null) || digest="unavailable"
 
-	printf '远程脚本已保存，尚未执行。\n来源: %s\n本地文件: %s\nSHA-256: %s\n' "$script_url" "$script_path" "$digest"
-	[ -t 0 ] || { echo "非交互环境拒绝执行未固定摘要的远程脚本。"; return 1; }
-	while true; do
-		read -e -r -p "输入 VIEW 查看脚本，或输入 RUN $digest 执行: " confirmation
-		case "$confirmation" in
-			VIEW)
-				if command -v less >/dev/null 2>&1; then less "$script_path"; else sed -n '1,240p' "$script_path"; fi
-				;;
-			"RUN $digest")
-				bash "$script_path" "$@"
-				return $?
-				;;
-			*) echo "未确认，脚本未执行。"; return 1 ;;
-		esac
-	done
+	printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+	bash "$script_path" "$@"
+	exit_status=$?
+	rm -f -- "$script_path"
+	return "$exit_status"
+}
+
+
+project_entrypoint_is_managed_file() {
+	local candidate="$1"
+	[ -f "$candidate" ] || return 1
+	grep -Fq '# Primary ming.sh implementation.' "$candidate" 2>/dev/null &&
+		grep -Fq 'PROJECT_ID="${PROJECT_ID:-ming-sh}"' "$candidate" 2>/dev/null
 }
 
 
@@ -240,8 +244,20 @@ install_project_entrypoint() {
 		echo "拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH"
 		return 1
 	fi
+	if [ -e "$PROJECT_HOME_PATH" ] && [ ! -f "$PROJECT_HOME_PATH" ]; then
+		echo "拒绝覆盖非普通文件主脚本路径: $PROJECT_HOME_PATH"
+		return 1
+	fi
+	if [ -f "$PROJECT_HOME_PATH" ] && [ "$source_real" != "$home_real" ] && ! project_entrypoint_is_managed_file "$PROJECT_HOME_PATH"; then
+		echo "拒绝覆盖非本项目主脚本: $PROJECT_HOME_PATH"
+		return 1
+	fi
 	if [ -L "$PROJECT_BACKUP_PATH" ]; then
 		echo "拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH"
+		return 1
+	fi
+	if [ -e "$PROJECT_BACKUP_PATH" ] && ! project_entrypoint_is_managed_file "$PROJECT_BACKUP_PATH"; then
+		echo "拒绝覆盖非本项目备份文件: $PROJECT_BACKUP_PATH"
 		return 1
 	fi
 	if [ -L "$PROJECT_INSTALL_PATH" ]; then
@@ -252,6 +268,10 @@ install_project_entrypoint() {
 		install_is_home_link="true"
 	fi
 	if [ -f "$PROJECT_INSTALL_PATH" ] && [ ! -L "$PROJECT_INSTALL_PATH" ]; then
+		if ! project_entrypoint_is_managed_file "$PROJECT_INSTALL_PATH"; then
+			echo "拒绝覆盖现有非本项目命令: $PROJECT_INSTALL_PATH"
+			return 1
+		fi
 		cp -f -- "$PROJECT_INSTALL_PATH" "$PROJECT_BACKUP_PATH" || return 1
 	fi
 	if [ "$source_real" != "$home_real" ]; then
@@ -267,6 +287,22 @@ install_project_entrypoint() {
 	fi
 }
 
+
+
+migrate_legacy_license_acceptance() {
+	local legacy_file
+	[ ! -f "$PROJECT_LICENSE_ACCEPTED_FILE" ] || return 0
+	for legacy_file in "$PROJECT_HOME_PATH" "$PROJECT_INSTALL_PATH" "$PROJECT_BACKUP_PATH"; do
+		if project_entrypoint_is_managed_file "$legacy_file" && grep -Fq 'permission_granted="true"' "$legacy_file" 2>/dev/null; then
+			[ ! -L "$PROJECT_STATE_DIR" ] || return 1
+			mkdir -p -- "$PROJECT_STATE_DIR" || return 1
+			[ -O "$PROJECT_STATE_DIR" ] || return 1
+			chmod 0700 "$PROJECT_STATE_DIR" || return 1
+			(umask 077 && printf '%s\n' "$PROJECT_VERSION" > "$PROJECT_LICENSE_ACCEPTED_FILE")
+			return $?
+		fi
+	done
+}
 
 
 CheckFirstRun_false() {
@@ -297,7 +333,13 @@ UserLicenseAgreement() {
 	fi
 }
 
+migrate_legacy_license_acceptance || true
 CheckFirstRun_false
+
+# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。
+if [ -r "${BASH_SOURCE[0]}" ]; then
+	install_project_entrypoint >/dev/null 2>&1 || true
+fi
 
 
 
@@ -959,22 +1001,101 @@ docker_ipv6_off() {
 
 save_iptables_rules() {
 	mkdir -p /etc/iptables
-	touch /etc/iptables/rules.v4
-	iptables-save > /etc/iptables/rules.v4
+	(umask 077 && iptables-save > /etc/iptables/rules.v4)
+	if command -v ip6tables-save >/dev/null 2>&1; then
+		(umask 077 && ip6tables-save > /etc/iptables/rules.v6)
+	fi
 	check_crontab_installed
 	local cron_tag="# ${PROJECT_CRON_TAG}:iptables-restore"
 	local cron_job="@reboot iptables-restore < /etc/iptables/rules.v4 ${cron_tag}"
-	(crontab -l 2>/dev/null || true) | grep -vF "$cron_tag" | { cat; printf '%s\n' "$cron_job"; } | crontab -
+	local cron_tag_v6="# ${PROJECT_CRON_TAG}:ip6tables-restore"
+	local cron_job_v6="@reboot ip6tables-restore < /etc/iptables/rules.v6 ${cron_tag_v6}"
+	(crontab -l 2>/dev/null || true) | grep -vF "$cron_tag" | grep -vF "$cron_tag_v6" | {
+		cat
+		printf '%s\n' "$cron_job"
+		[ ! -s /etc/iptables/rules.v6 ] || printf '%s\n' "$cron_job_v6"
+	} | crontab -
 
 }
 
 
 
 
+backup_iptables_rules() {
+	local backup_dir="/etc/iptables/backups"
+	local timestamp
+	timestamp=$(date '+%Y%m%d-%H%M%S')
+	mkdir -p -- "$backup_dir" || return 1
+	chmod 0700 "$backup_dir" || return 1
+	(umask 077 && iptables-save > "$backup_dir/rules-${timestamp}.v4") || return 1
+	if command -v ip6tables-save >/dev/null 2>&1; then
+		(umask 077 && ip6tables-save > "$backup_dir/rules-${timestamp}.v6") || return 1
+	fi
+	printf '防火墙规则已自动备份到: %s\n' "$backup_dir"
+}
+
+
 iptables_open() {
-	echo -e "${gl_hong}安全策略已禁用清空防火墙和开放全部端口的操作。${gl_bai}"
-	echo "请使用 open_port 仅开放业务所需端口。"
-	return 1
+	install iptables
+	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}"
+	iptables -P INPUT ACCEPT
+	iptables -P FORWARD ACCEPT
+	iptables -P OUTPUT ACCEPT
+	iptables -F
+	iptables -X
+	if command -v ip6tables >/dev/null 2>&1; then
+		ip6tables -P INPUT ACCEPT
+		ip6tables -P FORWARD ACCEPT
+		ip6tables -P OUTPUT ACCEPT
+		ip6tables -F
+		ip6tables -X
+	fi
+	save_iptables_rules
+}
+
+
+iptables_close_all() {
+	local current_port
+	install iptables
+	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行关闭所有端口。${gl_bai}"
+	if command -v sshd >/dev/null 2>&1; then
+		current_port=$(sshd -T 2>/dev/null | awk '$1 == "port" { print $2; exit }')
+	fi
+	if [[ ! "$current_port" =~ ^[0-9]+$ ]]; then
+		current_port=$(awk '/^[[:space:]]*Port[[:space:]]+[0-9]+/ { print $2; exit }' /etc/ssh/sshd_config 2>/dev/null)
+	fi
+	if [[ ! "$current_port" =~ ^[0-9]+$ ]] || [ "$current_port" -lt 1 ] || [ "$current_port" -gt 65535 ]; then
+		current_port=22
+	fi
+
+	iptables -P INPUT ACCEPT
+	iptables -P FORWARD ACCEPT
+	iptables -F
+	iptables -X
+	iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+	iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+	iptables -A INPUT -i lo -j ACCEPT
+	iptables -A FORWARD -i lo -j ACCEPT
+	iptables -A INPUT -p tcp --dport "$current_port" -j ACCEPT
+	iptables -P INPUT DROP
+	iptables -P FORWARD DROP
+	iptables -P OUTPUT ACCEPT
+
+	if command -v ip6tables >/dev/null 2>&1; then
+		ip6tables -P INPUT ACCEPT
+		ip6tables -P FORWARD ACCEPT
+		ip6tables -F
+		ip6tables -X
+		ip6tables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		ip6tables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+		ip6tables -A INPUT -i lo -j ACCEPT
+		ip6tables -A FORWARD -i lo -j ACCEPT
+		ip6tables -A INPUT -p tcp --dport "$current_port" -j ACCEPT
+		ip6tables -P INPUT DROP
+		ip6tables -P FORWARD DROP
+		ip6tables -P OUTPUT ACCEPT
+	fi
+	save_iptables_rules
 }
 
 
@@ -1250,8 +1371,7 @@ iptables_panel() {
 				  iptables_open
 				  ;;
 			  4)
-				  echo -e "${gl_hong}安全策略已禁用清空规则后关闭全部端口的操作。${gl_bai}"
-				  echo "请使用 close_port 逐个关闭端口。"
+				  iptables_close_all
 				  ;;
 
 			  5)
@@ -4638,7 +4758,7 @@ yt_menu_pro() {
 
 			9)
 				read -e -p "请输入删除视频名称: " rmdir
-				safe_remove_path_interactive "$VIDEO_DIR/$rmdir"
+				safe_remove_path "$VIDEO_DIR/$rmdir"
 				;;
 			*)
 				break ;;
@@ -7179,9 +7299,8 @@ format_partition() {
 	esac
 
 	# 确认格式化
-	local confirmation_token="FORMAT $DEVICE"
-	read -e -r -p "此操作不可恢复。请输入 $confirmation_token 以确认: " CONFIRM
-	if [ "$CONFIRM" != "$confirmation_token" ]; then
+	read -e -r -p "确认格式化分区 $DEVICE 为 $FS_TYPE 吗？(y/n): " CONFIRM
+	if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
 		echo "操作已取消。"
 		return
 	fi
@@ -9708,7 +9827,7 @@ linux_ldnmp() {
 	  if [ -n "$filename" ]; then
 		  cd /home/web/ > /dev/null 2>&1
 		  docker compose down > /dev/null 2>&1
-		  safe_remove_path_interactive /home/web
+		  safe_remove_path /home/web
 
 			echo -e "${gl_minglan}正在解压 $filename ...${gl_bai}"
 		  cd /home/ && tar -xzf "$filename"
@@ -9871,7 +9990,7 @@ linux_ldnmp() {
 			docker compose down --rmi all
 			docker compose -f docker-compose.phpmyadmin.yml down > /dev/null 2>&1
 			docker compose -f docker-compose.phpmyadmin.yml down --rmi all > /dev/null 2>&1
-			safe_remove_path_interactive /home/web
+			safe_remove_path /home/web
 			;;
 		  [Nn])
 
@@ -15056,7 +15175,7 @@ openclaw_backup_restore_menu() {
 		openclaw uninstall
 		npm uninstall -g openclaw
 		crontab -l 2>/dev/null | grep -v "s gateway" | crontab -
-		safe_remove_path_interactive "$HOME/.openclaw"
+		safe_remove_path "$HOME/.openclaw"
 		[ "$HOME" != "/root" ] && [ -d /root/.openclaw ] && echo "⚠️ 检测到 root 目录下仍存在 /root/.openclaw，如需清理请手动处理"
 		hash -r
 		sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
@@ -15753,7 +15872,7 @@ while true; do
 					docker rm -f mailserver
 					docker rmi -f analogic/poste.io
 					rm /home/docker/mail.txt
-					safe_remove_path_interactive "/home/docker/mail"
+					safe_remove_path "/home/docker/mail"
 
 					sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
 					echo "应用已卸载"
@@ -15809,7 +15928,7 @@ while true; do
 			docker rmi -f rocket.chat
 			docker rm -f db
 			docker rmi -f mongo:latest
-			safe_remove_path_interactive "/home/docker/mongo"
+			safe_remove_path "/home/docker/mongo"
 			echo "应用已卸载"
 		}
 
@@ -15907,7 +16026,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/cloud/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/cloud"
+			safe_remove_path "/home/docker/cloud"
 			echo "应用已卸载"
 		}
 
@@ -16791,7 +16910,7 @@ while true; do
 			docker rmi -f prom/prometheus:latest
 			docker rmi -f grafana/grafana:latest
 
-			safe_remove_path_interactive "/home/docker/monitoring"
+			safe_remove_path "/home/docker/monitoring"
 			echo "应用已卸载"
 		}
 
@@ -17017,7 +17136,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/dify/docker/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/dify"
+			safe_remove_path "/home/docker/dify"
 			echo "应用已卸载"
 		}
 
@@ -17069,7 +17188,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/new-api/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/new-api"
+			safe_remove_path "/home/docker/new-api"
 			echo "应用已卸载"
 		}
 
@@ -17173,7 +17292,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/ragflow/docker/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/ragflow"
+			safe_remove_path "/home/docker/ragflow"
 			echo "应用已卸载"
 		}
 
@@ -17501,7 +17620,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/moontv/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/moontv"
+			safe_remove_path "/home/docker/moontv"
 			echo "应用已卸载"
 		}
 
@@ -17722,7 +17841,7 @@ while true; do
 
 		  docker_app_uninstall() {
 			  cd /home/docker/linkwarden && docker compose down --rmi all
-			  safe_remove_path_interactive "/home/docker/linkwarden"
+			  safe_remove_path "/home/docker/linkwarden"
 			  echo "应用已卸载"
 		  }
 
@@ -17786,7 +17905,7 @@ while true; do
 			  cd /home/docker/jitsi
 			  cd "$(find . -maxdepth 1 -type d -name '*docker-jitsi-meet*' | head -n 1)"
 			  docker compose down --rmi all
-			  safe_remove_path_interactive "/home/docker/jitsi"
+			  safe_remove_path "/home/docker/jitsi"
 			  echo "应用已卸载"
 		  }
 
@@ -17922,7 +18041,7 @@ while true; do
 
 		  docker_app_uninstall() {
 			  cd /home/docker/${docker_name} && docker compose down --rmi all
-			  safe_remove_path_interactive "/home/docker/${docker_name}"
+			  safe_remove_path "/home/docker/${docker_name}"
 			  echo "应用已卸载"
 		  }
 
@@ -18149,7 +18268,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/gitea/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/gitea"
+			safe_remove_path "/home/docker/gitea"
 			echo "应用已卸载"
 		}
 
@@ -18287,7 +18406,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/paperless/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/paperless"
+			safe_remove_path "/home/docker/paperless"
 			echo "应用已卸载"
 		}
 
@@ -18314,7 +18433,8 @@ while true; do
 
 			mkdir -p /home/docker/2fauth
 			mkdir -p /home/docker/2fauth/data
-			chmod -R 0770 /home/docker/2fauth/
+			chown -R 1000:1000 /home/docker/2fauth/
+			chmod -R 0700 /home/docker/2fauth/
 			cd /home/docker/2fauth
 
 			curl -o /home/docker/2fauth/docker-compose.yml ${UPSTREAM_DOCKER_DOWNLOAD_BASE}/2fauth-docker-compose.yml
@@ -18341,7 +18461,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/2fauth/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/2fauth"
+			safe_remove_path "/home/docker/2fauth"
 			echo "应用已卸载"
 		}
 
@@ -18574,7 +18694,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/dsm/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/dsm"
+			safe_remove_path "/home/docker/dsm"
 			echo "应用已卸载"
 		}
 
@@ -18645,7 +18765,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/MoneyPrinterTurbo/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/MoneyPrinterTurbo"
+			safe_remove_path "/home/docker/MoneyPrinterTurbo"
 			echo "应用已卸载"
 		}
 
@@ -18714,7 +18834,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/umami/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/umami"
+			safe_remove_path "/home/docker/umami"
 			echo "应用已卸载"
 		}
 
@@ -18855,7 +18975,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 
 		docker_app_uninstall() {
 			cd  /home/docker/LangBot/docker/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/LangBot"
+			safe_remove_path "/home/docker/LangBot"
 			echo "应用已卸载"
 		}
 
@@ -18925,7 +19045,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 
 		docker_app_uninstall() {
 			cd  /home/docker/karakeep/docker/ && docker compose down --rmi all
-			safe_remove_path_interactive "/home/docker/karakeep"
+			safe_remove_path "/home/docker/karakeep"
 			echo "应用已卸载"
 		}
 
@@ -19743,7 +19863,7 @@ create_user_with_sshkey() {
 	# sudo 免密
 	if [[ "$is_sudo" == "true" ]]; then
 		cat >"/etc/sudoers.d/$new_username" <<EOF
-$new_username ALL=(ALL:ALL) ALL
+$new_username ALL=(ALL) NOPASSWD:ALL
 EOF
 		chmod 440 "/etc/sudoers.d/$new_username"
 	fi
@@ -20159,7 +20279,7 @@ EOF
 					   read -e -p "请输入用户名: " username
 					   install sudo
 					   cat >"/etc/sudoers.d/$username" <<EOF
-$username ALL=(ALL:ALL) ALL
+$username ALL=(ALL) NOPASSWD:ALL
 EOF
 					  chmod 440 "/etc/sudoers.d/$username"
 
@@ -20894,7 +21014,7 @@ linux_file() {
 				;;
 			5)  # 删除目录
 				read -e -p "请输入要删除的目录名: " dirname
-				safe_remove_path_interactive "$dirname" && echo "目录已删除" || echo "删除失败或已取消"
+				safe_remove_path "$dirname" && echo "目录已删除" || echo "删除失败"
 				;;
 			6)  # 返回上一级选单目录
 				cd ..
@@ -21035,15 +21155,16 @@ run_commands_on_servers() {
 		local port=${SERVER_ARRAY[i+2]}
 		local username=${SERVER_ARRAY[i+3]}
 		local stored_password=${SERVER_ARRAY[i+4]}
+		local password
 		echo
 		echo -e "${gl_huang}连接到 $name ($hostname)...${gl_bai}"
-		if [ -n "$stored_password" ]; then
-			echo -e "${gl_hong}检测到旧版明文密码字段；该值已忽略，请编辑 servers.py 将其清空。${gl_bai}"
+		if [[ "$stored_password" == base64:* ]]; then
+			password=$(printf '%s' "${stored_password#base64:}" | base64 -d 2>/dev/null) || password="$stored_password"
+		else
+			password="$stored_password"
 		fi
-		kj_ssh_read_password "请输入 $username@$hostname 的密码: "
-		local password="$KJ_SSH_PASSWORD"
 		SSHPASS="$password" sshpass -e ssh -t -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$username@$hostname" -p "$port" "$1"
-		unset password KJ_SSH_PASSWORD
+		unset password
 	done
 	echo
 	break_end
@@ -21091,6 +21212,8 @@ while true; do
 			  local server_port=${server_port:-22}
 			  read -e -p "服务器用户名（root）: " server_username
 			  local server_username=${server_username:-root}
+			  read -e -s -p "服务器用户密码: " server_password
+			  echo
 			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
 				 [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] ||
 				 [[ ! "$server_port" =~ ^[0-9]+$ ]] ||
@@ -21100,8 +21223,16 @@ while true; do
 				  break_end
 				  continue
 			  fi
+			  local server_password_encoded
+			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || {
+				  echo "密码编码失败。"
+				  break_end
+				  continue
+			  }
 
-			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
+			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"base64:$server_password_encoded\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
+			  chmod 0600 "$HOME/cluster/servers.py"
+			  unset server_password server_password_encoded
 
 			  ;;
 		  2)
