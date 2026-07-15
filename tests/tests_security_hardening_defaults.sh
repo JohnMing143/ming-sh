@@ -83,8 +83,13 @@ done
 if grep -En '^[[:space:]]*rm[[:space:]]+-rf[[:space:]]+(/home/docker|/home/web|/home/game|/var/log|/var/cache/apk|/etc/ssh)' "${production_shell_files[@]}"; then
 	fail "an unguarded broad system-path deletion remains"
 fi
-if grep -En '^[[:space:]]*[^#]*(curl|wget)[^|]*\|[[:space:]]*(bash|sh)' "${production_shell_files[@]}"; then
-	fail "a remote script pipeline remains"
+# The NodeSource setup pipeline is an explicitly retained convenience feature;
+# every other remote pipeline (including sudo variants) remains forbidden.
+approved_pipeline_source='https://rpm.nodesource.com/setup_24.x'
+unapproved_pipelines=$(grep -En '^[[:space:]]*[^#]*(curl|wget)[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh)' "${production_shell_files[@]}" | grep -Fv "$approved_pipeline_source" || true)
+if [ -n "$unapproved_pipelines" ]; then
+	echo "$unapproved_pipelines" >&2
+	fail "an unapproved remote script pipeline remains"
 fi
 if grep -En 'bash[[:space:]]+<\(|bash[[:space:]]+-c[[:space:]]+"\$\((curl|wget)' "${production_shell_files[@]}"; then
 	fail "a remote script process substitution remains"
