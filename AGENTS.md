@@ -12,10 +12,12 @@ kejilion/sh under the Apache License 2.0.
 - Never modify the host system, firewall, networking, cron, Docker, systemd,
   package manager, SSH configuration, or files outside this repository.
 - Never pipe remote scripts into a shell.
-- Keep telemetry and statistics reporting disabled by default.
+- Do not reintroduce project telemetry or usage-statistics reporting.
 - Do not introduce new remote reporting endpoints or services.
 - Record newly discovered high-risk commands in `SECURITY_AUDIT.md`.
-- Do not commit, push commits, or create releases unless explicitly requested.
+- After completing and validating a requested change, create one or more small,
+  reviewable local commits unless the user explicitly asks not to commit.
+- Never push commits or create releases unless explicitly requested.
 - Preserve the `LICENSE` file and required upstream copyright notices.
 
 ## Development workflow
