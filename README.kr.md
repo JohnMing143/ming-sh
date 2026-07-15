@@ -6,12 +6,6 @@
 
 [简体中文](README.md) · [繁體中文](README.tw.md) · [日本語](README.ja.md)
 
-> [!WARNING]
-> 이 도구에는 방화벽, 네트워크, SSH, cron, Docker, systemd, 패키지 및
-> `/etc`, `/usr`, `/home` 아래 파일을 변경하는 고권한 기능이 포함되어
-> 있습니다. 먼저 코드를 검토하고 테스트 머신에서 검증한 뒤 적절한 권한으로
-> 실행하십시오. 원격 스크립트를 shell에 직접 전달하지 마십시오.
-
 ## 주요 기능
 
 - **시스템 관리**: 시스템 정보 조회, 시스템 업데이트, 불필요한 파일 정리, 기본 도구
@@ -23,15 +17,10 @@
 
 ## 설치
 
-스크립트를 먼저 로컬로 다운로드하여 내용을 확인한 뒤 실행하는 것을
-권장합니다(`curl ... | bash`는 사용하지 마십시오):
+명령 하나로 설치와 실행이 완료됩니다:
 
 ```bash
-curl -fL --output ming.sh \
-  https://raw.githubusercontent.com/JohnMing143/ming-sh/main/kr/ming.sh
-bash -n ming.sh
-less ming.sh
-bash ming.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/JohnMing143/ming-sh/main/kr/ming.sh)
 ```
 
 처음 실행하면 명령이 `/usr/local/bin/m`에 설치되며, 이후에는 어느 디렉터리

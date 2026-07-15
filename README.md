@@ -5,11 +5,6 @@
 
 [繁體中文](README.tw.md) · [日本語](README.ja.md) · [한국어](README.kr.md)
 
-> [!WARNING]
-> 本工具包含修改防火墙、网络、SSH、cron、Docker、systemd、软件包以及
-> `/etc`、`/usr`、`/home` 下文件的高权限功能。请先审阅代码，在测试机验证，
-> 再以适当权限运行。不要把远程脚本直接传给 shell。
-
 ## 功能一览
 
 - **系统管理**：系统信息查询、系统更新、垃圾清理、常用基础工具
@@ -21,14 +16,10 @@
 
 ## 安装
 
-建议先把脚本下载到本地，检查后再运行（请勿使用 `curl ... | bash`）：
+一条命令即可完成安装并启动：
 
 ```bash
-curl -fL --output ming.sh \
-  https://raw.githubusercontent.com/JohnMing143/ming-sh/main/ming.sh
-bash -n ming.sh
-less ming.sh
-bash ming.sh
+bash <(curl -fsSL https://raw.githubusercontent.com/JohnMing143/ming-sh/main/ming.sh)
 ```
 
 首次运行会把命令安装到 `/usr/local/bin/m`，之后在任意目录输入 `m` 即可打开
