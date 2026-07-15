@@ -30,6 +30,10 @@ PROJECT_INSTALL_PATH="${PROJECT_INSTALL_PATH:-/usr/local/bin/${PROJECT_COMMAND}}
 PROJECT_BACKUP_PATH="${PROJECT_BACKUP_PATH:-${PROJECT_HOME_PATH}.bak}"
 PROJECT_LINK_PATH="${PROJECT_LINK_PATH:-}"
 GITHUB_PROXY_BASE="${GITHUB_PROXY_BASE:-}"
+case "$GITHUB_PROXY_BASE" in
+	''|https://*) ;;
+	*) GITHUB_PROXY_BASE="" ;;
+esac
 PROJECT_BBR_CONFIG_PATH="${PROJECT_BBR_CONFIG_PATH:-/etc/sysctl.d/99-${PROJECT_ID}-bbr.conf}"
 PROJECT_OPTIMIZE_CONFIG_PATH="${PROJECT_OPTIMIZE_CONFIG_PATH:-/etc/sysctl.d/99-${PROJECT_ID}-optimize.conf}"
 PROJECT_OPTIMIZE_MARKER="${PROJECT_OPTIMIZE_MARKER:-# ${PROJECT_ID}-optimize}"
@@ -40,6 +44,14 @@ PROJECT_UPDATE_LOG_URL="${PROJECT_UPDATE_LOG_URL:-}"
 PROJECT_WEBSITE_URL="${PROJECT_WEBSITE_URL:-}"
 PROJECT_SUPPORT_URL="${PROJECT_SUPPORT_URL:-}"
 PROJECT_APPS_REPO="${PROJECT_APPS_REPO:-}"
+PROJECT_STATE_DIR="${PROJECT_STATE_DIR:-${XDG_STATE_HOME:-${HOME}/.local/state}/${PROJECT_ID}}"
+PROJECT_LICENSE_ACCEPTED_FILE="${PROJECT_LICENSE_ACCEPTED_FILE:-${PROJECT_STATE_DIR}/license-accepted}"
+PROJECT_CACHE_DIR="${PROJECT_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/${PROJECT_ID}}"
+SSH_STRICT_HOST_KEY_CHECKING="${SSH_STRICT_HOST_KEY_CHECKING:-accept-new}"
+case "$SSH_STRICT_HOST_KEY_CHECKING" in
+	yes|accept-new) ;;
+	*) SSH_STRICT_HOST_KEY_CHECKING="yes" ;;
+esac
 UPSTREAM_REPO="${UPSTREAM_REPO:-kejilion/sh}"
 UPSTREAM_REPO_URL="${UPSTREAM_REPO_URL:-https://github.com/${UPSTREAM_REPO}}"
 UPSTREAM_LICENSE="${UPSTREAM_LICENSE:-Apache-2.0}"
@@ -97,7 +109,6 @@ gl_minglan='\033[96m'
 
 
 canshu="default"
-permission_granted="false"
 
 
 quanju_canshu() {
@@ -129,47 +140,138 @@ run_command() {
 }
 
 
-canshu_v6() {
-	if grep -q '^canshu="V6"' "$PROJECT_BACKUP_PATH" 2>/dev/null; then
-		canshu="V6"
-		sed -i 's/^canshu="default"/canshu="V6"/' "$PROJECT_HOME_PATH"
-		quanju_canshu
+safe_remove_path_interactive() {
+	local target="$1"
+	local parent_real target_name target_real confirmation
+	[ -e "$target" ] || [ -L "$target" ] || {
+		echo "目标不存在: $target"
+		return 1
+	}
+	target_name=$(basename -- "$target")
+	case "$target_name" in
+		''|.|..) echo "拒绝删除含糊路径: $target"; return 1 ;;
+	esac
+	parent_real=$(CDPATH='' cd -P -- "$(dirname -- "$target")" 2>/dev/null && pwd) || return 1
+	target_real="${parent_real%/}/$target_name"
+	case "$target_real" in
+		/|/bin|/boot|/dev|/etc|/home|/lib|/lib64|/proc|/root|/run|/sbin|/sys|/tmp|/usr|/var)
+			echo "拒绝删除关键系统路径: $target_real"
+			return 1
+			;;
+	esac
+	printf '即将递归删除: %s\n' "$target_real"
+	read -e -r -p "请输入 DELETE $target_real 以确认: " confirmation
+	[ "$confirmation" = "DELETE $target_real" ] || {
+		echo "操作已取消。"
+		return 1
+	}
+	rm -rf -- "$target_real"
+}
+
+remote_script_sha256() {
+	local script_path="$1"
+	if command -v sha256sum >/dev/null 2>&1; then
+		sha256sum "$script_path" | awk '{print $1}'
+	elif command -v shasum >/dev/null 2>&1; then
+		shasum -a 256 "$script_path" | awk '{print $1}'
+	else
+		openssl dgst -sha256 "$script_path" | awk '{print $NF}'
 	fi
 }
 
+run_reviewed_remote_script() {
+	local script_url="$1"
+	shift
+	local cache_dir script_path digest confirmation
+	case "$script_url" in
+		https://*) ;;
+		*) echo "拒绝下载非 HTTPS 脚本: $script_url"; return 1 ;;
+	esac
+	cache_dir="${PROJECT_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/${PROJECT_ID}}/remote-scripts"
+	[ ! -L "$cache_dir" ] || { echo "拒绝使用符号链接缓存目录: $cache_dir"; return 1; }
+	mkdir -p -- "$cache_dir" || return 1
+	[ -O "$cache_dir" ] || { echo "远程脚本缓存目录不属于当前用户: $cache_dir"; return 1; }
+	chmod 0700 "$cache_dir" || return 1
+	script_path=$(mktemp "$cache_dir/review.XXXXXX.sh") || return 1
+	chmod 0600 "$script_path"
 
-CheckFirstRun_true() {
-	if grep -q '^permission_granted="true"' "$PROJECT_BACKUP_PATH" 2>/dev/null; then
-		permission_granted="true"
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' "$PROJECT_HOME_PATH"
+	if command -v curl >/dev/null 2>&1; then
+		curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 --output "$script_path" "$script_url" || return 1
+	elif command -v wget >/dev/null 2>&1; then
+		wget --https-only --secure-protocol=TLSv1_2 -qO "$script_path" "$script_url" || return 1
+	else
+		echo "需要 curl 或 wget 才能下载脚本。"
+		return 1
 	fi
+	[ -s "$script_path" ] || { echo "下载结果为空。"; return 1; }
+	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; return 1; }
+	digest=$(remote_script_sha256 "$script_path") || return 1
+
+	printf '远程脚本已保存，尚未执行。\n来源: %s\n本地文件: %s\nSHA-256: %s\n' "$script_url" "$script_path" "$digest"
+	[ -t 0 ] || { echo "非交互环境拒绝执行未固定摘要的远程脚本。"; return 1; }
+	while true; do
+		read -e -r -p "输入 VIEW 查看脚本，或输入 RUN $digest 执行: " confirmation
+		case "$confirmation" in
+			VIEW)
+				if command -v less >/dev/null 2>&1; then less "$script_path"; else sed -n '1,240p' "$script_path"; fi
+				;;
+			"RUN $digest")
+				bash "$script_path" "$@"
+				return $?
+				;;
+			*) echo "未确认，脚本未执行。"; return 1 ;;
+		esac
+	done
 }
 
 
+install_project_entrypoint() {
+	local source_path source_real home_real install_real install_is_home_link="false"
+	source_path="${BASH_SOURCE[0]}"
+	[ -r "$source_path" ] || {
+		echo "无法读取当前脚本，拒绝安装快捷命令。"
+		return 1
+	}
 
-for shell_rc in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.bash_profile"; do
-	sed -i "/^alias ${PROJECT_COMMAND}=/d" "$shell_rc" > /dev/null 2>&1
-done
-unset shell_rc
+	source_real=$(readlink -f "$source_path" 2>/dev/null || printf '%s\n' "$source_path")
+	home_real=$(readlink -f "$PROJECT_HOME_PATH" 2>/dev/null || printf '%s\n' "$PROJECT_HOME_PATH")
+	install_real=$(readlink -f "$PROJECT_INSTALL_PATH" 2>/dev/null || printf '%s\n' "$PROJECT_INSTALL_PATH")
 
-if [ -f "$PROJECT_INSTALL_PATH" ]; then
-	cp -f "$PROJECT_INSTALL_PATH" "$PROJECT_BACKUP_PATH" > /dev/null 2>&1
-fi
-if [ -r "${BASH_SOURCE[0]}" ]; then
-	cp -f "${BASH_SOURCE[0]}" "$PROJECT_HOME_PATH" > /dev/null 2>&1
-	canshu_v6
-	CheckFirstRun_true
-	cp -f "$PROJECT_HOME_PATH" "$PROJECT_INSTALL_PATH" > /dev/null 2>&1
-	chmod +x "$PROJECT_HOME_PATH" "$PROJECT_INSTALL_PATH" > /dev/null 2>&1
-fi
-if [ -n "$PROJECT_LINK_PATH" ]; then
-	ln -sf "$PROJECT_INSTALL_PATH" "$PROJECT_LINK_PATH" > /dev/null 2>&1
-fi
+	if [ -L "$PROJECT_HOME_PATH" ] && [ "$source_real" != "$home_real" ]; then
+		echo "拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH"
+		return 1
+	fi
+	if [ -L "$PROJECT_BACKUP_PATH" ]; then
+		echo "拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH"
+		return 1
+	fi
+	if [ -L "$PROJECT_INSTALL_PATH" ]; then
+		if [ "$install_real" != "$home_real" ]; then
+			echo "拒绝覆盖指向其他目标的命令链接: $PROJECT_INSTALL_PATH"
+			return 1
+		fi
+		install_is_home_link="true"
+	fi
+	if [ -f "$PROJECT_INSTALL_PATH" ] && [ ! -L "$PROJECT_INSTALL_PATH" ]; then
+		cp -f -- "$PROJECT_INSTALL_PATH" "$PROJECT_BACKUP_PATH" || return 1
+	fi
+	if [ "$source_real" != "$home_real" ]; then
+		cp -f -- "$source_path" "$PROJECT_HOME_PATH" || return 1
+	fi
+	chmod 0755 "$PROJECT_HOME_PATH" || return 1
+	if [ "$install_is_home_link" != "true" ] && [ "$home_real" != "$install_real" ]; then
+		cp -f -- "$PROJECT_HOME_PATH" "$PROJECT_INSTALL_PATH" || return 1
+	fi
+	chmod 0755 "$PROJECT_INSTALL_PATH" || return 1
+	if [ -n "$PROJECT_LINK_PATH" ]; then
+		ln -sf -- "$PROJECT_INSTALL_PATH" "$PROJECT_LINK_PATH" || return 1
+	fi
+}
 
 
 
 CheckFirstRun_false() {
-	if grep -q '^permission_granted="false"' "$PROJECT_INSTALL_PATH" > /dev/null 2>&1; then
+	if [ ! -f "$PROJECT_LICENSE_ACCEPTED_FILE" ]; then
 		UserLicenseAgreement
 	fi
 }
@@ -185,8 +287,11 @@ UserLicenseAgreement() {
 
 
 	if [ "$user_input" = "y" ] || [ "$user_input" = "Y" ]; then
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' "$PROJECT_HOME_PATH"
-		sed -i 's/^permission_granted="false"/permission_granted="true"/' "$PROJECT_INSTALL_PATH"
+		[ ! -L "$PROJECT_STATE_DIR" ] || { echo "拒絕使用符號連結狀態目錄。"; exit 1; }
+		mkdir -p -- "$PROJECT_STATE_DIR" || exit 1
+		[ -O "$PROJECT_STATE_DIR" ] || { echo "狀態目錄不屬於目前使用者。"; exit 1; }
+		chmod 0700 "$PROJECT_STATE_DIR" || exit 1
+		(umask 077 && printf '%s\n' "$PROJECT_VERSION" > "$PROJECT_LICENSE_ACCEPTED_FILE") || exit 1
 	else
 		clear
 		exit
@@ -212,7 +317,7 @@ get_local_ip() {
 }
 
 public_ip=$(get_public_ip)
-isp_info=$(curl -s --max-time 3 http://ipinfo.io/org)
+isp_info=$(curl -s --max-time 3 https://ipinfo.io/org)
 
 
 if echo "$isp_info" | grep -Eiq 'CHINANET|mobile|unicom|telecom'; then
@@ -481,7 +586,7 @@ linuxmirrors_install_docker() {
 
 local country=$(curl -s ipinfo.io/country)
 if [ "$country" = "CN" ]; then
-	bash <(curl -sSL https://linuxmirrors.cn/docker.sh) \
+	run_reviewed_remote_script https://linuxmirrors.cn/docker.sh \
 	  --source mirrors.huaweicloud.com/docker-ce \
 	  --source-registry docker.1ms.run \
 	  --protocol https \
@@ -490,7 +595,7 @@ if [ "$country" = "CN" ]; then
 	  --close-firewall false \
 	  --ignore-backup-tips
 else
-	bash <(curl -sSL https://linuxmirrors.cn/docker.sh) \
+	run_reviewed_remote_script https://linuxmirrors.cn/docker.sh \
 	  --source download.docker.com \
 	  --source-registry registry.hub.docker.com \
 	  --protocol https \
@@ -858,8 +963,9 @@ save_iptables_rules() {
 	touch /etc/iptables/rules.v4
 	iptables-save > /etc/iptables/rules.v4
 	check_crontab_installed
-	crontab -l | grep -v 'iptables-restore' | crontab - > /dev/null 2>&1
-	(crontab -l ; echo '@reboot iptables-restore < /etc/iptables/rules.v4') | crontab - > /dev/null 2>&1
+	local cron_tag="# ${PROJECT_CRON_TAG}:iptables-restore"
+	local cron_job="@reboot iptables-restore < /etc/iptables/rules.v4 ${cron_tag}"
+	(crontab -l 2>/dev/null || true) | grep -vF "$cron_tag" | { cat; printf '%s\n' "$cron_job"; } | crontab -
 
 }
 
@@ -867,18 +973,9 @@ save_iptables_rules() {
 
 
 iptables_open() {
-	install iptables
-	save_iptables_rules
-	iptables -P INPUT ACCEPT
-	iptables -P FORWARD ACCEPT
-	iptables -P OUTPUT ACCEPT
-	iptables -F
-
-	ip6tables -P INPUT ACCEPT
-	ip6tables -P FORWARD ACCEPT
-	ip6tables -P OUTPUT ACCEPT
-	ip6tables -F
-
+	echo -e "${gl_hong}安全策略已禁用清空防火墙和开放全部端口的操作。${gl_bai}"
+	echo "请使用 open_port 仅开放业务所需端口。"
+	return 1
 }
 
 
@@ -1151,34 +1248,10 @@ iptables_panel() {
 				  close_port $c_port
 				  ;;
 			  3)
-				  # 開放所有連接埠
-				  current_port=$(grep -E '^ *Port [0-9]+' /etc/ssh/sshd_config | awk '{print $2}')
-				  iptables -F
-				  iptables -X
-				  iptables -P INPUT ACCEPT
-				  iptables -P FORWARD ACCEPT
-				  iptables -P OUTPUT ACCEPT
-				  iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-				  iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-				  iptables -A INPUT -i lo -j ACCEPT
-				  iptables -A FORWARD -i lo -j ACCEPT
-				  iptables -A INPUT -p tcp --dport $current_port -j ACCEPT
-				  iptables-save > /etc/iptables/rules.v4
+				  iptables_open
 				  ;;
 			  4)
-				  # 關閉所有連接埠
-				  current_port=$(grep -E '^ *Port [0-9]+' /etc/ssh/sshd_config | awk '{print $2}')
-				  iptables -F
-				  iptables -X
-				  iptables -P INPUT DROP
-				  iptables -P FORWARD DROP
-				  iptables -P OUTPUT ACCEPT
-				  iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-				  iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-				  iptables -A INPUT -i lo -j ACCEPT
-				  iptables -A FORWARD -i lo -j ACCEPT
-				  iptables -A INPUT -p tcp --dport $current_port -j ACCEPT
-				  iptables-save > /etc/iptables/rules.v4
+				  echo "Bulk firewall resets are disabled. Use close_port for specific ports."
 				  ;;
 
 			  5)
@@ -1357,9 +1430,9 @@ update_docker_compose_with_db_creds() {
   if ! grep -q "letsencrypt" /home/web/docker-compose.yml; then
 	wget -O /home/web/docker-compose.yml ${UPSTREAM_DOCKER_DOWNLOAD_BASE}/LNMP-docker-compose-10.yml
 
-  	dbrootpasswd=$(grep -oP 'MYSQL_ROOT_PASSWORD:\s*\K.*' /home/web/docker-compose1.yml | tr -d '[:space:]')
-  	dbuse=$(grep -oP 'MYSQL_USER:\s*\K.*' /home/web/docker-compose1.yml | tr -d '[:space:]')
-  	dbusepasswd=$(grep -oP 'MYSQL_PASSWORD:\s*\K.*' /home/web/docker-compose1.yml | tr -d '[:space:]')
+		dbrootpasswd=$(grep -oP 'MYSQL_ROOT_PASSWORD:\s*\K.*' /home/web/docker-compose1.yml | tr -d '[:space:]')
+		dbuse=$(grep -oP 'MYSQL_USER:\s*\K.*' /home/web/docker-compose1.yml | tr -d '[:space:]')
+		dbusepasswd=$(grep -oP 'MYSQL_PASSWORD:\s*\K.*' /home/web/docker-compose1.yml | tr -d '[:space:]')
 
 	sed -i "s#webroot#$dbrootpasswd#g" /home/web/docker-compose.yml
 	sed -i "s#${UPSTREAM_DB_PASSWORD_PLACEHOLDER}#$dbusepasswd#g" /home/web/docker-compose.yml
@@ -1367,7 +1440,7 @@ update_docker_compose_with_db_creds() {
   fi
 
   if grep -q "${UPSTREAM_NGINX_IMAGE}" /home/web/docker-compose1.yml; then
-  	sed -i "s|${UPSTREAM_NGINX_IMAGE}|nginx:alpine|g" /home/web/docker-compose.yml  > /dev/null 2>&1
+		sed -i "s|${UPSTREAM_NGINX_IMAGE}|nginx:alpine|g" /home/web/docker-compose.yml  > /dev/null 2>&1
 	sed -i "s|nginx:alpine|${UPSTREAM_NGINX_IMAGE}|g" /home/web/docker-compose.yml  > /dev/null 2>&1
   fi
 
@@ -1415,8 +1488,8 @@ install_ldnmp() {
 
 	  cd /home/web && docker compose up -d
 	  sleep 1
-  	  crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
-  	  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
+		  crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
+		  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
 
 	  fix_phpfpm_conf php
 	  fix_phpfpm_conf php74
@@ -2830,17 +2903,13 @@ setup_docker_dir() {
 	mkdir -p /home /home/docker 2>/dev/null
 
 	if [ -d "/vol1/1000/" ] && [ ! -d "/vol1/1000/docker" ]; then
-		cp -f /home/docker /home/docker1 2>/dev/null
-		rm -rf /home/docker 2>/dev/null
-		mkdir -p /vol1/1000/docker 2>/dev/null
-		ln -s /vol1/1000/docker /home/docker 2>/dev/null
+		mv -- /home/docker /vol1/1000/docker || return 1
+		ln -s -- /vol1/1000/docker /home/docker || return 1
 	fi
 
 	if [ -d "/volume1/" ] && [ ! -d "/volume1/docker" ]; then
-		cp -f /home/docker /home/docker1 2>/dev/null
-		rm -rf /home/docker 2>/dev/null
-		mkdir -p /volume1/docker 2>/dev/null
-		ln -s /volume1/docker /home/docker 2>/dev/null
+		mv -- /home/docker /volume1/docker || return 1
+		ln -s -- /volume1/docker /home/docker || return 1
 	fi
 
 
@@ -3136,10 +3205,17 @@ tmux_run_d() {
 
 local base_name="tmuxd"
 local tmuxd_ID=1
+local -a tmux_command=()
+
+read -r -a tmux_command <<< "$tmuxd"
+if [ "${#tmux_command[@]}" -eq 0 ] || ! command -v "${tmux_command[0]}" >/dev/null 2>&1; then
+  echo "Enter a directly executable program and arguments; shell pipelines and redirections are not supported."
+  return 1
+fi
 
 # 檢查會話是否存在的函數
 session_exists() {
-  tmux has-session -t $1 2>/dev/null
+  tmux has-session -t "$1" 2>/dev/null
 }
 
 # 循環直到找到一個不存在的會話名稱
@@ -3148,7 +3224,7 @@ while session_exists "$base_name-$tmuxd_ID"; do
 done
 
 # 建立新的 tmux 會話
-tmux new -d -s "$base_name-$tmuxd_ID" "$tmuxd"
+tmux new-session -d -s "$base_name-$tmuxd_ID" -- "${tmux_command[@]}"
 
 
 }
@@ -3979,7 +4055,6 @@ while true; do
 		1)
 			check_disk_space 1
 			install wget
-			iptables_open
 			panel_app_install
 
 			add_app_id
@@ -4563,7 +4638,7 @@ yt_menu_pro() {
 
 			9)
 				read -e -p "請輸入刪除影片名稱:" rmdir
-				rm -rf "$VIDEO_DIR/$rmdir"
+				safe_remove_path_interactive "$VIDEO_DIR/$rmdir"
 				;;
 			*)
 				break ;;
@@ -4666,11 +4741,11 @@ linux_clean() {
 		echo "清理包管理器快取..."
 		apk cache clean
 		echo "刪除系統日誌..."
-		rm -rf /var/log/*
+		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
 		echo "刪除APK快取..."
-		rm -rf /var/cache/apk/*
+		find /var/cache/apk -xdev -type f -mtime +7 -delete 2>/dev/null
 		echo "刪除臨時檔案..."
-		rm -rf /tmp/*
+		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pacman &>/dev/null; then
 		pacman -Rns $(pacman -Qdtq) --noconfirm
@@ -4688,9 +4763,9 @@ linux_clean() {
 
 	elif command -v opkg &>/dev/null; then
 		echo "刪除系統日誌..."
-		rm -rf /var/log/*
+		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
 		echo "刪除臨時檔案..."
-		rm -rf /tmp/*
+		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pkg &>/dev/null; then
 		echo "清理未使用的依賴..."
@@ -4698,9 +4773,9 @@ linux_clean() {
 		echo "清理包管理器快取..."
 		pkg clean -y
 		echo "刪除系統日誌..."
-		rm -rf /var/log/*
+		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
 		echo "刪除臨時檔案..."
-		rm -rf /tmp/*
+		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	else
 		echo "未知的套件管理器!"
@@ -4829,8 +4904,6 @@ correct_ssh_config() {
 			   -e 's/^\s*#\?\s*PasswordAuthentication .*/PasswordAuthentication yes/' \
 			   -e 's/^\s*#\?\s*PubkeyAuthentication .*/PubkeyAuthentication yes/' "$sshd_config"
 	fi
-
-	rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
 }
 
 
@@ -4847,7 +4920,6 @@ new_ssh_port() {
 
   restart_ssh
   open_port $new_port
-  remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
 
   echo "SSH 連接埠已修改為:$new_port"
 
@@ -4863,7 +4935,6 @@ sshkey_on() {
 		   -e 's/^\s*#\?\s*PasswordAuthentication .*/PasswordAuthentication no/' \
 		   -e 's/^\s*#\?\s*PubkeyAuthentication .*/PubkeyAuthentication yes/' \
 		   -e 's/^\s*#\?\s*ChallengeResponseAuthentication .*/ChallengeResponseAuthentication no/' /etc/ssh/sshd_config
-	rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
 	restart_ssh
 	echo -e "${gl_lv}使用者金鑰登入模式已開啟，已關閉密碼登入模式，重連將會生效${gl_bai}"
 
@@ -5061,9 +5132,9 @@ sshkey_panel() {
 	  else
 	  	  IS_KEY_ENABLED="${gl_hui}未啟用${gl_bai}"
 	  fi
-  	  echo -e "使用者密鑰登入模式${IS_KEY_ENABLED}"
-  	  echo "------------------------------------------------"
-  	  echo "將會產生金鑰對，更安全的方式SSH登錄"
+		  echo -e "使用者密鑰登入模式${IS_KEY_ENABLED}"
+		  echo "------------------------------------------------"
+		  echo "將會產生金鑰對，更安全的方式SSH登錄"
 	  echo "------------------------"
 	  echo "1. 產生新密鑰對 2. 手動輸入已有公鑰"
 	  echo "3. 從GitHub導入已有公鑰 4. 從網址導入已有公鑰"
@@ -5149,8 +5220,6 @@ add_sshpasswd() {
 	fi
 
 	sed -i 's/^\s*#\?\s*PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-	rm -rf /etc/ssh/sshd_config.d/* /etc/ssh/ssh_config.d/*
-
 	restart_ssh
 
 	echo -e "${gl_lv}密碼設定完畢，已更改為密碼登入模式！${gl_bai}"
@@ -5186,22 +5255,12 @@ clear
 
 
 dd_xitong() {
-		dd_xitong_MollyLau() {
-			wget --no-check-certificate -qO InstallNET.sh "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" && chmod a+x InstallNET.sh
-
-		}
-
-		dd_xitong_bin456789() {
-			curl -O ${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh
-		}
-
 		dd_xitong_1() {
 		  echo -e "重裝後初始使用者名稱:${gl_huang}root${gl_bai}初始密碼:${gl_huang}LeitboGi0ro${gl_bai}初始連接埠:${gl_huang}22${gl_bai}"
 		  echo -e "${gl_huang}重裝後請及時修改初始密碼，以防止暴力入侵。命令列輸入passwd修改密碼${gl_bai}"
 		  echo -e "按任意鍵繼續..."
 		  read -n 1 -s -r -p ""
 		  install wget
-		  dd_xitong_MollyLau
 		}
 
 		dd_xitong_2() {
@@ -5209,21 +5268,18 @@ dd_xitong() {
 		  echo -e "按任意鍵繼續..."
 		  read -n 1 -s -r -p ""
 		  install wget
-		  dd_xitong_MollyLau
 		}
 
 		dd_xitong_3() {
 		  echo -e "重裝後初始使用者名稱:${gl_huang}root${gl_bai}初始密碼:${gl_huang}123@@@${gl_bai}初始連接埠:${gl_huang}22${gl_bai}"
 		  echo -e "按任意鍵繼續..."
 		  read -n 1 -s -r -p ""
-		  dd_xitong_bin456789
 		}
 
 		dd_xitong_4() {
 		  echo -e "重裝後初始使用者名稱:${gl_huang}Administrator${gl_bai}初始密碼:${gl_huang}123@@@${gl_bai}初始連接埠:${gl_huang}3389${gl_bai}"
 		  echo -e "按任意鍵繼續..."
 		  read -n 1 -s -r -p ""
-		  dd_xitong_bin456789
 		}
 
 		  while true; do
@@ -5264,211 +5320,211 @@ dd_xitong() {
 
 			  1)
 				dd_xitong_3
-				bash reinstall.sh debian 13
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" debian 13 || continue
 				reboot
 				exit
 				;;
 
 			  2)
 				dd_xitong_3
-				bash reinstall.sh debian 12
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" debian 12 || continue
 				reboot
 				exit
 				;;
 			  3)
 				dd_xitong_3
-				bash reinstall.sh debian 11
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" debian 11 || continue
 				reboot
 				exit
 				;;
 			  4)
 				dd_xitong_3
-				bash reinstall.sh debian 10
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" debian 10 || continue
 				reboot
 				exit
 				;;
 			  11)
 				dd_xitong_3
-				bash reinstall.sh ubuntu 26.04
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" ubuntu 26.04 || continue
 				reboot
 				exit
 				;;
 			  12)
 				dd_xitong_3
-				bash reinstall.sh ubuntu 24.04
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" ubuntu 24.04 || continue
 				reboot
 				exit
 				;;
 			  13)
 				dd_xitong_3
-				bash reinstall.sh ubuntu 22.04
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" ubuntu 22.04 || continue
 				reboot
 				exit
 				;;
 			  14)
 				dd_xitong_3
-				bash reinstall.sh ubuntu 20.04
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" ubuntu 20.04 || continue
 				reboot
 				exit
 				;;
 
 			  21)
 				dd_xitong_3
-				bash reinstall.sh rocky
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" rocky || continue
 				reboot
 				exit
 				;;
 
 			  22)
 				dd_xitong_3
-				bash reinstall.sh rocky 9
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" rocky 9 || continue
 				reboot
 				exit
 				;;
 
 			  23)
 				dd_xitong_3
-				bash reinstall.sh almalinux
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" almalinux || continue
 				reboot
 				exit
 				;;
 
 			  24)
 				dd_xitong_3
-				bash reinstall.sh almalinux 9
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" almalinux 9 || continue
 				reboot
 				exit
 				;;
 
 			  25)
 				dd_xitong_3
-				bash reinstall.sh oracle
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" oracle || continue
 				reboot
 				exit
 				;;
 
 			  26)
 				dd_xitong_3
-				bash reinstall.sh oracle 9
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" oracle 9 || continue
 				reboot
 				exit
 				;;
 
 			  27)
 				dd_xitong_3
-				bash reinstall.sh fedora 44
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" fedora 44 || continue
 				reboot
 				exit
 				;;
 
 			  28)
 				dd_xitong_3
-				bash reinstall.sh fedora 43
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" fedora 43 || continue
 				reboot
 				exit
 				;;
 
 			  29)
 				dd_xitong_3
-				bash reinstall.sh centos 10
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" centos 10 || continue
 				reboot
 				exit
 				;;
 
 			  30)
 				dd_xitong_3
-				bash reinstall.sh centos 9
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" centos 9 || continue
 				reboot
 				exit
 				;;
 
 			  31)
 				dd_xitong_1
-				bash InstallNET.sh -alpine
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" -alpine || continue
 				reboot
 				exit
 				;;
 
 			  32)
 				dd_xitong_3
-				bash reinstall.sh arch
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" arch || continue
 				reboot
 				exit
 				;;
 
 			  33)
 				dd_xitong_3
-				bash reinstall.sh kali
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" kali || continue
 				reboot
 				exit
 				;;
 
 			  34)
 				dd_xitong_3
-				bash reinstall.sh openeuler
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" openeuler || continue
 				reboot
 				exit
 				;;
 
 			  35)
 				dd_xitong_3
-				bash reinstall.sh opensuse
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" opensuse || continue
 				reboot
 				exit
 				;;
 
 			  36)
 				dd_xitong_3
-				bash reinstall.sh fnos
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" fnos || continue
 				reboot
 				exit
 				;;
 
 			  41)
 				dd_xitong_2
-				bash InstallNET.sh -windows 11 -lang "cn"
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" -windows 11 -lang "cn" || continue
 				reboot
 				exit
 				;;
 
 			  42)
 				dd_xitong_2
-				bash InstallNET.sh -windows 10 -lang "cn"
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" -windows 10 -lang "cn" || continue
 				reboot
 				exit
 				;;
 
 			  43)
 				dd_xitong_4
-				bash reinstall.sh windows --iso="https://archive.org/download/en_windows_7_professional_with_sp1_x64_dvd_u_676939_201906/en_windows_7_professional_with_sp1_x64_dvd_u_676939.iso" --image-name='windows 7 professional'
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" windows --iso="https://archive.org/download/en_windows_7_professional_with_sp1_x64_dvd_u_676939_201906/en_windows_7_professional_with_sp1_x64_dvd_u_676939.iso" --image-name='windows 7 professional' || continue
 				reboot
 				exit
 				;;
 
 			  44)
 				dd_xitong_2
-				bash InstallNET.sh -windows 2025 -lang "cn"
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" -windows 2025 -lang "cn" || continue
 				reboot
 				exit
 				;;
 
 			  45)
 				dd_xitong_2
-				bash InstallNET.sh -windows 2022 -lang "cn"
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" -windows 2022 -lang "cn" || continue
 				reboot
 				exit
 				;;
 
 			  46)
 				dd_xitong_2
-				bash InstallNET.sh -windows 2019 -lang "cn"
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" -windows 2019 -lang "cn" || continue
 				reboot
 				exit
 				;;
 
 			  47)
 				dd_xitong_4
-				bash reinstall.sh dd --img https://r2.hotdog.eu.org/win11-arm-with-pagefile-15g.xz
+				run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/bin456789/reinstall/main/reinstall.sh" dd --img https://r2.hotdog.eu.org/win11-arm-with-pagefile-15g.xz || continue
 				reboot
 				exit
 				;;
@@ -5626,7 +5682,7 @@ bbrv3() {
 
 		  local cpu_arch=$(uname -m)
 		  if [ "$cpu_arch" = "aarch64" ]; then
-			bash <(curl -sL jhb.ovh/jb/bbrv3arm.sh)
+			run_reviewed_remote_script https://jhb.ovh/jb/bbrv3arm.sh
 			break_end
 			linux_Settings
 		  fi
@@ -6312,13 +6368,13 @@ Kernel_optimize() {
 			  cd ~
 			  clear
 			  restore_defaults
-			  curl -sS ${PROJECT_DOWNLOAD_BASE}/network-optimize.sh -o /tmp/network-optimize.sh && source /tmp/network-optimize.sh && restore_network_defaults
+			  run_reviewed_remote_script "${PROJECT_DOWNLOAD_BASE}/network-optimize.sh" restore
 			  ;;
 
 		  7)
 			  cd ~
 			  clear
-			  curl -sS ${PROJECT_DOWNLOAD_BASE}/network-optimize.sh | bash
+			  run_reviewed_remote_script "${PROJECT_DOWNLOAD_BASE}/network-optimize.sh"
 			  ;;
 
 		  *)
@@ -6554,7 +6610,7 @@ linux_trash() {
 }
 
 linux_fav() {
-bash <(curl -l -s ${gh_proxy}raw.githubusercontent.com/byJoey/cmdbox/refs/heads/main/install.sh)
+run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/byJoey/cmdbox/refs/heads/main/install.sh"
 }
 
 # 建立備份
@@ -6921,7 +6977,7 @@ use_connection() {
 	echo "正在連接到$name ($ip)..."
 	if [[ -f "$password_or_key" ]]; then
 		# 使用密鑰連接
-		ssh -o StrictHostKeyChecking=no -i "$password_or_key" -p "$port" "$user@$ip"
+		ssh -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" -i "$password_or_key" -p "$port" "$user@$ip"
 		if [[ $? -ne 0 ]]; then
 			echo "連線失敗！請檢查以下內容："
 			echo "1. 密鑰檔案路徑是否正確：$password_or_key"
@@ -6937,7 +6993,7 @@ use_connection() {
 			echo "  - CentOS/RHEL: yum install sshpass"
 			return
 		fi
-		sshpass -p "$password_or_key" ssh -o StrictHostKeyChecking=no -p "$port" "$user@$ip"
+		SSHPASS="$password_or_key" sshpass -e ssh -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" -p "$port" "$user@$ip"
 		if [[ $? -ne 0 ]]; then
 			echo "連線失敗！請檢查以下內容："
 			echo "1. 使用者名稱和密碼是否正確。"
@@ -7091,16 +7147,21 @@ list_mounted_partitions() {
 # 格式化分割區
 format_partition() {
 	read -e -p "請輸入要格式化的分割區名稱（例如 sda1）:" PARTITION
+	local DEVICE="/dev/$PARTITION"
 
 	# 檢查分割區是否存在
-	if ! lsblk -o NAME | grep -w "$PARTITION" > /dev/null; then
+	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] || ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
 		echo "分區不存在！"
 		return
 	fi
 
 	# 檢查分割區是否已經掛載
-	if lsblk -o MOUNTPOINT | grep -w "$PARTITION" > /dev/null; then
+	if findmnt -rn -S "$DEVICE" >/dev/null 2>&1 || lsblk -nro MOUNTPOINT "$DEVICE" | grep -q '[^[:space:]]'; then
 		echo "分割區已經掛載，請先卸載！"
+		return
+	fi
+	if find "/sys/class/block/$PARTITION/holders" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null | grep -q .; then
+		echo "Partition is still held by another block device."
 		return
 	fi
 
@@ -7121,15 +7182,21 @@ format_partition() {
 	esac
 
 	# 確認格式化
-	read -e -p "確認格式化分割區 /dev/$PARTITION為$FS_TYPE嗎？ (y/n):" CONFIRM
-	if [ "$CONFIRM" != "y" ]; then
+	local confirmation_token="FORMAT $DEVICE"
+	read -e -r -p "Type $confirmation_token to confirm this destructive operation: " CONFIRM
+	if [ "$CONFIRM" != "$confirmation_token" ]; then
 		echo "操作已取消。"
 		return
 	fi
 
 	# 格式化分割區
-	echo "正在格式化分割區 /dev/$PARTITION為$FS_TYPE ..."
-	mkfs.$FS_TYPE "/dev/$PARTITION"
+	echo "Formatting partition $DEVICE as $FS_TYPE ..."
+	case "$FS_TYPE" in
+		ext4) mkfs.ext4 -- "$DEVICE" ;;
+		xfs) mkfs.xfs -- "$DEVICE" ;;
+		ntfs) mkfs.ntfs -- "$DEVICE" ;;
+		vfat) mkfs.vfat -- "$DEVICE" ;;
+	esac
 
 	if [ $? -eq 0 ]; then
 		echo "分割區格式化成功！"
@@ -7302,7 +7369,7 @@ run_task() {
 	fi
 
 	# 新增 SSH 連線通用參數
-	local ssh_options="-p $port -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+	local ssh_options="-p $port -o StrictHostKeyChecking=${SSH_STRICT_HOST_KEY_CHECKING}"
 
 	if [[ "$auth_method" == "password" ]]; then
 		if ! command -v sshpass &> /dev/null; then
@@ -7312,7 +7379,7 @@ run_task() {
 			echo "  - CentOS/RHEL: yum install sshpass"
 			return
 		fi
-		sshpass -p "$password_or_key" rsync $options -e "ssh $ssh_options" "$source" "$destination"
+		SSHPASS="$password_or_key" sshpass -e rsync $options -e "ssh $ssh_options" "$source" "$destination"
 	else
 		# 檢查密鑰檔案是否存在和權限是否正確
 		if [[ ! -f "$password_or_key" ]]; then
@@ -7754,7 +7821,7 @@ linux_tools() {
 			18)
 			  clear
 			  cd ~
-			  curl -fsSL https://opencode.ai/install | bash
+			  run_reviewed_remote_script https://opencode.ai/install
 			  source ~/.bashrc
 			  source ~/.profile
 			  opencode
@@ -7874,9 +7941,7 @@ linux_bbr() {
 		done
 	else
 		install wget
-		wget --no-check-certificate -O tcpx.sh ${gh_proxy}raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcpx.sh
-		chmod +x tcpx.sh
-		./tcpx.sh
+		run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcpx.sh"
 	fi
 
 
@@ -8157,7 +8222,7 @@ docker_ssh_migration() {
 		echo -e "${gl_huang}傳輸備份中...${gl_bai}"
 		if [[ -z "$TARGET_PASS" ]]; then
 			# 使用密鑰登入
-			scp -P "$TARGET_PORT" -o StrictHostKeyChecking=no -r "$LATEST_TAR" "$TARGET_USER@$TARGET_IP:/tmp/"
+			scp -P "$TARGET_PORT" -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" -r "$LATEST_TAR" "$TARGET_USER@$TARGET_IP:/tmp/"
 		fi
 
 	}
@@ -8421,7 +8486,7 @@ linux_docker() {
 			  ;;
 		  8)
 			  clear
-			  bash <(curl -sSL https://linuxmirrors.cn/docker.sh)
+			  run_reviewed_remote_script https://linuxmirrors.cn/docker.sh
 			  ;;
 
 		  9)
@@ -8526,39 +8591,39 @@ linux_test() {
 	  case $sub_choice in
 		  1)
 			  clear
-			  bash <(curl -Ls https://cdn.jsdelivr.net/gh/missuo/OpenAI-Checker/openai.sh)
+			  run_reviewed_remote_script https://cdn.jsdelivr.net/gh/missuo/OpenAI-Checker/openai.sh
 			  ;;
 		  2)
 			  clear
-			  bash <(curl -L -s check.unlock.media)
+			  run_reviewed_remote_script https://check.unlock.media
 			  ;;
 		  3)
 			  clear
 			  install wget
-			  wget -qO- ${gh_proxy}github.com/yeahwu/check/raw/main/check.sh | bash
+			  run_reviewed_remote_script "${gh_proxy}github.com/yeahwu/check/raw/main/check.sh"
 			  ;;
 		  4)
 			  clear
-			  bash <(curl -Ls IP.Check.Place)
+			  run_reviewed_remote_script https://IP.Check.Place
 			  ;;
 
 
 		  11)
 			  clear
 			  install wget
-			  wget -qO- git.io/besttrace | bash
+			  run_reviewed_remote_script https://git.io/besttrace
 			  ;;
 		  12)
 			  clear
-			  curl ${gh_proxy}raw.githubusercontent.com/zhucaidan/mtr_trace/main/mtr_trace.sh | bash
+			  run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/zhucaidan/mtr_trace/main/mtr_trace.sh"
 			  ;;
 		  13)
 			  clear
-			  bash <(curl -Lso- https://git.io/superspeed_uxh)
+			  run_reviewed_remote_script https://git.io/superspeed_uxh
 			  ;;
 		  14)
 			  clear
-			  curl nxtrace.org/nt |bash
+			  run_reviewed_remote_script https://nxtrace.org/nt
 			  nexttrace --fast-trace --tcp
 			  ;;
 		  15)
@@ -8583,53 +8648,53 @@ linux_test() {
 			  echo "------------------------"
 
 			  read -e -p "輸入一個指定IP:" testip
-			  curl nxtrace.org/nt |bash
+			  run_reviewed_remote_script https://nxtrace.org/nt
 			  nexttrace $testip
 			  ;;
 
 		  16)
 			  clear
-			  curl ${gh_proxy}raw.githubusercontent.com/ludashi2020/backtrace/main/install.sh -sSf | sh
+			  run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/ludashi2020/backtrace/main/install.sh"
 			  ;;
 
 		  17)
 			  clear
-			  bash <(curl -sL ${gh_proxy}raw.githubusercontent.com/i-abc/Speedtest/main/speedtest.sh)
+			  run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/i-abc/Speedtest/main/speedtest.sh"
 			  ;;
 
 		  18)
 			  clear
-			  bash <(curl -sL Net.Check.Place)
+			  run_reviewed_remote_script https://Net.Check.Place
 			  ;;
 
 		  19)
 			  clear
-			  bash <(curl -sL https://raw.githubusercontent.com/ibsgss/TcpQuality/main/runTcpQuality.sh)
+			  run_reviewed_remote_script https://raw.githubusercontent.com/ibsgss/TcpQuality/main/runTcpQuality.sh
 			  ;;
 
 		  21)
 			  clear
 			  check_swap
-			  curl -sL yabs.sh | bash -s -- -i -5
+			  run_reviewed_remote_script https://yabs.sh -i -5
 			  ;;
 		  22)
 			  clear
 			  check_swap
-			  bash <(curl -sL bash.icu/gb5)
+			  run_reviewed_remote_script https://bash.icu/gb5
 			  ;;
 
 		  31)
 			  clear
-			  curl -Lso- bench.sh | bash
+			  run_reviewed_remote_script https://bench.sh
 			  ;;
 		  32)
 			  clear
-			  curl -L ${gh_proxy}github.com/spiritLHLS/ecs/raw/main/ecs.sh -o ecs.sh && chmod +x ecs.sh && bash ecs.sh
+			  run_reviewed_remote_script "${gh_proxy}github.com/spiritLHLS/ecs/raw/main/ecs.sh"
 			  ;;
 
 		  33)
 			  clear
-			  bash <(curl -sL https://run.NodeQuality.com)
+			  run_reviewed_remote_script https://run.NodeQuality.com
 			  ;;
 
 
@@ -8751,7 +8816,7 @@ linux_Oracle() {
 
 			  read -e -p "請輸入你重裝後的密碼:" vpspasswd
 			  install wget
-			  bash <(wget --no-check-certificate -qO- "${gh_proxy}raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh") $xitong -v 64 -p $vpspasswd -port 22
+			  run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh" "$xitong" -v 64 -p "$vpspasswd" -port 22
 			  ;;
 			[Nn])
 			  echo "已取消"
@@ -8764,7 +8829,7 @@ linux_Oracle() {
 
 		  4)
 			  clear
-			  bash <(wget -qO- ${gh_proxy}github.com/Yohann0617/oci-helper/releases/latest/download/sh_oci-helper_install.sh)
+			  run_reviewed_remote_script "${gh_proxy}github.com/Yohann0617/oci-helper/releases/latest/download/sh_oci-helper_install.sh"
 			  ;;
 		  5)
 			  clear
@@ -8772,7 +8837,7 @@ linux_Oracle() {
 			  ;;
 		  6)
 			  clear
-			  bash <(curl -L -s jhb.ovh/jb/v6.sh)
+			  run_reviewed_remote_script https://jhb.ovh/jb/v6.sh
 			  echo "此功能由jhb大神提供，感謝他！"
 			  ;;
 		  0)
@@ -8834,10 +8899,10 @@ fi
 
 fix_phpfpm_conf() {
 	local container_name=$1
-	docker exec "$container_name" sh -c "mkdir -p /run/$container_name && chmod 777 /run/$container_name"
+	docker exec "$container_name" sh -c "mkdir -p /run/$container_name && chmod 755 /run/$container_name"
 	docker exec "$container_name" sh -c "sed -i '1i [global]\\ndaemonize = no' /usr/local/etc/php-fpm.d/www.conf"
 	docker exec "$container_name" sh -c "sed -i '/^listen =/d' /usr/local/etc/php-fpm.d/www.conf"
-	docker exec "$container_name" sh -c "echo -e '\nlisten = /run/$container_name/php-fpm.sock\nlisten.owner = www-data\nlisten.group = www-data\nlisten.mode = 0777' >> /usr/local/etc/php-fpm.d/www.conf"
+	docker exec "$container_name" sh -c "echo -e '\nlisten = /run/$container_name/php-fpm.sock\nlisten.owner = www-data\nlisten.group = www-data\nlisten.mode = 0666' >> /usr/local/etc/php-fpm.d/www.conf"
 	docker exec "$container_name" sh -c "rm -f /usr/local/etc/php-fpm.d/zz-docker.conf"
 
 	find /home/web/conf.d/ -type f -name "*.conf" -exec sed -i "s#fastcgi_pass ${container_name}:9000;#fastcgi_pass unix:/run/${container_name}/php-fpm.sock;#g" {} \;
@@ -9573,7 +9638,7 @@ linux_ldnmp() {
 			if [ -n "$latest_tar" ]; then
 			  ssh-keygen -f "/root/.ssh/known_hosts" -R "$remote_ip"
 			  sleep 2  # 添加等待时间
-			  scp -P "$TARGET_PORT" -o StrictHostKeyChecking=no "$latest_tar" "root@$remote_ip:/home/"
+			  scp -P "$TARGET_PORT" -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$latest_tar" "root@$remote_ip:/home/"
 			  echo "檔案已傳送至遠端伺服器home目錄。"
 			else
 			  echo "未找到要傳送的文件。"
@@ -9647,7 +9712,7 @@ linux_ldnmp() {
 	  if [ -n "$filename" ]; then
 		  cd /home/web/ > /dev/null 2>&1
 		  docker compose down > /dev/null 2>&1
-		  rm -rf /home/web > /dev/null 2>&1
+		  safe_remove_path_interactive /home/web
 
 			echo -e "${gl_minglan}正在解壓縮$filename ...${gl_bai}"
 		  cd /home/ && tar -xzf "$filename"
@@ -9737,7 +9802,7 @@ linux_ldnmp() {
 			  sed -i "s/image: php:fpm-alpine/image: php:${version}-fpm-alpine/" /home/web/docker-compose.yml
 			  docker rm -f $ldnmp_pods
 			  docker images --filter=reference="$ldnmp_pods*" -q | xargs docker rmi > /dev/null 2>&1
-  			  docker images --filter=reference="${UPSTREAM_IMAGE_NAMESPACE}/${ldnmp_pods}*" -q | xargs docker rmi > /dev/null 2>&1
+		  docker images --filter=reference="${UPSTREAM_IMAGE_NAMESPACE}/${ldnmp_pods}*" -q | xargs docker rmi > /dev/null 2>&1
 			  docker compose up -d --force-recreate $ldnmp_pods
 			  docker exec php chown -R www-data:www-data /var/www/html
 
@@ -9810,7 +9875,7 @@ linux_ldnmp() {
 			docker compose down --rmi all
 			docker compose -f docker-compose.phpmyadmin.yml down > /dev/null 2>&1
 			docker compose -f docker-compose.phpmyadmin.yml down --rmi all > /dev/null 2>&1
-			rm -rf /home/web
+			safe_remove_path_interactive /home/web
 			;;
 		  [Nn])
 
@@ -9945,7 +10010,7 @@ moltbot_menu() {
 		fi
 
 		if command -v apt &>/dev/null; then
-			curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
+			run_reviewed_remote_script https://deb.nodesource.com/setup_24.x
 			apt update -y
 			apt install build-essential python3 libatomic1 nodejs -y
 		fi
@@ -11249,7 +11314,7 @@ PY
 	        return 0
 	    fi
 
- 		if command -v apt >/dev/null 2>&1; then
+		if command -v apt >/dev/null 2>&1; then
 	        mkdir -p /etc/apt/keyrings
 	        curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /etc/apt/keyrings/charm.gpg
 	        echo "deb [signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | tee /etc/apt/sources.list.d/charm.list > /dev/null
@@ -13325,9 +13390,9 @@ PY
 		fi
 		echo "⬇️ 安裝 bun..."
 		if command -v curl >/dev/null 2>&1; then
-			curl -fsSL https://bun.sh/install | bash
+			run_reviewed_remote_script https://bun.sh/install
 		elif command -v wget >/dev/null 2>&1; then
-			wget -qO- https://bun.sh/install | bash
+			run_reviewed_remote_script https://bun.sh/install
 		else
 			echo "❌ 未偵測到 curl 或 wget，無法安裝 bun。"
 			return 1
@@ -14995,7 +15060,7 @@ openclaw_backup_restore_menu() {
 		openclaw uninstall
 		npm uninstall -g openclaw
 		crontab -l 2>/dev/null | grep -v "s gateway" | crontab -
-		rm -rf "$HOME/.openclaw"
+		safe_remove_path_interactive "$HOME/.openclaw"
 		[ "$HOME" != "/root" ] && [ -d /root/.openclaw ] && echo "⚠️ 偵測到 root 目錄下仍存在 /root/.openclaw，如需清理請手動處理"
 		hash -r
 		sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
@@ -15332,7 +15397,7 @@ while true; do
 		local panelurl="https://www.bt.cn/new/index.html"
 
 		panel_app_install() {
-			if [ -f /usr/bin/curl ];then curl -sSO https://download.bt.cn/install/install_panel.sh;else wget -O install_panel.sh https://download.bt.cn/install/install_panel.sh;fi;bash install_panel.sh ed8484bec
+			run_reviewed_remote_script https://download.bt.cn/install/install_panel.sh ed8484bec
 		}
 
 		panel_app_manage() {
@@ -15340,9 +15405,7 @@ while true; do
 		}
 
 		panel_app_uninstall() {
-			curl -o bt-uninstall.sh http://download.bt.cn/install/bt-uninstall.sh > /dev/null 2>&1 && chmod +x bt-uninstall.sh && ./bt-uninstall.sh
-			chmod +x bt-uninstall.sh
-			./bt-uninstall.sh
+			run_reviewed_remote_script https://download.bt.cn/install/bt-uninstall.sh
 		}
 
 		install_panel
@@ -15359,7 +15422,7 @@ while true; do
 		local panelurl="https://www.aapanel.com/new/index.html"
 
 		panel_app_install() {
-			URL=https://www.aapanel.com/script/install_7.0_en.sh && if [ -f /usr/bin/curl ];then curl -ksSO "$URL" ;else wget --no-check-certificate -O install_7.0_en.sh "$URL";fi;bash install_7.0_en.sh aapanel
+			run_reviewed_remote_script https://www.aapanel.com/script/install_7.0_en.sh aapanel
 		}
 
 		panel_app_manage() {
@@ -15367,9 +15430,7 @@ while true; do
 		}
 
 		panel_app_uninstall() {
-			curl -o bt-uninstall.sh http://download.bt.cn/install/bt-uninstall.sh > /dev/null 2>&1 && chmod +x bt-uninstall.sh && ./bt-uninstall.sh
-			chmod +x bt-uninstall.sh
-			./bt-uninstall.sh
+			run_reviewed_remote_script https://download.bt.cn/install/bt-uninstall.sh
 		}
 
 		install_panel
@@ -15384,7 +15445,7 @@ while true; do
 
 		panel_app_install() {
 			install bash
-			bash -c "$(curl -sSL https://resource.fit2cloud.com/1panel/package/v2/quick_start.sh)"
+			run_reviewed_remote_script https://resource.fit2cloud.com/1panel/package/v2/quick_start.sh
 		}
 
 		panel_app_manage() {
@@ -15441,7 +15502,7 @@ while true; do
 		docker_rum() {
 
 			mkdir -p /home/docker/openlist
-			chmod -R 777 /home/docker/openlist
+			chmod -R 0750 /home/docker/openlist
 
 			docker run -d \
 				--restart=always \
@@ -15536,7 +15597,7 @@ while true; do
 					check_disk_space 1
 					install unzip jq
 					install_docker
-					curl -sL ${gh_proxy}raw.githubusercontent.com/nezhahq/scripts/refs/heads/main/install.sh -o nezha.sh && chmod +x nezha.sh && ./nezha.sh
+					run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/nezhahq/scripts/refs/heads/main/install.sh"
 					local docker_port=$(docker port $docker_name | awk -F'[:]' '/->/ {print $NF}' | uniq)
 					check_docker_app_ip
 					;;
@@ -15696,7 +15757,7 @@ while true; do
 					docker rm -f mailserver
 					docker rmi -f analogic/poste.io
 					rm /home/docker/mail.txt
-					rm -rf /home/docker/mail
+					safe_remove_path_interactive "/home/docker/mail"
 
 					sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
 					echo "應用程式已解除安裝"
@@ -15752,7 +15813,7 @@ while true; do
 			docker rmi -f rocket.chat
 			docker rm -f db
 			docker rmi -f mongo:latest
-			rm -rf /home/docker/mongo
+			safe_remove_path_interactive "/home/docker/mongo"
 			echo "應用程式已解除安裝"
 		}
 
@@ -15831,7 +15892,7 @@ while true; do
 		local app_size="2"
 
 		docker_app_install() {
-			cd /home/ && mkdir -p docker/cloud && cd docker/cloud && mkdir temp_data && mkdir -vp cloudreve/{uploads,avatar} && touch cloudreve/conf.ini && touch cloudreve/cloudreve.db && mkdir -p aria2/config && mkdir -p data/aria2 && chmod -R 777 data/aria2
+			cd /home/ && mkdir -p docker/cloud && cd docker/cloud && mkdir temp_data && mkdir -vp cloudreve/{uploads,avatar} && touch cloudreve/conf.ini && touch cloudreve/cloudreve.db && mkdir -p aria2/config && mkdir -p data/aria2 && chmod -R 0770 data/aria2
 			curl -o /home/docker/cloud/docker-compose.yml ${UPSTREAM_DOCKER_DOWNLOAD_BASE}/cloudreve-docker-compose.yml
 			sed -i "s/5212:5212/${docker_port}:5212/g" /home/docker/cloud/docker-compose.yml
 			cd /home/docker/cloud/
@@ -15850,7 +15911,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/cloud/ && docker compose down --rmi all
-			rm -rf /home/docker/cloud
+			safe_remove_path_interactive "/home/docker/cloud"
 			echo "應用程式已解除安裝"
 		}
 
@@ -16022,7 +16083,7 @@ while true; do
 				1)
 					install_docker
 					check_disk_space 5
-					bash -c "$(curl -fsSLk https://waf-ce.chaitin.cn/release/latest/setup.sh)"
+					run_reviewed_remote_script https://waf-ce.chaitin.cn/release/latest/setup.sh
 
 					add_app_id
 					clear
@@ -16033,7 +16094,7 @@ while true; do
 					;;
 
 				2)
-					bash -c "$(curl -fsSLk https://waf-ce.chaitin.cn/release/latest/upgrade.sh)"
+					run_reviewed_remote_script https://waf-ce.chaitin.cn/release/latest/upgrade.sh
 					docker rmi $(docker images | grep "safeline" | grep "none" | awk '{print $3}')
 					echo ""
 
@@ -16514,7 +16575,7 @@ while true; do
 		clear
 		install_docker
 		check_disk_space 1
-		bash -c "$(curl --insecure -fsSL https://ddsrem.com/xiaoya_install.sh)"
+		run_reviewed_remote_script https://ddsrem.com/xiaoya_install.sh
 		  ;;
 
 	  39|bililive)
@@ -16569,7 +16630,7 @@ while true; do
 
 		panel_app_install() {
 			cd ~
-			bash <(curl -sSLm 10 https://dl.acepanel.net/helper.sh)
+			run_reviewed_remote_script https://dl.acepanel.net/helper.sh
 		}
 
 		panel_app_manage() {
@@ -16578,7 +16639,7 @@ while true; do
 
 		panel_app_uninstall() {
 			cd ~
-			bash <(curl -sSLm 10 https://dl.acepanel.net/helper.sh)
+			run_reviewed_remote_script https://dl.acepanel.net/helper.sh
 
 		}
 
@@ -16734,7 +16795,7 @@ while true; do
 			docker rmi -f prom/prometheus:latest
 			docker rmi -f grafana/grafana:latest
 
-			rm -rf /home/docker/monitoring
+			safe_remove_path_interactive "/home/docker/monitoring"
 			echo "應用程式已解除安裝"
 		}
 
@@ -16823,7 +16884,7 @@ while true; do
 	  51|pve)
 		clear
 		check_disk_space 1
-		curl -L ${gh_proxy}raw.githubusercontent.com/oneclickvirt/pve/main/scripts/install_pve.sh -o install_pve.sh && chmod +x install_pve.sh && bash install_pve.sh
+		run_reviewed_remote_script "${gh_proxy}raw.githubusercontent.com/oneclickvirt/pve/main/scripts/install_pve.sh"
 		  ;;
 
 
@@ -16880,7 +16941,7 @@ while true; do
 
 		panel_app_install() {
 			cd ~
-			wget https://dl.amh.sh/amh.sh && bash amh.sh
+			run_reviewed_remote_script https://dl.amh.sh/amh.sh
 		}
 
 		panel_app_manage() {
@@ -16960,7 +17021,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/dify/docker/ && docker compose down --rmi all
-			rm -rf /home/docker/dify
+			safe_remove_path_interactive "/home/docker/dify"
 			echo "應用程式已解除安裝"
 		}
 
@@ -17012,7 +17073,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/new-api/ && docker compose down --rmi all
-			rm -rf /home/docker/new-api
+			safe_remove_path_interactive "/home/docker/new-api"
 			echo "應用程式已解除安裝"
 		}
 
@@ -17032,7 +17093,7 @@ while true; do
 		local app_size="2"
 
 		docker_app_install() {
-			curl -sSL ${gh_proxy}github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh | bash
+			run_reviewed_remote_script "${gh_proxy}github.com/jumpserver/jumpserver/releases/latest/download/quick_start.sh"
 			clear
 			echo "已經安裝完成"
 			check_docker_app_ip
@@ -17116,7 +17177,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/ragflow/docker/ && docker compose down --rmi all
-			rm -rf /home/docker/ragflow
+			safe_remove_path_interactive "/home/docker/ragflow"
 			echo "應用程式已解除安裝"
 		}
 
@@ -17174,7 +17235,7 @@ while true; do
 
 			add_yuming
 			mkdir -p /home/docker/n8n
-			chmod -R 777 /home/docker/n8n
+			chown -R 1000:1000 /home/docker/n8n && chmod -R 0700 /home/docker/n8n
 
 			docker run -d --name n8n \
 			  --restart=always \
@@ -17444,7 +17505,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/moontv/ && docker compose down --rmi all
-			rm -rf /home/docker/moontv
+			safe_remove_path_interactive "/home/docker/moontv"
 			echo "應用程式已解除安裝"
 		}
 
@@ -17556,7 +17617,7 @@ while true; do
 		local app_size="2"
 
 		docker_app_install() {
-			bash -c "$(curl -fsSLk https://release.baizhi.cloud/panda-wiki/manager.sh)"
+			run_reviewed_remote_script https://release.baizhi.cloud/panda-wiki/manager.sh
 		}
 
 		docker_app_update() {
@@ -17665,7 +17726,7 @@ while true; do
 
 		  docker_app_uninstall() {
 			  cd /home/docker/linkwarden && docker compose down --rmi all
-			  rm -rf /home/docker/linkwarden
+			  safe_remove_path_interactive "/home/docker/linkwarden"
 			  echo "應用程式已解除安裝"
 		  }
 
@@ -17729,7 +17790,7 @@ while true; do
 			  cd /home/docker/jitsi
 			  cd "$(find . -maxdepth 1 -type d -name '*docker-jitsi-meet*' | head -n 1)"
 			  docker compose down --rmi all
-			  rm -rf /home/docker/jitsi
+			  safe_remove_path_interactive "/home/docker/jitsi"
 			  echo "應用程式已解除安裝"
 		  }
 
@@ -17865,7 +17926,7 @@ while true; do
 
 		  docker_app_uninstall() {
 			  cd /home/docker/${docker_name} && docker compose down --rmi all
-			  rm -rf /home/docker/${docker_name}
+			  safe_remove_path_interactive "/home/docker/${docker_name}"
 			  echo "應用程式已解除安裝"
 		  }
 
@@ -17885,7 +17946,7 @@ while true; do
 		docker_rum() {
 
 			mkdir -p /home/docker/jellyfin/media
-			chmod -R 777 /home/docker/jellyfin
+			chmod -R 0750 /home/docker/jellyfin
 
 			docker run -d \
 			  --name jellyfin \
@@ -18092,7 +18153,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/gitea/ && docker compose down --rmi all
-			rm -rf /home/docker/gitea
+			safe_remove_path_interactive "/home/docker/gitea"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18230,7 +18291,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/paperless/ && docker compose down --rmi all
-			rm -rf /home/docker/paperless
+			safe_remove_path_interactive "/home/docker/paperless"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18257,7 +18318,7 @@ while true; do
 
 			mkdir -p /home/docker/2fauth
 			mkdir -p /home/docker/2fauth/data
-			chmod -R 777 /home/docker/2fauth/
+			chmod -R 0770 /home/docker/2fauth/
 			cd /home/docker/2fauth
 
 			curl -o /home/docker/2fauth/docker-compose.yml ${UPSTREAM_DOCKER_DOWNLOAD_BASE}/2fauth-docker-compose.yml
@@ -18284,7 +18345,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/2fauth/ && docker compose down --rmi all
-			rm -rf /home/docker/2fauth
+			safe_remove_path_interactive "/home/docker/2fauth"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18492,7 +18553,7 @@ while true; do
 
 			mkdir -p /home/docker/dsm
 			mkdir -p /home/docker/dsm/dev
-			chmod -R 777 /home/docker/dsm/
+			chmod -R 0770 /home/docker/dsm/
 			cd /home/docker/dsm
 
 			curl -o /home/docker/dsm/docker-compose.yml ${UPSTREAM_DOCKER_DOWNLOAD_BASE}/dsm-docker-compose.yml
@@ -18517,7 +18578,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd /home/docker/dsm/ && docker compose down --rmi all
-			rm -rf /home/docker/dsm
+			safe_remove_path_interactive "/home/docker/dsm"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18588,7 +18649,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/MoneyPrinterTurbo/ && docker compose down --rmi all
-			rm -rf /home/docker/MoneyPrinterTurbo
+			safe_remove_path_interactive "/home/docker/MoneyPrinterTurbo"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18657,7 +18718,7 @@ while true; do
 
 		docker_app_uninstall() {
 			cd  /home/docker/umami/ && docker compose down --rmi all
-			rm -rf /home/docker/umami
+			safe_remove_path_interactive "/home/docker/umami"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18798,7 +18859,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 
 		docker_app_uninstall() {
 			cd  /home/docker/LangBot/docker/ && docker compose down --rmi all
-			rm -rf /home/docker/LangBot
+			safe_remove_path_interactive "/home/docker/LangBot"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18868,7 +18929,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 
 		docker_app_uninstall() {
 			cd  /home/docker/karakeep/docker/ && docker compose down --rmi all
-			rm -rf /home/docker/karakeep
+			safe_remove_path_interactive "/home/docker/karakeep"
 			echo "應用程式已解除安裝"
 		}
 
@@ -18970,7 +19031,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 		  ;;
 
 	  115|hermes)
-	  	  bash <(curl -sL ${PROJECT_DOWNLOAD_BASE}/hermes_manager.sh)
+			  run_reviewed_remote_script "${PROJECT_DOWNLOAD_BASE}/hermes_manager.sh"
 		  ;;
 
 	  b)
@@ -18993,7 +19054,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 				if [ -n "$latest_tar" ]; then
 				  ssh-keygen -f "/root/.ssh/known_hosts" -R "$remote_ip"
 				  sleep 2  # 添加等待时间
-				  scp -P "$TARGET_PORT" -o StrictHostKeyChecking=no "$latest_tar" "root@$remote_ip:/"
+				  scp -P "$TARGET_PORT" -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$latest_tar" "root@$remote_ip:/"
 				  echo "檔案已傳送至遠端伺服器/根目錄。"
 				else
 				  echo "未找到要傳送的文件。"
@@ -19251,7 +19312,7 @@ switch_mirror() {
 
 	if [ "$country" = "CN" ]; then
 		echo "使用國內鏡像來源..."
-		bash <(curl -sSL https://linuxmirrors.cn/main.sh) \
+		run_reviewed_remote_script https://linuxmirrors.cn/main.sh \
 		  --source mirrors.huaweicloud.com \
 		  --protocol https \
 		  --use-intranet-source false \
@@ -19264,7 +19325,7 @@ switch_mirror() {
 	else
 		echo "使用海外鏡像來源..."
 		if [ -f /etc/os-release ] && grep -qi "oracle" /etc/os-release; then
-			bash <(curl -sSL https://linuxmirrors.cn/main.sh) \
+			run_reviewed_remote_script https://linuxmirrors.cn/main.sh \
 			  --source mirrors.xtom.com \
 			  --protocol https \
 			  --use-intranet-source false \
@@ -19275,7 +19336,7 @@ switch_mirror() {
 			  --install-epel false \
 			  --pure-mode
 		else
-			bash <(curl -sSL https://linuxmirrors.cn/main.sh) \
+			run_reviewed_remote_script https://linuxmirrors.cn/main.sh \
 				--use-official-source true \
 				--protocol https \
 				--use-intranet-source false \
@@ -19686,7 +19747,7 @@ create_user_with_sshkey() {
 	# sudo 免密
 	if [[ "$is_sudo" == "true" ]]; then
 		cat >"/etc/sudoers.d/$new_username" <<EOF
-$new_username ALL=(ALL) NOPASSWD:ALL
+$new_username ALL=(ALL:ALL) ALL
 EOF
 		chmod 440 "/etc/sudoers.d/$new_username"
 	fi
@@ -19783,6 +19844,11 @@ linux_Settings() {
 					  break_end
 					  continue
 				  fi
+				  install_project_entrypoint || {
+					  echo -e "${gl_hong}安裝主命令失敗，未建立快捷鍵。${gl_bai}"
+					  break_end
+					  continue
+				  }
 				  find /usr/local/bin/ -type l -exec bash -c 'link=$1; target=$2; [ "$(readlink -f "$link")" = "$target" ] && rm -f "$link"' _ {} "$project_install_target" \;
 				  if [ "$kuaijiejian" != "$PROJECT_COMMAND" ]; then
 					  ln -sf "$PROJECT_INSTALL_PATH" "/usr/local/bin/$kuaijiejian"
@@ -19856,7 +19922,7 @@ linux_Settings() {
 					return
 				fi
 
-				curl https://pyenv.run | bash
+				run_reviewed_remote_script https://pyenv.run
 				cat << EOF >> ~/.bashrc
 
 export PYENV_ROOT="\$HOME/.pyenv"
@@ -19888,8 +19954,6 @@ EOF
 		  5)
 			  root_use
 			  iptables_open
-			  remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
-			  echo "連接埠已全部開放"
 
 			  ;;
 		  6)
@@ -19990,7 +20054,7 @@ EOF
 
 					3)
 						clear
-						bash <(curl -L -s jhb.ovh/jb/v6.sh)
+						run_reviewed_remote_script https://jhb.ovh/jb/v6.sh
 						echo "此功能由jhb大神提供，感謝他！"
 						;;
 
@@ -20059,7 +20123,7 @@ EOF
 				while IFS=: read -r username _ userid groupid _ _ homedir shell; do
 					local groups=$(groups "$username" | cut -d : -f 2)
 					local sudo_status
-					if sudo -n -lU "$username" 2>/dev/null | grep -q "(ALL) \(NOPASSWD: \)\?ALL"; then
+					if sudo -lU "$username" 2>/dev/null | grep -Eq '\(ALL(:ALL)?\).*ALL'; then
 						sudo_status="Yes"
 					else
 						sudo_status="No"
@@ -20099,7 +20163,7 @@ EOF
 					   read -e -p "請輸入使用者名稱:" username
 					   install sudo
 					   cat >"/etc/sudoers.d/$username" <<EOF
-$username ALL=(ALL) NOPASSWD:ALL
+$username ALL=(ALL:ALL) ALL
 EOF
 					  chmod 440 "/etc/sudoers.d/$username"
 
@@ -20311,13 +20375,13 @@ EOF
 
 		  case $choice in
 			  1)
-				  bash <(curl -sSL https://linuxmirrors.cn/main.sh)
+				  run_reviewed_remote_script https://linuxmirrors.cn/main.sh
 				  ;;
 			  2)
-				  bash <(curl -sSL https://linuxmirrors.cn/main.sh) --edu
+				  run_reviewed_remote_script https://linuxmirrors.cn/main.sh --edu
 				  ;;
 			  3)
-				  bash <(curl -sSL https://linuxmirrors.cn/main.sh) --abroad
+				  run_reviewed_remote_script https://linuxmirrors.cn/main.sh --abroad
 				  ;;
 			  4)
 				  switch_mirror false false
@@ -20565,10 +20629,7 @@ EOF
 		  26)
 			  root_use
 			  cd ~
-			  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/upgrade_openssh9.8p1.sh
-			  chmod +x ~/upgrade_openssh9.8p1.sh
-			  ~/upgrade_openssh9.8p1.sh
-			  rm -f ~/upgrade_openssh9.8p1.sh
+			  run_reviewed_remote_script "${PROJECT_DOWNLOAD_BASE}/upgrade_openssh9.8p1.sh"
 			  ;;
 
 		  27)
@@ -20718,7 +20779,7 @@ EOF
 				  echo -e "[${gl_lv}OK${gl_bai}] 11/12. 安裝基礎工具${gl_huang}docker wget sudo tar unzip socat btop nano vim${gl_bai}"
 				  echo "------------------------------------------------"
 
-				  curl -sS ${PROJECT_DOWNLOAD_BASE}/network-optimize.sh | bash
+				  run_reviewed_remote_script "${PROJECT_DOWNLOAD_BASE}/network-optimize.sh"
 				  echo -e "[${gl_lv}OK${gl_bai}] 12/12. Linux系統核心參數最佳化"
 				  echo -e "${gl_lv}一條龍系統調優已完成${gl_bai}"
 
@@ -20756,6 +20817,7 @@ EOF
 				  (crontab -l | grep -v "$PROJECT_SCRIPT_NAME") | crontab -
 				  [ -n "$PROJECT_LINK_PATH" ] && rm -f "$PROJECT_LINK_PATH"
 				  rm -f "$PROJECT_INSTALL_PATH" "$PROJECT_HOME_PATH"
+				  rm -f "$PROJECT_LICENSE_ACCEPTED_FILE"
 				  echo "腳本已卸載，再見！"
 				  break_end
 				  clear
@@ -20836,7 +20898,7 @@ linux_file() {
 				;;
 			5)  # 删除目录
 				read -e -p "請輸入要刪除的目錄名稱:" dirname
-				rm -rf "$dirname" && echo "目錄已刪除" || echo "刪除失敗"
+				safe_remove_path_interactive "$dirname" && echo "目錄已刪除" || echo "刪除失敗"
 				;;
 			6)  # 返回上一级选单目录
 				cd ..
@@ -20930,7 +20992,7 @@ linux_file() {
 				sleep 2  # 等待时间
 
 				# 使用scp傳輸文件
-				scp -P "$remote_port" -o StrictHostKeyChecking=no "$file_to_transfer" "$remote_user@$remote_ip:/home/" <<EOF
+				scp -P "$remote_port" -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$file_to_transfer" "$remote_user@$remote_ip:/home/" <<EOF
 $remote_password
 EOF
 
@@ -20976,11 +21038,14 @@ run_commands_on_servers() {
 		local hostname=${SERVER_ARRAY[i+1]}
 		local port=${SERVER_ARRAY[i+2]}
 		local username=${SERVER_ARRAY[i+3]}
-		local password=${SERVER_ARRAY[i+4]}
+		local stored_password=${SERVER_ARRAY[i+4]}
 		echo
 		echo -e "${gl_huang}連接到$name ($hostname)...${gl_bai}"
-		# sshpass -p "$password" ssh -o StrictHostKeyChecking=no "$username@$hostname" -p "$port" "$1"
-		sshpass -p "$password" ssh -t -o StrictHostKeyChecking=no "$username@$hostname" -p "$port" "$1"
+		if [ -n "$stored_password" ]; then echo -e "${gl_hong}舊版明文密碼已忽略，請從 servers.py 清除。${gl_bai}"; fi
+		kj_ssh_read_password "請輸入 $username@$hostname 的密碼: "
+		local password="$KJ_SSH_PASSWORD"
+		SSHPASS="$password" sshpass -e ssh -t -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$username@$hostname" -p "$port" "$1"
+		unset password KJ_SSH_PASSWORD
 	done
 	echo
 	break_end
@@ -20989,19 +21054,22 @@ run_commands_on_servers() {
 
 
 linux_cluster() {
-mkdir cluster
-if [ ! -f ~/cluster/servers.py ]; then
-	cat > ~/cluster/servers.py << EOF
+mkdir -p "$HOME/cluster"
+chmod 0700 "$HOME/cluster"
+if [ ! -f "$HOME/cluster/servers.py" ]; then
+	(umask 077 && cat > "$HOME/cluster/servers.py" << EOF
 servers = [
 
 ]
 EOF
+)
 fi
+chmod 0600 "$HOME/cluster/servers.py"
 
 while true; do
 	  clear
 	  echo "伺服器叢集控制"
-	  cat ~/cluster/servers.py
+	  cat "$HOME/cluster/servers.py"
 	  echo
 	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  echo -e "${gl_minglan}伺服器清單管理${gl_bai}"
@@ -21025,18 +21093,17 @@ while true; do
 			  local server_port=${server_port:-22}
 			  read -e -p "伺服器使用者名稱（root）:" server_username
 			  local server_username=${server_username:-root}
-			  read -e -p "伺服器用戶密碼:" server_password
-
-			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"$server_password\", \"remote_path\": \"/home/\"}," ~/cluster/servers.py
+			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] || [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] || [[ ! "$server_port" =~ ^[0-9]+$ ]] || [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] || [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then echo "伺服器資訊格式無效。"; break_end; continue; fi
+			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
 
 			  ;;
 		  2)
 			  read -e -p "請輸入需要刪除的關鍵字:" rmserver
-			  sed -i "/$rmserver/d" ~/cluster/servers.py
+			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"; else echo "伺服器名稱格式無效。"; fi
 			  ;;
 		  3)
 			  install nano
-			  nano ~/cluster/servers.py
+			  nano "$HOME/cluster/servers.py"
 			  ;;
 
 		  4)
@@ -21123,11 +21190,11 @@ games_server_tools() {
 	  case $sub_choice in
 
 		  1) cd ~
-			 curl -sS -O ${PROJECT_DOWNLOAD_BASE}/palworld.sh ; chmod +x palworld.sh ; ./palworld.sh
+			 run_reviewed_remote_script "${PROJECT_DOWNLOAD_BASE}/palworld.sh"
 			 exit
 			 ;;
 		  2) cd ~
-			 curl -sS -O ${PROJECT_DOWNLOAD_BASE}/mc.sh ; chmod +x mc.sh ; ./mc.sh
+			 run_reviewed_remote_script "${PROJECT_DOWNLOAD_BASE}/mc.sh"
 			 exit
 			 ;;
 
@@ -21212,7 +21279,7 @@ case $choice in
   5) linux_bbr ;;
   6) linux_docker ;;
   7) clear ; install wget
-	wget -N https://gitlab.com/fscarmen/warp/-/raw/main/menu.sh ; bash menu.sh [option] [lisence/url/token]
+	run_reviewed_remote_script https://gitlab.com/fscarmen/warp/-/raw/main/menu.sh
 	;;
   8) linux_test ;;
   9) linux_Oracle ;;
