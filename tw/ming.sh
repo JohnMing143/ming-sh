@@ -11236,65 +11236,6 @@ PY
 		break_end
 	}
 
-	openclaw_api_providers_showcase() {
-
-		clear
-		echo ""
-		echo -e "${gl_kjlan}╔════════════════════════════════════════════════════════════╗${gl_bai}"
-		echo -e "${gl_kjlan}║${gl_bai}            ${gl_huang}🌟 API 廠商推薦列表${gl_bai}                          ${gl_kjlan}║${gl_bai}"
-		echo -e "${gl_kjlan}║${gl_bai}            ${gl_zi}部分入口含 AFF${gl_bai}                            ${gl_kjlan}║${gl_bai}"
-		echo -e "${gl_kjlan}╚════════════════════════════════════════════════════════════╝${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● DeepSeek${gl_bai}"
-		echo -e "    ${gl_kjlan}https://api-docs.deepseek.com/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● OpenRouter${gl_bai}"
-		echo -e "    ${gl_kjlan}https://openrouter.ai/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● Kimi${gl_bai}"
-		echo -e "    ${gl_kjlan}https://platform.moonshot.cn/docs/guide/start-using-kimi-api${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● 超算互聯網${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.scnet.cn/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● 優雲智算${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://passport.compshare.cn/register?referral_code=4mscFZXfutfFi8swMVsPuf${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● 矽基流動${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://cloud.siliconflow.cn/i/irWVdPic${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● 智譜 GLM${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.bigmodel.cn/glm-coding?ic=HYOTDOAJMR${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● PackyAPI${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.packyapi.com/register?aff=wHri${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● 雲霧 API${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://yunwu.ai/register?aff=ZuyK${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}●柏拉圖AI${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://api.bltcy.ai/register?aff=TBzb114019${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● MiniMax${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.minimaxi.com/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● NVIDIA${gl_bai}"
-		echo -e "    ${gl_kjlan}https://build.nvidia.com/settings/api-keys${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● Ollama${gl_bai}"
-		echo -e "    ${gl_kjlan}https://ollama.com/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● 白山雲${gl_bai}"
-		echo -e "    ${gl_kjlan}https://ai.baishan.com/${gl_bai}"
-		echo ""
-		echo -e "${gl_kjlan}────────────────────────────────────────────────────────────${gl_bai}"
-		echo -e "  ${gl_zi}圖例：${gl_lv}● 官方入口${gl_bai}  ${gl_huang}● AFF 推薦入口${gl_bai}"
-		echo ""
-		echo -e "${gl_huang}提示：複製連結到瀏覽器開啟即可訪問${gl_bai}"
-		echo ""
-		read -erp "按回車鍵返回..." dummy
-	}
-
 	openclaw_api_manage_menu() {
 		while true; do
 			clear
@@ -11307,7 +11248,6 @@ PY
 			echo "2. 同步API供應商模型列表"
 			echo "3. 切換 API 類型（completions / responses）"
 			echo "4. 刪除API"
-			echo "5. API 廠商推薦"
 			echo "0. 退出"
 			echo "---------------------------------------"
 			read -erp "請輸入你的選擇:" api_choice
@@ -11324,9 +11264,6 @@ PY
 					;;
 				4)
 					delete-openclaw-provider-interactive
-					;;
-				5)
-					openclaw_api_providers_showcase
 					;;
 				0)
 					return 0

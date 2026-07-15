@@ -11236,65 +11236,6 @@ PY
 		break_end
 	}
 
-	openclaw_api_providers_showcase() {
-
-		clear
-		echo ""
-		echo -e "${gl_kjlan}╔════════════════════════════════════════════════════════════╗${gl_bai}"
-		echo -e "${gl_kjlan}║${gl_bai}            ${gl_huang}🌟 API 벤더 추천 목록${gl_bai}                          ${gl_kjlan}║${gl_bai}"
-		echo -e "${gl_kjlan}║${gl_bai}            ${gl_zi}일부 입구에는 AFF가 포함되어 있습니다.${gl_bai}                            ${gl_kjlan}║${gl_bai}"
-		echo -e "${gl_kjlan}╚════════════════════════════════════════════════════════════╝${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● DeepSeek${gl_bai}"
-		echo -e "    ${gl_kjlan}https://api-docs.deepseek.com/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● OpenRouter${gl_bai}"
-		echo -e "    ${gl_kjlan}https://openrouter.ai/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● Kimi${gl_bai}"
-		echo -e "    ${gl_kjlan}https://platform.moonshot.cn/docs/guide/start-using-kimi-api${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● 슈퍼컴퓨팅 인터넷${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.scnet.cn/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● Youyun 지능형 컴퓨팅${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://passport.compshare.cn/register?referral_code=4mscFZXfutfFi8swMVsPuf${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● 실리콘 기반 흐름${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://cloud.siliconflow.cn/i/irWVdPic${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● GLM${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.bigmodel.cn/glm-coding?ic=HYOTDOAJMR${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● PackyAPI${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.packyapi.com/register?aff=wHri${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● 클라우드 API${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://yunwu.ai/register?aff=ZuyK${gl_bai}"
-		echo ""
-		echo -e "  ${gl_huang}● 플라톤 AI${gl_bai} ${gl_zi}[AFF]${gl_bai}"
-		echo -e "    ${gl_kjlan}https://api.bltcy.ai/register?aff=TBzb114019${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● MiniMax${gl_bai}"
-		echo -e "    ${gl_kjlan}https://www.minimaxi.com/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● NVIDIA${gl_bai}"
-		echo -e "    ${gl_kjlan}https://build.nvidia.com/settings/api-keys${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● Ollama${gl_bai}"
-		echo -e "    ${gl_kjlan}https://ollama.com/${gl_bai}"
-		echo ""
-		echo -e "  ${gl_lv}● 백산구름${gl_bai}"
-		echo -e "    ${gl_kjlan}https://ai.baishan.com/${gl_bai}"
-		echo ""
-		echo -e "${gl_kjlan}────────────────────────────────────────────────────────────${gl_bai}"
-		echo -e "  ${gl_zi}전설:${gl_lv}● 공식 입장${gl_bai}  ${gl_huang}● AFF 추천 입장${gl_bai}"
-		echo ""
-		echo -e "${gl_huang}팁: 링크를 복사하고 브라우저에서 열어서 액세스하세요.${gl_bai}"
-		echo ""
-		read -erp "돌아가려면 Enter를 누르세요..." dummy
-	}
-
 	openclaw_api_manage_menu() {
 		while true; do
 			clear
@@ -11307,7 +11248,6 @@ PY
 			echo "2. API 제공자 모델 목록 동기화"
 			echo "3. API 유형 전환(완료/응답)"
 			echo "4. API 삭제"
-			echo "5. API 공급업체에서 권장하는 사항"
 			echo "0. 종료"
 			echo "---------------------------------------"
 			read -erp "선택사항을 입력하세요:" api_choice
@@ -11324,9 +11264,6 @@ PY
 					;;
 				4)
 					delete-openclaw-provider-interactive
-					;;
-				5)
-					openclaw_api_providers_showcase
 					;;
 				0)
 					return 0
