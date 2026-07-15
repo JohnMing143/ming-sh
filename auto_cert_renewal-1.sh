@@ -1,10 +1,12 @@
+#!/usr/bin/env bash
+
 # 定义证书存储目录
 certs_directory="/etc/letsencrypt/live/"
 
 days_before_expiry=5  # 设置在证书到期前几天触发续签
 
 # 遍历所有证书文件
-for cert_dir in $certs_directory*; do
+for cert_dir in "$certs_directory"*; do
     # 获取域名
     domain=$(basename "$cert_dir")
 
@@ -30,7 +32,7 @@ for cert_dir in $certs_directory*; do
     current_timestamp=$(date +%s)
 
     # 计算距离过期还有几天
-    days_until_expiry=$(( ($expiration_timestamp - $current_timestamp) / 86400 ))
+    days_until_expiry=$(( (expiration_timestamp - current_timestamp) / 86400 ))
 
     # 检查是否需要续签（在满足续签条件的情况下）
     if [ $days_until_expiry -le $days_before_expiry ]; then
@@ -39,18 +41,8 @@ for cert_dir in $certs_directory*; do
         # 停止 Nginx
         docker stop nginx
 
-        iptables -P INPUT ACCEPT
-        iptables -P FORWARD ACCEPT
-        iptables -P OUTPUT ACCEPT
-        iptables -F
-    
-        ip6tables -P INPUT ACCEPT
-        ip6tables -P FORWARD ACCEPT
-        ip6tables -P OUTPUT ACCEPT
-        ip6tables -F
-
         # 续签证书
-        certbot certonly --standalone -d $domain --email your@email.com --agree-tos --no-eff-email --force-renewal
+        certbot certonly --standalone -d "$domain" --email your@email.com --agree-tos --no-eff-email --force-renewal
 
         # 启动 Nginx
         docker start nginx

@@ -19,11 +19,30 @@ fi
 UPSTREAM_PALWORLD_SETTINGS_URL="${UPSTREAM_PALWORLD_SETTINGS_URL:-https://kejilion.pro/PalWorldSettings.ini}"
 ENABLE_SELF_UPDATE="${ENABLE_SELF_UPDATE:-false}"
 
+run_reviewed_remote_script() {
+    local script_url="$1"
+    local cache_dir script_path digest confirmation
+    case "$script_url" in https://*) ;; *) echo "拒绝非 HTTPS 脚本: $script_url"; return 1 ;; esac
+    cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/ming-sh/remote-scripts"
+    [ ! -L "$cache_dir" ] || { echo "拒绝符号链接缓存目录。"; return 1; }
+    mkdir -p -- "$cache_dir" && chmod 0700 "$cache_dir" || return 1
+    [ -O "$cache_dir" ] || { echo "缓存目录不属于当前用户。"; return 1; }
+    script_path=$(mktemp "$cache_dir/review.XXXXXX.sh") || return 1
+    chmod 0600 "$script_path"
+    curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 --output "$script_path" "$script_url" || return 1
+    bash -n "$script_path" || { echo "远程脚本语法检查失败: $script_path"; return 1; }
+    digest=$(sha256sum "$script_path" | awk '{print $1}') || return 1
+    printf '脚本尚未执行。\n来源: %s\n文件: %s\nSHA-256: %s\n' "$script_url" "$script_path" "$digest"
+    [ -t 0 ] || { echo "非交互环境拒绝执行未固定摘要的脚本。"; return 1; }
+    read -r -p "输入 RUN $digest 执行: " confirmation
+    [ "$confirmation" = "RUN $digest" ] || { echo "脚本未执行。"; return 1; }
+    bash "$script_path"
+}
+
 ln -sf ~/palworld.sh /usr/local/bin/p
 
 ip_address() {
 ipv4_address=$(curl -s ipv4.ip.sb)
-ipv6_address=$(curl -s --max-time 1 ipv6.ip.sb)
 }
 
 
@@ -96,7 +115,7 @@ install_add_docker() {
         rc-update add docker default
         service docker start
     else
-        curl -fsSL https://get.docker.com | sh && ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin
+        run_reviewed_remote_script https://get.docker.com && ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin
         systemctl start docker
         systemctl enable docker
     fi
@@ -120,8 +139,80 @@ pal_start() {
 }
 
 pal_backup() {
-  cd ~
-  curl -sS -O "${PROJECT_DOWNLOAD_BASE}/pal_backup.sh" && chmod +x pal_backup.sh
+  local target="$HOME/pal_backup.sh"
+  {
+    printf '#!/usr/bin/env bash\nset -euo pipefail\n\n'
+    declare -f pal_export_world
+    printf '\npal_export_world\n'
+  } > "$target" || return 1
+  chmod 0700 "$target"
+}
+
+pal_set_backup_cron() {
+  local schedule="$1"
+  local cron_tag="# ming-sh:palworld-backup"
+  local cron_job="$schedule $HOME/pal_backup.sh $cron_tag"
+  (crontab -l 2>/dev/null || true) | grep -vF "$cron_tag" | { cat; printf '%s\n' "$cron_job"; } | crontab -
+}
+
+pal_archive_is_safe() {
+    local archive="$1"
+    local listing
+    listing=$(tar -tzf "$archive") || return 1
+    printf '%s\n' "$listing" | awk '
+        /^\// { bad=1 }
+        /(^|\/)\.\.($|\/)/ { bad=1 }
+        END { exit bad }
+    '
+}
+
+pal_export_world() {
+    local backup_root="/home/game/palworld-backups"
+    local stage archive
+    mkdir -p -- "$backup_root"
+    stage=$(mktemp -d "$backup_root/.stage.XXXXXX") || return 1
+    if ! docker cp steamcmd:/home/steam/Steam/steamapps/common/PalServer/Pal/Saved/. "$stage/Saved"; then
+        rm -rf -- "$stage"
+        return 1
+    fi
+    archive="$backup_root/palworld_$(date +"%Y%m%d%H%M%S").tar.gz"
+    if tar -C "$stage" -czf "$archive" Saved; then
+        chmod 0600 "$archive"
+        rm -rf -- "$stage"
+        printf '\033[0;32m游戏存档已导出至: %s\033[0m\n' "$archive"
+    else
+        rm -rf -- "$stage" "$archive"
+        return 1
+    fi
+}
+
+pal_restore_world() {
+    local backup_root="/home/game/palworld-backups"
+    local latest_archive stage previous_saved failed_saved saved_path
+    latest_archive=$(find "$backup_root" -maxdepth 1 -type f -name 'palworld_*.tar.gz' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -n 1 | cut -d' ' -f2-)
+    [ -n "$latest_archive" ] || { echo "未找到 Palworld 备份。"; return 1; }
+    pal_archive_is_safe "$latest_archive" || { echo "备份包含不安全路径，拒绝恢复。"; return 1; }
+    stage=$(mktemp -d "$backup_root/.restore.XXXXXX") || return 1
+    tar -C "$stage" -xzf "$latest_archive" || { rm -rf -- "$stage"; return 1; }
+    [ -d "$stage/Saved" ] || { echo "备份缺少 Saved 目录。"; rm -rf -- "$stage"; return 1; }
+
+    saved_path="/home/steam/Steam/steamapps/common/PalServer/Pal/Saved"
+    previous_saved="${saved_path}.ming-backup-$(date +"%Y%m%d%H%M%S")"
+    failed_saved="${saved_path}.failed-$(date +"%Y%m%d%H%M%S")"
+    tmux kill-session -t my1 >/dev/null 2>&1 || true
+    docker stop steamcmd >/dev/null 2>&1 || { rm -rf -- "$stage"; return 1; }
+    docker exec steamcmd sh -c 'set -eu; mv -- "$1" "$2"; mkdir -p -- "$1"' sh "$saved_path" "$previous_saved" || { rm -rf -- "$stage"; return 1; }
+    if docker cp "$stage/Saved/." "steamcmd:$saved_path/"; then
+        docker exec -u root steamcmd sh -c 'chown -R steam:steam "$1" && chmod -R u+rwX,g+rwX,o-rwx "$1"' sh "$saved_path"
+        echo "恢复完成；旧存档保留在容器内: $previous_saved"
+    else
+        docker exec steamcmd sh -c 'set -eu; mv -- "$1" "$3"; mv -- "$2" "$1"' sh "$saved_path" "$previous_saved" "$failed_saved"
+        rm -rf -- "$stage"
+        return 1
+    fi
+    rm -rf -- "$stage"
+    docker restart steamcmd >/dev/null 2>&1
+    pal_start
 }
 
 pal_install_status() {
@@ -180,7 +271,7 @@ echo "00. 脚本更新"
 echo "------------------------"
 echo "0. 退出脚本"
 echo "------------------------"
-read -p "请输入你的选择: " choice
+read -r -p "请输入你的选择: " choice
 
 case $choice in
   1)
@@ -235,12 +326,12 @@ case $choice in
 
             echo "当前虚拟内存: $swap_info"
 
-            read -p "是否调整大小?(Y/N): " choice
+            read -r -p "是否调整大小?(Y/N): " choice
 
             case "$choice" in
               [Yy])
                 # 输入新的虚拟内存大小
-                read -p "请输入虚拟内存大小MB: " new_swap
+                read -r -p "请输入虚拟内存大小MB: " new_swap
 
                 # 获取当前系统中所有的 swap 分区
                 swap_partitions=$(grep -E '^/dev/' /proc/swaps | awk '{print $1}')
@@ -260,7 +351,7 @@ case $choice in
                 rm -f /swapfile
 
                 # 创建新的 swap 分区
-                dd if=/dev/zero of=/swapfile bs=1M count=$new_swap
+                dd if=/dev/zero of=/swapfile bs=1M count="$new_swap"
                 chmod 600 /swapfile
                 mkswap /swapfile
                 swapon /swapfile
@@ -287,25 +378,11 @@ case $choice in
 
   7)
     clear
-    mkdir -p /home/game
-    docker cp steamcmd:/home/steam/Steam/steamapps/common/PalServer/Pal/Saved/ /home/game/palworld/ > /dev/null 2>&1
-    cd /home/game && tar czvf palworld_$(date +"%Y%m%d%H%M%S").tar.gz palworld > /dev/null 2>&1
-    rm -rf /home/game/palworld/
-    echo -e "\033[0;32m游戏存档已导出存放在: /home/game/\033[0m"
+    pal_export_world
     ;;
   8)
     clear
-    tmux kill-session -t my1
-    docker exec -it steamcmd bash -c "rm -rf /home/steam/Steam/steamapps/common/PalServer/Pal/Saved/*"
-    cd /home/game/ && ls -t /home/game/*.tar.gz | head -1 | xargs -I {} tar -xzf {}
-    docker cp /home/game/palworld/Config steamcmd:/home/steam/Steam/steamapps/common/PalServer/Pal/Saved/Config > /dev/null 2>&1
-    docker cp /home/game/palworld/ImGui steamcmd:/home/steam/Steam/steamapps/common/PalServer/Pal/Saved/ImGui > /dev/null 2>&1
-    docker cp /home/game/palworld/SaveGames steamcmd:/home/steam/Steam/steamapps/common/PalServer/Pal/Saved/SaveGames > /dev/null 2>&1
-    docker exec -it -u root steamcmd bash -c "chmod -R 777 /home/steam/Steam/steamapps/common/PalServer/Pal/Saved/"
-    rm -rf /home/game/palworld/
-    echo -e "\033[0;32m游戏存档已导入\033[0m"
-    docker restart steamcmd > /dev/null 2>&1
-    pal_start
+    pal_restore_world
     ;;
 
   9)
@@ -314,23 +391,23 @@ case $choice in
     echo "------------------------"
     echo "1. 每周备份       2. 每天备份       3. 每小时备份"
     echo "------------------------"
-    read -p "请输入你的选择: " dingshi
+    read -r -p "请输入你的选择: " dingshi
     case $dingshi in
         1)
             pal_backup
-            (crontab -l ; echo "0 0 * * 1 ./pal_backup.sh") | crontab - > /dev/null 2>&1
+            pal_set_backup_cron "0 0 * * 1"
             echo "每周一备份，已设置"
 
             ;;
         2)
             pal_backup
-            (crontab -l ; echo "0 3 * * * ./pal_backup.sh") | crontab - > /dev/null 2>&1
+            pal_set_backup_cron "0 3 * * *"
             echo "每天凌晨3点备份，已设置"
 
             ;;
         3)
             pal_backup
-            (crontab -l ; echo "0 * * * * ./pal_backup.sh") | crontab - > /dev/null 2>&1
+            pal_set_backup_cron "0 * * * *"
             echo "每小时整点备份，已设置"
 
             ;;
@@ -347,8 +424,8 @@ case $choice in
 
     echo "配置游戏参数"
     echo "------------------------"
-    read -p "设置加入的密码（回车默认无密码）: " server_password
-    read -p "设置游戏难度: （1. 简单    2. 普通    3. 困难）:" Difficulty
+    read -r -p "设置加入的密码（回车默认无密码）: " server_password
+    read -r -p "设置游戏难度: （1. 简单    2. 普通    3. 困难）:" Difficulty
       case $Difficulty in
         1)
             Difficulty=1
@@ -366,9 +443,9 @@ case $choice in
             ;;
       esac
 
-    read -p "经验值倍率: （回车默认1倍）:" exp_rate
+    read -r -p "经验值倍率: （回车默认1倍）:" exp_rate
       ExpRate=${exp_rate:-1}
-    read -p "死亡后掉落设置: （1. 掉落    2. 不掉落）:" DeathPenalty
+    read -r -p "死亡后掉落设置: （1. 掉落    2. 不掉落）:" DeathPenalty
       case $DeathPenalty in
         1)
             DeathPenalty=All
@@ -383,7 +460,7 @@ case $choice in
             ;;
       esac
 
-    read -p "设置pvp模式: （1. 开启    2. 关闭）:" pal_pvp
+    read -r -p "设置pvp模式: （1. 开启    2. 关闭）:" pal_pvp
 
       case $pal_pvp in
         1)
@@ -410,7 +487,7 @@ case $choice in
 
     docker exec -it steamcmd bash -c "rm -f /home/steam/Steam/steamapps/common/PalServer/Pal/Saved/Config/LinuxServer/PalWorldSettings.ini"
     docker cp ~/PalWorldSettings.ini steamcmd:/home/steam/Steam/steamapps/common/PalServer/Pal/Saved/Config/LinuxServer/ > /dev/null 2>&1
-    docker exec -it -u root steamcmd bash -c "chmod -R 777 /home/steam/Steam/steamapps/common/PalServer/Pal/Saved/"
+    docker exec -it -u root steamcmd bash -c "chown -R steam:steam /home/steam/Steam/steamapps/common/PalServer/Pal/Saved/ && chmod -R u+rwX,g+rwX,o-rwx /home/steam/Steam/steamapps/common/PalServer/Pal/Saved/"
     rm -f ~/PalWorldSettings.ini
     echo -e "\033[0;32m游戏配置已导入\033[0m"
     docker restart steamcmd > /dev/null 2>&1
@@ -435,7 +512,7 @@ case $choice in
     ;;
 
   m)
-    cd ~
+    cd ~ || exit 1
     if command -v "$PROJECT_COMMAND" >/dev/null 2>&1; then
       "$PROJECT_COMMAND"
     else

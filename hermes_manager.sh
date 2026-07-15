@@ -21,6 +21,26 @@ fi
 # --- ming.sh 增强版 API 管理核心 ---
 CONFIG_FILE="$HOME/.hermes/config.yaml"
 
+run_reviewed_remote_script() {
+    local script_url="$1"
+    local cache_dir script_path digest confirmation
+    case "$script_url" in https://*) ;; *) echo "拒绝非 HTTPS 脚本: $script_url"; return 1 ;; esac
+    cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/ming-sh/remote-scripts"
+    [ ! -L "$cache_dir" ] || { echo "拒绝符号链接缓存目录。"; return 1; }
+    mkdir -p -- "$cache_dir" && chmod 0700 "$cache_dir" || return 1
+    [ -O "$cache_dir" ] || { echo "缓存目录不属于当前用户。"; return 1; }
+    script_path=$(mktemp "$cache_dir/review.XXXXXX.sh") || return 1
+    chmod 0600 "$script_path"
+    curl --fail --show-error --silent --location --proto '=https' --tlsv1.2 --output "$script_path" "$script_url" || return 1
+    bash -n "$script_path" || { echo "远程脚本语法检查失败: $script_path"; return 1; }
+    digest=$(sha256sum "$script_path" | awk '{print $1}') || return 1
+    printf '脚本尚未执行。\n来源: %s\n文件: %s\nSHA-256: %s\n' "$script_url" "$script_path" "$digest"
+    [ -t 0 ] || { echo "非交互环境拒绝执行未固定摘要的脚本。"; return 1; }
+    read -r -p "输入 RUN $digest 执行: " confirmation
+    [ "$confirmation" = "RUN $digest" ] || { echo "脚本未执行。"; return 1; }
+    bash "$script_path"
+}
+
 config_tool() {
     # 自动适配 CONFIG_FILE 路径
     if [ ! -f "$CONFIG_FILE" ]; then
@@ -271,9 +291,9 @@ hermes_model_probe() {
 
     # 从 custom_providers 中查找对应条目
     provider_name="$target_model"
-    local entry=$(echo "$ps_json" | jq -c --arg n "$provider_name" '.[] | select(.name == $n)' 2>/dev/null)
+    local entry
+    entry=$(echo "$ps_json" | jq -c --arg n "$provider_name" '.[] | select(.name == $n)' 2>/dev/null)
     if [ -z "$entry" ]; then
-        HERMES_PROBE_STATUS="ERROR"
         HERMES_PROBE_MESSAGE="未找到模型配置"
         HERMES_PROBE_LATENCY="-"
         HERMES_PROBE_REPLY="-"
@@ -370,13 +390,11 @@ PYEOF
     rm -f "$tmp_response"
 
     if [ "$p_exit" = "0" ] && [ "$p_http" -ge 200 ] 2>/dev/null && [ "$p_http" -lt 300 ] 2>/dev/null; then
-        HERMES_PROBE_STATUS="OK"
         HERMES_PROBE_MESSAGE="HTTP ${p_http}"
         HERMES_PROBE_LATENCY="${p_latency}ms"
         HERMES_PROBE_REPLY="$reply_preview"
         return 0
     else
-        HERMES_PROBE_STATUS="FAIL"
         HERMES_PROBE_MESSAGE="HTTP ${p_http:-0} / exit ${p_exit:-1}"
         HERMES_PROBE_LATENCY="${p_latency:-?}ms"
         HERMES_PROBE_REPLY="$reply_preview"
@@ -500,7 +518,7 @@ api_management_submenu() {
         echo -e "${BLUE}=======================================${NC}"
         echo -e "      ${PURPLE}API & 模型管理 (OpenClaw 风格)${NC}"
         echo -e "${BLUE}=======================================${NC}"
-        echo -e "${CYAN}当前激活模型:${NC} ${GREEN}$(echo $info | jq -r .m)${NC}"
+        echo -e "${CYAN}当前激活模型:${NC} ${GREEN}$(echo "$info" | jq -r .m)${NC}"
         echo -e "---------------------------------------"
         echo -e "${CYAN}已配置 API 列表:${NC}"
         local groups_lat_json
@@ -535,7 +553,7 @@ api_management_submenu() {
         echo -e "4. 删除 API 供应商"
         echo -e "0. 返回主菜单"
         echo -e "---------------------------------------"
-        read -p "选择序号: " sub_choice
+        read -r -p "选择序号: " sub_choice
         case "$sub_choice" in
             1)
                 local orange="#FF8C00"
@@ -565,7 +583,7 @@ api_management_submenu() {
                         echo "$models_list"
                         echo "当前默认：${default_model}"
                         echo "----------------"
-                        read -e -p "请输入模型编号或名称 (输入 0 退出): " selected_model
+                        read -e -r -p "请输入模型编号或名称 (输入 0 退出): " selected_model
 
                         if [ "$selected_model" = "0" ]; then
                             break
@@ -668,13 +686,13 @@ api_management_submenu() {
                 ;;
             2)
                 echo -e "${CYAN}--- 添加新 API 供应商 ---${NC}"
-                read -p "请输入供应商名称 (如: DeepSeek): " n
+                read -r -p "请输入供应商名称 (如: DeepSeek): " n
                 [ -z "$n" ] && continue
-                read -p "请输入 Base URL (如: https://api.deepseek.com/v1): " u
+                read -r -p "请输入 Base URL (如: https://api.deepseek.com/v1): " u
                 [ -z "$u" ] && continue
                 u="${u%/}"
                 echo -ne "${YELLOW}请输入 API Key (输入隐藏): ${NC}"
-                read -s k
+                read -r -s k
                 echo ""
                 [ -z "$k" ] && continue
                 
@@ -696,7 +714,7 @@ api_management_submenu() {
                     done
                     
                     echo -e "---------------------------------------"
-                    read -p "是否同时添加该供应商的所有 $m_count 个模型？(y/N): " bulk_confirm
+                    read -r -p "是否同时添加该供应商的所有 $m_count 个模型？(y/N): " bulk_confirm
                     if [[ "$bulk_confirm" =~ ^[Yy]$ ]]; then
                         # 转换数组为 JSON
                         m_json_list=$(echo "$m_list_str" | jq -R . | jq -s -c .)
@@ -709,7 +727,7 @@ api_management_submenu() {
                     fi
                 else
                     echo -e "${RED}❌ 无法获取列表。${NC}"
-                    read -p "请手动输入模型 ID: " m_manual
+                    read -r -p "请手动输入模型 ID: " m_manual
                     [ -n "$m_manual" ] && config_tool add_p "$n" "$u" "$k" "$m_manual"
                 fi
                 sleep 2
@@ -726,10 +744,10 @@ api_management_submenu() {
                 fi
                 echo "$groups_json" | jq -r '.[] | "  ● \(.name) (\(.count) 个模型)"'
                 echo ""
-                read -p "请输入要同步的 API 名称(provider)，直接回车同步全部: " sync_provider
+                read -r -p "请输入要同步的 API 名称(provider)，直接回车同步全部: " sync_provider
                 sync_api_provider_models "$sync_provider"
                 echo ""
-                read -p "按回车键继续..."
+                read -r -p "按回车键继续..."
                 ;;
             4)
                 echo -e "${CYAN}已配置的供应商分组:${NC}"
@@ -749,11 +767,11 @@ api_management_submenu() {
                     echo -e "  ${GREEN}${#g_names[@]}.${NC} $g_name (${g_cnt} 个模型)"
                 done < <(echo "$groups_json" | jq -c '.[]')
                 echo -e "  ${GREEN}0.${NC} 取消"
-                read -p "选择要删除的供应商序号: " d_idx
+                read -r -p "选择要删除的供应商序号: " d_idx
                 if [ "$d_idx" == "0" ] || [ -z "$d_idx" ]; then continue; fi
                 d_name="${g_names[$((d_idx-1))]}"
                 if [ -n "$d_name" ]; then
-                    read -p "确认删除 [$d_name] 及其所有模型? (y/N): " del_confirm
+                    read -r -p "确认删除 [$d_name] 及其所有模型? (y/N): " del_confirm
                     if [[ "$del_confirm" =~ ^[Yy]$ ]]; then
                         config_tool del_p "$d_name"
                         echo -e "${RED}🗑️ 已删除 $d_name${NC}"
@@ -952,7 +970,7 @@ show_menu() {
     echo -e "${GREEN}8.${NC} 卸载 Hermes"
     echo -e "${GREEN}0.${NC} 退出"
     echo -e "${CYAN}=================================================${NC}"
-    if ! read -p " 请输入数字 [0-8]: " choice; then
+    if ! read -r -p " 请输入数字 [0-8]: " choice; then
         echo -e "\n${GREEN}退出脚本。${NC}"
         exit 0
     fi
@@ -961,7 +979,7 @@ show_menu() {
     case $choice in
         1)
             echo -e "${YELLOW}开始安装 Hermes Agent...${NC}"
-            curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+            run_reviewed_remote_script https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh
             refresh_hermes_path
             hermes gateway install
             hermes gateway start
@@ -1009,7 +1027,7 @@ show_menu() {
             ;;
         8)
             if check_installed; then
-                read -p "确定要卸载 Hermes 吗？所有数据将被清除。(y/N): " confirm
+                read -r -p "确定要卸载 Hermes 吗？所有数据将被清除。(y/N): " confirm
                 if [[ "$confirm" =~ ^[Yy]$ ]]; then
                     hermes uninstall
                     sed -i "/\b115\b/d" /home/docker/appno.txt
@@ -1025,7 +1043,7 @@ show_menu() {
             ;;
     esac
     echo ""
-    read -p "按回车键返回主菜单..."
+    read -r -p "按回车键返回主菜单..."
 }
 
 # 主循环

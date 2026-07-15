@@ -1,5 +1,5 @@
 {
-  "bind": "0.0.0.0:8181",
+  "bind": "127.0.0.1:8181",
   "tls": {
     "enabled": false,
     "cert_file": "",
@@ -10,11 +10,11 @@
   "license_id": "github",
   "public_share": false,
   "site_password": "",
-  "setup_password": "webgptpasswd",
-  "server_tokens": true,
+  "setup_password": "",
+  "server_tokens": false,
   "proxy_api_prefix": "",
   "isolated_conv_title": "*",
-  "disable_signup": false,
+  "disable_signup": true,
   "auto_conv_arkose": false,
   "proxy_file_service": false,
   "custom_doh_host": "",

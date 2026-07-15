@@ -1,164 +1,67 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# 设置OpenSSH的版本号
-OPENSSH_VERSION=$(curl -s https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/ | grep -oP 'openssh-\K[0-9]+\.[0-9]+p[0-9]+' | sort -V | tail -n 1)
-
-
-# 检测系统类型
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS=$ID
-else
-    echo "无法检测操作系统类型。"
-    exit 1
+if [ "${EUID:-$(id -u)}" -ne 0 ]; then
+	echo "请使用 root 运行此升级工具。" >&2
+	exit 1
 fi
 
-# 等待并检查锁文件
-wait_for_lock() {
-    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
-        echo "等待dpkg锁释放..."
-        sleep 1
-    done
-}
+if [ -r /etc/os-release ]; then
+	# shellcheck disable=SC1091
+	. /etc/os-release
+else
+	echo "无法检测操作系统类型。" >&2
+	exit 1
+fi
 
-# 修复dpkg中断问题
-fix_dpkg() {
-    DEBIAN_FRONTEND=noninteractive dpkg --configure -a
-}
+current_version=$(ssh -V 2>&1 | head -n 1)
+printf '当前 OpenSSH: %s\n' "$current_version"
+echo "此工具只使用发行版签名的软件仓库升级 OpenSSH，不再下载和编译未校验的源码包。"
+read -r -p "继续升级 OpenSSH 软件包吗？(y/N): " confirm
+[[ "$confirm" =~ ^[Yy]$ ]] || { echo "已取消。"; exit 0; }
 
-# 安装依赖包
-install_dependencies() {
-    case $OS in
-        ubuntu|debian)
-            wait_for_lock
-            fix_dpkg
-            DEBIAN_FRONTEND=noninteractive apt update
-            DEBIAN_FRONTEND=noninteractive apt install -y build-essential zlib1g-dev libssl-dev libpam0g-dev wget ntpdate -o Dpkg::Options::="--force-confnew"
-            ;;
-        centos|rhel|almalinux|rocky|fedora)
-            yum install -y epel-release
-            yum groupinstall -y "Development Tools"
-            yum install -y zlib-devel openssl-devel pam-devel wget ntpdate
-            ;;
-        alpine)
-            apk add build-base zlib-dev openssl-dev pam-dev wget ntpdate
-            ;;
-        *)
-            echo "不支持的操作系统：$OS"
-            exit 1
-            ;;
-    esac
-}
+case "${ID:-}" in
+	ubuntu|debian)
+		export DEBIAN_FRONTEND=noninteractive
+		apt-get update
+		apt-get install --only-upgrade -y openssh-client openssh-server
+		;;
+	centos|rhel|almalinux|rocky|fedora)
+		if command -v dnf >/dev/null 2>&1; then
+			dnf upgrade -y openssh openssh-clients openssh-server
+		else
+			yum update -y openssh openssh-clients openssh-server
+		fi
+		;;
+	alpine)
+		apk update
+		apk upgrade openssh openssh-client openssh-server
+		;;
+	arch)
+		pacman -Syu --noconfirm openssh
+		;;
+	opensuse*|sles)
+		zypper --non-interactive update openssh
+		;;
+	*)
+		echo "暂不支持该发行版: ${ID:-unknown}" >&2
+		exit 1
+		;;
+esac
 
+if command -v sshd >/dev/null 2>&1; then
+	sshd -t
+fi
 
-# 下载、编译和安装OpenSSH
-install_openssh() {
-    wget --no-check-certificate https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-${OPENSSH_VERSION}.tar.gz
+if command -v systemctl >/dev/null 2>&1; then
+	systemctl restart ssh 2>/dev/null || systemctl restart sshd
+elif command -v rc-service >/dev/null 2>&1; then
+	rc-service sshd restart
+elif command -v service >/dev/null 2>&1; then
+	service ssh restart 2>/dev/null || service sshd restart
+else
+	echo "OpenSSH 已升级，但未检测到受支持的服务管理器；请手动重启 SSH 服务。"
+fi
 
-    # 解压最新的 .tar.gz 文件
-    tar -xzf openssh-*.tar.gz
-
-    # 获取解压出来的目录名并进入（自动适配）
-    DIR_NAME=$(tar -tzf openssh-*.tar.gz | head -1 | cut -f1 -d"/")
-    cd "$DIR_NAME"
-
-
-    ./configure
-    make
-    make install
-}
-
-# 重启SSH服务
-restart_ssh() {
-    mv /usr/bin/ssh /usr/bin/ssh.bak
-    ln -s /usr/local/bin/ssh /usr/bin/ssh
-    case $OS in
-        ubuntu|debian)
-            systemctl restart ssh
-            ;;
-        centos|rhel|almalinux|rocky|fedora)
-            systemctl restart sshd
-            ;;
-        alpine)
-            rc-service sshd restart
-            ;;
-        *)
-            echo "不支持的操作系统：$OS"
-            exit 1
-            ;;
-    esac
-}
-
-# 设置路径优先级
-set_path_priority() {
-    NEW_SSH_PATH=$(which sshd)  # 假设新版本的sshd和ssh在同一个目录
-    NEW_SSH_DIR=$(dirname "$NEW_SSH_PATH")
-
-    if [[ ":$PATH:" != *":$NEW_SSH_DIR:"* ]]; then
-        export PATH="$NEW_SSH_DIR:$PATH"
-        echo "export PATH=\"$NEW_SSH_DIR:\$PATH\"" >> ~/.bashrc
-    fi
-}
-
-# 验证更新
-verify_installation() {
-    echo "SSH版本信息："
-    ssh -V
-    sshd -V
-}
-
-# 清理下载的文件
-clean_up() {
-    cd ..
-    rm -rf openssh-${OPENSSH_VERSION}*
-}
-
-
-# 标题
-check_openssh_test() {
-echo "SSH高危漏洞修复工具"
-echo "视频介绍: https://www.bilibili.com/video/BV1dm421G7dy?t=0.1"
-echo "--------------------------"
-}
-
-# 检查OpenSSH版本
-check_openssh_version() {
-    current_version=$(ssh -V 2>&1 | awk '{print $1}' | cut -d_ -f2 | cut -d'p' -f1)
-
-    # 版本范围
-    min_version=8.5
-    max_version=9.8
-
-    if awk -v ver="$current_version" -v min="$min_version" -v max="$max_version" 'BEGIN{if(ver>=min && ver<=max) exit 0; else exit 1}'; then
-      check_openssh_test
-      echo "SSH版本: $current_version  在8.5到9.8之间，需要修复。"
-      read -p "确定继续吗？(Y/N): " choice
-          case "$choice" in
-            [Yy])
-              install_dependencies
-              install_openssh
-              restart_ssh
-              set_path_priority
-              verify_installation
-              clean_up
-
-              ;;
-            [Nn])
-              echo "已取消"
-              exit 1
-              ;;
-            *)
-              echo "无效的选择，请输入 Y 或 N。"
-              exit 1
-              ;;
-          esac
-    else
-      check_openssh_test
-      echo "SSH版本: $current_version  不在8.5到9.8之间，无需修复。"
-      exit 1
-    fi
-
-}
-
-
-check_openssh_version
+printf '升级后 OpenSSH: '
+ssh -V
