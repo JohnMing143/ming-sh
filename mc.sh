@@ -188,7 +188,7 @@ echo "------------------------"
 echo "11. 更新Minecraft服务"
 echo "12. 卸载Minecraft服务"
 echo "------------------------"
-echo "m. ming.sh 工具箱（k 兼容）"
+echo "m. ming.sh 工具箱"
 echo "------------------------"
 echo "00. 脚本更新"
 echo "------------------------"
@@ -430,7 +430,7 @@ case $choice in
       read -p "请输入 Minecraft Java 版档案名称:" mc_deop
       docker exec --user 1000 mcserver mc-send-to-console deop $mc_deop
       ;;
-  m|k)
+  m)
     cd ~
     if command -v "$PROJECT_COMMAND" >/dev/null 2>&1; then
       "$PROJECT_COMMAND"

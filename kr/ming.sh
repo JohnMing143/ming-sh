@@ -1,5 +1,5 @@
 #!/bin/bash
-# Primary ming.sh implementation. See kejilion.sh for the legacy wrapper.
+# Primary ming.sh implementation.
 project_script_dir=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)
 for project_config_candidate in \
 	"${PROJECT_CONFIG_FILE:-}" \
@@ -30,29 +30,9 @@ PROJECT_INSTALL_PATH="${PROJECT_INSTALL_PATH:-/usr/local/bin/${PROJECT_COMMAND}}
 PROJECT_BACKUP_PATH="${PROJECT_BACKUP_PATH:-${PROJECT_HOME_PATH}.bak}"
 PROJECT_LINK_PATH="${PROJECT_LINK_PATH:-}"
 GITHUB_PROXY_BASE="${GITHUB_PROXY_BASE:-}"
-KEEP_LEGACY_K="${KEEP_LEGACY_K:-true}"
-KEEP_LEGACY_PATHS="${KEEP_LEGACY_PATHS:-true}"
-LEGACY_COMMAND="${LEGACY_COMMAND:-k}"
-LEGACY_SCRIPT_NAME="${LEGACY_SCRIPT_NAME:-kejilion.sh}"
-LEGACY_HOME_PATH="${LEGACY_HOME_PATH:-${HOME}/${LEGACY_SCRIPT_NAME}}"
-LEGACY_BACKUP_PATH="${LEGACY_BACKUP_PATH:-${LEGACY_HOME_PATH}.bak}"
-LEGACY_INSTALL_PATH="${LEGACY_INSTALL_PATH:-/usr/local/bin/${LEGACY_COMMAND}}"
-LEGACY_LINK_PATH="${LEGACY_LINK_PATH:-/usr/bin/${LEGACY_COMMAND}}"
 PROJECT_BBR_CONFIG_PATH="${PROJECT_BBR_CONFIG_PATH:-/etc/sysctl.d/99-${PROJECT_ID}-bbr.conf}"
 PROJECT_OPTIMIZE_CONFIG_PATH="${PROJECT_OPTIMIZE_CONFIG_PATH:-/etc/sysctl.d/99-${PROJECT_ID}-optimize.conf}"
 PROJECT_OPTIMIZE_MARKER="${PROJECT_OPTIMIZE_MARKER:-# ${PROJECT_ID}-optimize}"
-LEGACY_BBR_CONFIG_PATH="${LEGACY_BBR_CONFIG_PATH:-/etc/sysctl.d/99-kejilion-bbr.conf}"
-LEGACY_OPTIMIZE_CONFIG_PATH="${LEGACY_OPTIMIZE_CONFIG_PATH:-/etc/sysctl.d/99-kejilion-optimize.conf}"
-LEGACY_OPTIMIZE_MARKER="${LEGACY_OPTIMIZE_MARKER:-# kejilion-optimize}"
-if [ "$KEEP_LEGACY_PATHS" = "true" ]; then
-	ACTIVE_BBR_CONFIG_PATH="${ACTIVE_BBR_CONFIG_PATH:-$LEGACY_BBR_CONFIG_PATH}"
-	ACTIVE_OPTIMIZE_CONFIG_PATH="${ACTIVE_OPTIMIZE_CONFIG_PATH:-$LEGACY_OPTIMIZE_CONFIG_PATH}"
-	ACTIVE_OPTIMIZE_MARKER="${ACTIVE_OPTIMIZE_MARKER:-$LEGACY_OPTIMIZE_MARKER}"
-else
-	ACTIVE_BBR_CONFIG_PATH="${ACTIVE_BBR_CONFIG_PATH:-$PROJECT_BBR_CONFIG_PATH}"
-	ACTIVE_OPTIMIZE_CONFIG_PATH="${ACTIVE_OPTIMIZE_CONFIG_PATH:-$PROJECT_OPTIMIZE_CONFIG_PATH}"
-	ACTIVE_OPTIMIZE_MARKER="${ACTIVE_OPTIMIZE_MARKER:-$PROJECT_OPTIMIZE_MARKER}"
-fi
 ENABLE_SELF_UPDATE="${ENABLE_SELF_UPDATE:-false}"
 ENABLE_AUTO_UPDATE="${ENABLE_AUTO_UPDATE:-false}"
 PROJECT_UPDATE_URL="${PROJECT_UPDATE_URL:-}"
@@ -150,9 +130,7 @@ run_command() {
 
 
 canshu_v6() {
-	if grep -q '^canshu="V6"' "$PROJECT_BACKUP_PATH" 2>/dev/null || \
-	   grep -q '^canshu="V6"' "$LEGACY_INSTALL_PATH" 2>/dev/null || \
-	   grep -q '^canshu="V6"' "$LEGACY_BACKUP_PATH" 2>/dev/null; then
+	if grep -q '^canshu="V6"' "$PROJECT_BACKUP_PATH" 2>/dev/null; then
 		canshu="V6"
 		sed -i 's/^canshu="default"/canshu="V6"/' "$PROJECT_HOME_PATH"
 		quanju_canshu
@@ -161,9 +139,7 @@ canshu_v6() {
 
 
 CheckFirstRun_true() {
-	if grep -q '^permission_granted="true"' "$PROJECT_BACKUP_PATH" 2>/dev/null || \
-	   grep -q '^permission_granted="true"' "$LEGACY_INSTALL_PATH" 2>/dev/null || \
-	   grep -q '^permission_granted="true"' "$LEGACY_BACKUP_PATH" 2>/dev/null; then
+	if grep -q '^permission_granted="true"' "$PROJECT_BACKUP_PATH" 2>/dev/null; then
 		permission_granted="true"
 		sed -i 's/^permission_granted="false"/permission_granted="true"/' "$PROJECT_HOME_PATH"
 	fi
@@ -173,9 +149,6 @@ CheckFirstRun_true() {
 
 for shell_rc in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.bash_profile"; do
 	sed -i "/^alias ${PROJECT_COMMAND}=/d" "$shell_rc" > /dev/null 2>&1
-	if [ "$KEEP_LEGACY_K" = "true" ]; then
-		sed -i "/^alias ${LEGACY_COMMAND}=/d" "$shell_rc" > /dev/null 2>&1
-	fi
 done
 unset shell_rc
 
@@ -191,13 +164,6 @@ if [ -r "${BASH_SOURCE[0]}" ]; then
 fi
 if [ -n "$PROJECT_LINK_PATH" ]; then
 	ln -sf "$PROJECT_INSTALL_PATH" "$PROJECT_LINK_PATH" > /dev/null 2>&1
-fi
-if [ "$KEEP_LEGACY_PATHS" = "true" ]; then
-	ln -sf "$PROJECT_HOME_PATH" "$LEGACY_HOME_PATH" > /dev/null 2>&1
-fi
-if [ "$KEEP_LEGACY_K" = "true" ]; then
-	ln -sf "$PROJECT_INSTALL_PATH" "$LEGACY_INSTALL_PATH" > /dev/null 2>&1
-	ln -sf "$PROJECT_INSTALL_PATH" "$LEGACY_LINK_PATH" > /dev/null 2>&1
 fi
 
 
@@ -4748,7 +4714,7 @@ linux_clean() {
 bbr_on() {
 
 # 커널 조정 모듈과의 충돌을 방지하기 위해 sysctl.d에 대한 통합 쓰기
-local CONF="$ACTIVE_BBR_CONFIG_PATH"
+local CONF="$PROJECT_BBR_CONFIG_PATH"
 mkdir -p /etc/sysctl.d
 echo "net.core.default_qdisc=fq" > "$CONF"
 echo "net.ipv4.tcp_congestion_control=bbr" >> "$CONF"
@@ -5958,7 +5924,7 @@ _get_mem_mb() {
 _kernel_optimize_core() {
 	local mode_name="$1"
 	local scene="${2:-high}"
-	local CONF="$ACTIVE_OPTIMIZE_CONFIG_PATH"
+	local CONF="$PROJECT_OPTIMIZE_CONFIG_PATH"
 	local MEM_MB=$(_get_mem_mb)
 
 	echo -e "${gl_lv}로 전환하다${mode_name}...${gl_bai}"
@@ -6219,10 +6185,10 @@ SYSCTL
 	fi
 
 	# ── 파일 설명자 제한 사항 ──
-	if ! grep -Fq "$ACTIVE_OPTIMIZE_MARKER" /etc/security/limits.conf 2>/dev/null; then
+	if ! grep -Fq "$PROJECT_OPTIMIZE_MARKER" /etc/security/limits.conf 2>/dev/null; then
 		cat >> /etc/security/limits.conf << LIMITS
 
-$ACTIVE_OPTIMIZE_MARKER
+$PROJECT_OPTIMIZE_MARKER
 * soft nofile 1048576
 * hard nofile 1048576
 root soft nofile 1048576
@@ -6259,7 +6225,7 @@ optimize_web_server() {
 restore_defaults() {
 	echo -e "${gl_lv}기본 설정으로 되돌리기...${gl_bai}"
 
-	local CONF="$ACTIVE_OPTIMIZE_CONFIG_PATH"
+	local CONF="$PROJECT_OPTIMIZE_CONFIG_PATH"
 
 	# 최적화 구성 파일 삭제(외부 링크 자동 튜닝 구성 포함)
 	rm -f "$CONF"
@@ -6276,8 +6242,8 @@ restore_defaults() {
 		echo always > /sys/kernel/mm/transparent_hugepage/enabled 2>/dev/null
 
 	# 파일 설명자 구성 정리
-	if grep -Fq "$ACTIVE_OPTIMIZE_MARKER" /etc/security/limits.conf 2>/dev/null; then
-		sed -i "\\|^${ACTIVE_OPTIMIZE_MARKER}$|,+4d" /etc/security/limits.conf
+	if grep -Fq "$PROJECT_OPTIMIZE_MARKER" /etc/security/limits.conf 2>/dev/null; then
+		sed -i "\\|^${PROJECT_OPTIMIZE_MARKER}$|,+4d" /etc/security/limits.conf
 	fi
 
 	# BBR 지속성 정리
@@ -6291,7 +6257,7 @@ Kernel_optimize() {
 	root_use
 	while true; do
 	  clear
-	  local current_mode=$(grep "^# 모드:" "$ACTIVE_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 모드: //' | awk -F'|' '{print $1}' | xargs)
+	  local current_mode=$(grep "^# 모드:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 모드: //' | awk -F'|' '{print $1}' | xargs)
 	  [ -z "$current_mode" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode="자동 튜닝 모드"
 	  echo "Linux 시스템 커널 매개변수 최적화"
 	  if [ -n "$current_mode" ]; then
@@ -7401,7 +7367,7 @@ schedule_task() {
 	local cron_job="$cron_time $PROJECT_COMMAND rsync_run $num"
 
 	# 동일한 작업이 이미 존재하는지 확인하세요.
-	if crontab -l | grep -Fq -e "$PROJECT_COMMAND rsync_run $num" -e "$LEGACY_COMMAND rsync_run $num"; then
+	if crontab -l | grep -Fq "$PROJECT_COMMAND rsync_run $num"; then
 		echo "오류: 이 작업에 대해 예약된 동기화가 이미 존재합니다!"
 		return
 	fi
@@ -7415,7 +7381,7 @@ schedule_task() {
 view_tasks() {
 	echo "현재 예약된 작업:"
 	echo "---------------------------------"
-	crontab -l | grep -F -e "$PROJECT_COMMAND rsync_run" -e "$LEGACY_COMMAND rsync_run"
+	crontab -l | grep -F "$PROJECT_COMMAND rsync_run"
 	echo "---------------------------------"
 }
 
@@ -7427,7 +7393,7 @@ delete_task_schedule() {
 		return
 	fi
 
-	crontab -l | grep -Fv -e "$PROJECT_COMMAND rsync_run $num" -e "$LEGACY_COMMAND rsync_run $num" | crontab -
+	crontab -l | grep -Fv "$PROJECT_COMMAND rsync_run $num" | crontab -
 	echo "태스크 번호가 삭제되었습니다.$num예약된 작업"
 }
 
@@ -19818,7 +19784,7 @@ linux_Settings() {
 					  continue
 				  fi
 				  find /usr/local/bin/ -type l -exec bash -c 'link=$1; target=$2; [ "$(readlink -f "$link")" = "$target" ] && rm -f "$link"' _ {} "$project_install_target" \;
-				  if [ "$kuaijiejian" != "$PROJECT_COMMAND" ] && [ "$kuaijiejian" != "$LEGACY_COMMAND" ]; then
+				  if [ "$kuaijiejian" != "$PROJECT_COMMAND" ]; then
 					  ln -sf "$PROJECT_INSTALL_PATH" "/usr/local/bin/$kuaijiejian"
 				  fi
 				  ln -sf "$PROJECT_INSTALL_PATH" "/usr/bin/$kuaijiejian" > /dev/null 2>&1
@@ -20787,15 +20753,9 @@ EOF
 			  case "$choice" in
 				[Yy])
 				  clear
-				  (crontab -l | grep -v -e "$PROJECT_SCRIPT_NAME" -e "$LEGACY_SCRIPT_NAME") | crontab -
+				  (crontab -l | grep -v "$PROJECT_SCRIPT_NAME") | crontab -
 				  [ -n "$PROJECT_LINK_PATH" ] && rm -f "$PROJECT_LINK_PATH"
 				  rm -f "$PROJECT_INSTALL_PATH" "$PROJECT_HOME_PATH"
-				  if [ "$KEEP_LEGACY_K" = "true" ]; then
-					  rm -f "$LEGACY_INSTALL_PATH" "$LEGACY_LINK_PATH"
-				  fi
-				  if [ "$KEEP_LEGACY_PATHS" = "true" ]; then
-					  rm -f "$LEGACY_HOME_PATH"
-				  fi
 				  echo "스크립트가 제거되었습니다. 안녕!"
 				  break_end
 				  clear

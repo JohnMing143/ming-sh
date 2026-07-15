@@ -174,7 +174,7 @@ echo "------------------------"
 echo "11. 更新幻兽帕鲁服务"
 echo "12. 卸载幻兽帕鲁服务"
 echo "------------------------"
-echo "m. ming.sh 工具箱（k 兼容）"
+echo "m. ming.sh 工具箱"
 echo "------------------------"
 echo "00. 脚本更新"
 echo "------------------------"
@@ -434,7 +434,7 @@ case $choice in
     docker rmi -f cm2network/steamcmd
     ;;
 
-  m|k)
+  m)
     cd ~
     if command -v "$PROJECT_COMMAND" >/dev/null 2>&1; then
       "$PROJECT_COMMAND"
