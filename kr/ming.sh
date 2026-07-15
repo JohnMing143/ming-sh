@@ -113,7 +113,7 @@ gl_huang='\033[33m'
 gl_lan='\033[34m'
 gl_bai='\033[0m'
 gl_zi='\033[35m'
-gl_kjlan='\033[96m'
+gl_minglan='\033[96m'
 
 
 canshu="default"
@@ -211,7 +211,7 @@ CheckFirstRun_false() {
 # 사용자에게 약관에 동의하라는 메시지를 표시합니다.
 UserLicenseAgreement() {
 	clear
-	echo -e "${gl_kjlan}${PROJECT_NAME} 도구 상자에 오신 것을 환영합니다${gl_bai}"
+	echo -e "${gl_minglan}${PROJECT_NAME} 도구 상자에 오신 것을 환영합니다${gl_bai}"
 	echo "스크립트를 처음 사용하는 경우 사용자 라이센스 계약을 읽고 동의하십시오."
 	echo "License: ${UPSTREAM_LICENSE}; ${PROJECT_LICENSE_URL}"
 	echo -e "----------------------"
@@ -271,7 +271,7 @@ install() {
 
 	for package in "$@"; do
 		if ! command -v "$package" &>/dev/null; then
-			echo -e "${gl_kjlan}설치 중$package...${gl_bai}"
+			echo -e "${gl_minglan}설치 중$package...${gl_bai}"
 			if command -v dnf &>/dev/null; then
 				dnf -y update
 				dnf install -y epel-release
@@ -345,7 +345,7 @@ remove() {
 	fi
 
 	for package in "$@"; do
-		echo -e "${gl_kjlan}제거 중$package...${gl_bai}"
+		echo -e "${gl_minglan}제거 중$package...${gl_bai}"
 		if command -v dnf &>/dev/null; then
 			dnf remove -y "$package"
 		elif command -v yum &>/dev/null; then
@@ -541,7 +541,7 @@ install_add_docker_cn
 
 
 install_add_docker() {
-	echo -e "${gl_kjlan}도커 환경 설치 중...${gl_bai}"
+	echo -e "${gl_minglan}도커 환경 설치 중...${gl_bai}"
 	if command -v apt &>/dev/null || command -v yum &>/dev/null || command -v dnf &>/dev/null; then
 		linuxmirrors_install_docker
 	else
@@ -710,14 +710,14 @@ while true; do
 		1)
 			read -e -p "이미지 이름을 입력하세요(여러 이미지 이름은 공백으로 구분하세요):" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}이미지 가져오기:$name${gl_bai}"
+				echo -e "${gl_minglan}이미지 가져오기:$name${gl_bai}"
 				docker pull $name
 			done
 			;;
 		2)
 			read -e -p "이미지 이름을 입력하세요(여러 이미지 이름은 공백으로 구분하세요):" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}이미지 업데이트 중:$name${gl_bai}"
+				echo -e "${gl_minglan}이미지 업데이트 중:$name${gl_bai}"
 				docker pull $name
 			done
 			;;
@@ -4641,7 +4641,7 @@ fix_dpkg() {
 
 
 linux_update() {
-	echo -e "${gl_kjlan}시스템 업데이트 진행 중...${gl_bai}"
+	echo -e "${gl_minglan}시스템 업데이트 진행 중...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		dnf -y update
 	elif command -v yum &>/dev/null; then
@@ -4668,7 +4668,7 @@ linux_update() {
 
 
 linux_clean() {
-	echo -e "${gl_kjlan}시스템 청소 진행 중...${gl_bai}"
+	echo -e "${gl_minglan}시스템 청소 진행 중...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		rpm --rebuilddb
 		dnf autoremove -y
@@ -5844,7 +5844,7 @@ elrepo() {
 
 
 clamav_freshclam() {
-	echo -e "${gl_kjlan}바이러스 데이터베이스 업데이트 중...${gl_bai}"
+	echo -e "${gl_minglan}바이러스 데이터베이스 업데이트 중...${gl_bai}"
 	docker run --rm \
 		--name clamav \
 		--mount source=clam_db,target=/var/lib/clamav \
@@ -5858,7 +5858,7 @@ clamav_scan() {
 		return
 	fi
 
-	echo -e "${gl_kjlan}$* 디렉터리를 검색하는 중...${gl_bai}"
+	echo -e "${gl_minglan}$* 디렉터리를 검색하는 중...${gl_bai}"
 
 	# 마운트 매개변수 빌드
 	local MOUNT_PARAMS=""
@@ -5905,7 +5905,7 @@ clamav() {
 				echo "다양한 유형의 악성 코드를 탐지하고 제거하는 데 주로 사용되는 오픈 소스 바이러스 백신 소프트웨어 도구입니다."
 				echo "바이러스, 트로이 목마, 스파이웨어, 악성 스크립트 및 기타 유해한 소프트웨어가 포함됩니다."
 				echo "------------------------"
-				echo -e "${gl_lv}1. 전체 스캔${gl_bai}             ${gl_huang}2. 중요한 디렉토리 스캔${gl_bai}            ${gl_kjlan}3. 사용자 정의 디렉터리 검색${gl_bai}"
+				echo -e "${gl_lv}1. 전체 스캔${gl_bai}             ${gl_huang}2. 중요한 디렉토리 스캔${gl_bai}            ${gl_minglan}3. 사용자 정의 디렉터리 검색${gl_bai}"
 				echo "------------------------"
 				echo "0. 이전 메뉴로 돌아가기"
 				echo "------------------------"
@@ -7480,7 +7480,7 @@ linux_info() {
 
 
 	clear
-	echo -e "${gl_kjlan}시스템 정보를 쿼리하는 중...${gl_bai}"
+	echo -e "${gl_minglan}시스템 정보를 쿼리하는 중...${gl_bai}"
 
 	ip_address
 
@@ -7533,41 +7533,41 @@ linux_info() {
 
 	clear
 	echo -e "시스템 정보 쿼리"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}호스트 이름:${gl_bai}$hostname"
-	echo -e "${gl_kjlan}시스템 버전:${gl_bai}$os_info"
-	echo -e "${gl_kjlan}리눅스 버전:${gl_bai}$kernel_version"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU 아키텍처:${gl_bai}$cpu_arch"
-	echo -e "${gl_kjlan}CPU 모델:${gl_bai}$cpu_info"
-	echo -e "${gl_kjlan}CPU 코어 수:${gl_bai}$cpu_cores"
-	echo -e "${gl_kjlan}CPU 주파수:${gl_bai}$cpu_freq"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU 사용량:${gl_bai}$cpu_usage_percent%"
-	echo -e "${gl_kjlan}시스템 부하:${gl_bai}$load"
-	echo -e "${gl_kjlan}TCP|UDP 연결 수:${gl_bai}$tcp_count|$udp_count"
-	echo -e "${gl_kjlan}물리적 메모리:${gl_bai}$mem_info"
-	echo -e "${gl_kjlan}가상 메모리:${gl_bai}$swap_info"
-	echo -e "${gl_kjlan}하드 드라이브 사용량:${gl_bai}$disk_info"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}받은 총액:${gl_bai}$rx"
-	echo -e "${gl_kjlan}보낸 총액:${gl_bai}$tx"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}네트워크 알고리즘:${gl_bai}$congestion_algorithm $queue_algorithm"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}연산자:${gl_bai}$isp_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}호스트 이름:${gl_bai}$hostname"
+	echo -e "${gl_minglan}시스템 버전:${gl_bai}$os_info"
+	echo -e "${gl_minglan}리눅스 버전:${gl_bai}$kernel_version"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU 아키텍처:${gl_bai}$cpu_arch"
+	echo -e "${gl_minglan}CPU 모델:${gl_bai}$cpu_info"
+	echo -e "${gl_minglan}CPU 코어 수:${gl_bai}$cpu_cores"
+	echo -e "${gl_minglan}CPU 주파수:${gl_bai}$cpu_freq"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU 사용량:${gl_bai}$cpu_usage_percent%"
+	echo -e "${gl_minglan}시스템 부하:${gl_bai}$load"
+	echo -e "${gl_minglan}TCP|UDP 연결 수:${gl_bai}$tcp_count|$udp_count"
+	echo -e "${gl_minglan}물리적 메모리:${gl_bai}$mem_info"
+	echo -e "${gl_minglan}가상 메모리:${gl_bai}$swap_info"
+	echo -e "${gl_minglan}하드 드라이브 사용량:${gl_bai}$disk_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}받은 총액:${gl_bai}$rx"
+	echo -e "${gl_minglan}보낸 총액:${gl_bai}$tx"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}네트워크 알고리즘:${gl_bai}$congestion_algorithm $queue_algorithm"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}연산자:${gl_bai}$isp_info"
 	if [ -n "$ipv4_address" ]; then
-		echo -e "${gl_kjlan}IPv4 주소:${gl_bai}$ipv4_address"
+		echo -e "${gl_minglan}IPv4 주소:${gl_bai}$ipv4_address"
 	fi
 
 	if [ -n "$ipv6_address" ]; then
-		echo -e "${gl_kjlan}IPv6 주소:${gl_bai}$ipv6_address"
+		echo -e "${gl_minglan}IPv6 주소:${gl_bai}$ipv6_address"
 	fi
-	echo -e "${gl_kjlan}DNS 주소:${gl_bai}$dns_addresses"
-	echo -e "${gl_kjlan}위치:${gl_bai}$country $city"
-	echo -e "${gl_kjlan}시스템 시간:${gl_bai}$timezone $current_time"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}실행 시간:${gl_bai}$runtime"
+	echo -e "${gl_minglan}DNS 주소:${gl_bai}$dns_addresses"
+	echo -e "${gl_minglan}위치:${gl_bai}$country $city"
+	echo -e "${gl_minglan}시스템 시간:${gl_bai}$timezone $current_time"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}실행 시간:${gl_bai}$runtime"
 	echo
 
 
@@ -7610,7 +7610,7 @@ linux_tools() {
 	  fi
 
 	  echo "📦 패키지 관리자를 사용하세요:$PM"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 
 	  for ((i=0; i<${#tools[@]}; i+=2)); do
 		# 왼쪽 열
@@ -7633,29 +7633,29 @@ linux_tools() {
 		fi
 	  done
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}컬 다운로드 도구${gl_huang}★${gl_bai}                   ${gl_kjlan}2.   ${gl_bai}wget 다운로드 도구${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}sudo 최고 관리 권한 도구${gl_kjlan}4.   ${gl_bai}socat 통신 연결 도구"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}htop 시스템 모니터링 도구${gl_kjlan}6.   ${gl_bai}iftop 네트워크 트래픽 모니터링 도구"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}unzip ZIP 압축 및 압축 풀기 도구${gl_kjlan}8.   ${gl_bai}tar GZ 압축 및 압축 해제 도구"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}tmux 다중 채널 백그라운드 실행 도구${gl_kjlan}10.  ${gl_bai}ffmpeg 비디오 인코딩 라이브 스트리밍 도구"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}btop 최신 모니터링 도구${gl_huang}★${gl_bai}             ${gl_kjlan}12.  ${gl_bai}레인저 파일 관리 도구"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}ncdu 디스크 사용량 보기 도구${gl_kjlan}14.  ${gl_bai}fzf 글로벌 검색 도구"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}vim 텍스트 편집기${gl_kjlan}16.  ${gl_bai}나노 텍스트 편집기${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}Git 버전 관리 시스템${gl_kjlan}18.  ${gl_bai}오픈코드 AI 프로그래밍 도우미${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}매트릭스 스크린세이버${gl_kjlan}22.  ${gl_bai}달리는 기차 화면 보호기"
-	  echo -e "${gl_kjlan}26.  ${gl_bai}테트리스 미니 게임${gl_kjlan}27.  ${gl_bai}뱀 미니게임"
-	  echo -e "${gl_kjlan}28.  ${gl_bai}우주 침략자 미니 게임"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}모두 설치${gl_kjlan}32.  ${gl_bai}모두 설치(화면 보호기 및 게임 제외)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}모두 제거"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}지정된 도구 설치${gl_kjlan}42.  ${gl_bai}지정된 도구 제거"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}컬 다운로드 도구${gl_huang}★${gl_bai}                   ${gl_minglan}2.   ${gl_bai}wget 다운로드 도구${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}3.   ${gl_bai}sudo 최고 관리 권한 도구${gl_minglan}4.   ${gl_bai}socat 통신 연결 도구"
+	  echo -e "${gl_minglan}5.   ${gl_bai}htop 시스템 모니터링 도구${gl_minglan}6.   ${gl_bai}iftop 네트워크 트래픽 모니터링 도구"
+	  echo -e "${gl_minglan}7.   ${gl_bai}unzip ZIP 압축 및 압축 풀기 도구${gl_minglan}8.   ${gl_bai}tar GZ 압축 및 압축 해제 도구"
+	  echo -e "${gl_minglan}9.   ${gl_bai}tmux 다중 채널 백그라운드 실행 도구${gl_minglan}10.  ${gl_bai}ffmpeg 비디오 인코딩 라이브 스트리밍 도구"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}btop 최신 모니터링 도구${gl_huang}★${gl_bai}             ${gl_minglan}12.  ${gl_bai}레인저 파일 관리 도구"
+	  echo -e "${gl_minglan}13.  ${gl_bai}ncdu 디스크 사용량 보기 도구${gl_minglan}14.  ${gl_bai}fzf 글로벌 검색 도구"
+	  echo -e "${gl_minglan}15.  ${gl_bai}vim 텍스트 편집기${gl_minglan}16.  ${gl_bai}나노 텍스트 편집기${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}17.  ${gl_bai}Git 버전 관리 시스템${gl_minglan}18.  ${gl_bai}오픈코드 AI 프로그래밍 도우미${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}매트릭스 스크린세이버${gl_minglan}22.  ${gl_bai}달리는 기차 화면 보호기"
+	  echo -e "${gl_minglan}26.  ${gl_bai}테트리스 미니 게임${gl_minglan}27.  ${gl_bai}뱀 미니게임"
+	  echo -e "${gl_minglan}28.  ${gl_bai}우주 침략자 미니 게임"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}모두 설치${gl_minglan}32.  ${gl_bai}모두 설치(화면 보호기 및 게임 제외)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}모두 제거"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}지정된 도구 설치${gl_minglan}42.  ${gl_bai}지정된 도구 제거"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -7929,7 +7929,7 @@ docker_ssh_migration() {
 
 	list_backups() {
 		local BACKUP_ROOT="/tmp"
-		echo -e "${gl_kjlan}현재 백업 목록:${gl_bai}"
+		echo -e "${gl_minglan}현재 백업 목록:${gl_bai}"
 		ls -1dt ${BACKUP_ROOT}/docker_backup_* 2>/dev/null || echo "백업 없음"
 	}
 
@@ -7940,7 +7940,7 @@ docker_ssh_migration() {
 	# ----------------------------
 	backup_docker() {
 
-		echo -e "${gl_kjlan}Docker 컨테이너 백업 중...${gl_bai}"
+		echo -e "${gl_minglan}Docker 컨테이너 백업 중...${gl_bai}"
 		docker ps --format '{{.Names}}'
 		read -e -p  "백업할 컨테이너의 이름을 입력하십시오(여러 개의 공백을 구분하고 Enter를 눌러 실행 중인 모든 컨테이너를 백업하십시오)." containers
 
@@ -7974,7 +7974,7 @@ docker_ssh_migration() {
 			docker inspect "$c" > "$inspect_file"
 
 			if is_compose_container "$c"; then
-				echo -e "${gl_kjlan}감지됨$c도커 작성 컨테이너입니다${gl_bai}"
+				echo -e "${gl_minglan}감지됨$c도커 작성 컨테이너입니다${gl_bai}"
 				local project_dir=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project.working_dir"] // empty')
 				local project_name=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project"] // empty')
 
@@ -8042,7 +8042,7 @@ docker_ssh_migration() {
 
 		# /home/docker 아래의 모든 파일을 백업합니다(하위 디렉터리 제외).
 		if [ -d "/home/docker" ]; then
-			echo -e "${gl_kjlan}/home/docker 아래의 파일을 백업합니다...${gl_bai}"
+			echo -e "${gl_minglan}/home/docker 아래의 파일을 백업합니다...${gl_bai}"
 			find /home/docker -maxdepth 1 -type f | tar -czf "${BACKUP_DIR}/home_docker_files.tar.gz" -T -
 			echo -e "${gl_lv}/home/docker 아래의 파일은 다음과 같이 패키지되었습니다.${BACKUP_DIR}/home_docker_files.tar.gz${gl_bai}"
 		fi
@@ -8062,7 +8062,7 @@ docker_ssh_migration() {
 		read -e -p  "복원할 백업 디렉터리를 입력하십시오:" BACKUP_DIR
 		[[ ! -d "$BACKUP_DIR" ]] && { echo -e "${gl_hong}백업 디렉터리가 존재하지 않습니다.${gl_bai}"; return; }
 
-		echo -e "${gl_kjlan}복원 작업을 시작하는 중...${gl_bai}"
+		echo -e "${gl_minglan}복원 작업을 시작하는 중...${gl_bai}"
 
 		install tar jq gzip
 		install_docker
@@ -8098,7 +8098,7 @@ docker_ssh_migration() {
 		done
 
 		# --------- 일반 컨테이너를 계속 복원합니다 ---------
-		echo -e "${gl_kjlan}일반 Docker 컨테이너 확인 및 복원...${gl_bai}"
+		echo -e "${gl_minglan}일반 Docker 컨테이너 확인 및 복원...${gl_bai}"
 		local has_container=false
 		for json in "$BACKUP_DIR"/*_inspect.json; do
 			[[ ! -f "$json" ]] && continue
@@ -8161,7 +8161,7 @@ docker_ssh_migration() {
 
 		# /home/docker 아래의 파일 복원
 		if [ -f "$BACKUP_DIR/home_docker_files.tar.gz" ]; then
-			echo -e "${gl_kjlan}/home/docker 아래의 파일을 복원하는 중...${gl_bai}"
+			echo -e "${gl_minglan}/home/docker 아래의 파일을 복원하는 중...${gl_bai}"
 			mkdir -p /home/docker
 			tar -xzf "$BACKUP_DIR/home_docker_files.tar.gz" -C /
 			echo -e "${gl_lv}/home/docker 아래의 파일이 복원되었습니다.${gl_bai}"
@@ -8251,29 +8251,29 @@ linux_docker() {
 	  clear
 	  echo -e "도커 관리"
 	  docker_tato
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}Docker 환경 설치 및 업데이트${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}Docker 전역 상태 보기${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}도커 컨테이너 관리${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}도커 이미지 관리"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}도커 네트워크 관리"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}도커 볼륨 관리"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}쓸모없는 도커 컨테이너를 정리하고 네트워크 데이터 볼륨을 미러링하세요."
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}Docker 소스 변경"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}daemon.json 파일 편집"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}Docker-ipv6 액세스 활성화"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}Docker-ipv6 액세스 끄기"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}Docker 환경 백업/마이그레이션/복원"
-	  echo -e "${gl_kjlan}20.  ${gl_bai}Docker 환경 제거"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}Docker 환경 설치 및 업데이트${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}2.   ${gl_bai}Docker 전역 상태 보기${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}도커 컨테이너 관리${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}4.   ${gl_bai}도커 이미지 관리"
+	  echo -e "${gl_minglan}5.   ${gl_bai}도커 네트워크 관리"
+	  echo -e "${gl_minglan}6.   ${gl_bai}도커 볼륨 관리"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}7.   ${gl_bai}쓸모없는 도커 컨테이너를 정리하고 네트워크 데이터 볼륨을 미러링하세요."
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}8.   ${gl_bai}Docker 소스 변경"
+	  echo -e "${gl_minglan}9.   ${gl_bai}daemon.json 파일 편집"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}Docker-ipv6 액세스 활성화"
+	  echo -e "${gl_minglan}12.  ${gl_bai}Docker-ipv6 액세스 끄기"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}19.  ${gl_bai}Docker 환경 백업/마이그레이션/복원"
+	  echo -e "${gl_minglan}20.  ${gl_bai}Docker 환경 제거"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -8523,38 +8523,38 @@ linux_test() {
 	while true; do
 	  clear
 	  echo -e "테스트 스크립트 수집"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}IP 및 잠금 해제 상태 감지"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}ChatGPT 잠금 해제 상태 감지"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}지역 스트리밍 미디어 잠금 해제 테스트"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}예우 스트리밍 미디어 잠금 해제 감지"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}xykt IP 품질 확인 스크립트${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}IP 및 잠금 해제 상태 감지"
+	  echo -e "${gl_minglan}1.   ${gl_bai}ChatGPT 잠금 해제 상태 감지"
+	  echo -e "${gl_minglan}2.   ${gl_bai}지역 스트리밍 미디어 잠금 해제 테스트"
+	  echo -e "${gl_minglan}3.   ${gl_bai}예우 스트리밍 미디어 잠금 해제 감지"
+	  echo -e "${gl_minglan}4.   ${gl_bai}xykt IP 품질 확인 스크립트${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}네트워크 회선 속도 테스트"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}besttrace 3 네트워크 백홀 지연 라우팅 테스트"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}mtr_trace 삼중 네트워크 백홀 회선 테스트"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}초고속 트리플 네트워크 속도 테스트"
-	  echo -e "${gl_kjlan}14.  ${gl_bai}nxtrace 빠른 백홀 테스트 스크립트"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}nxtrace는 IP 백홀 테스트 스크립트를 지정합니다."
-	  echo -e "${gl_kjlan}16.  ${gl_bai}ludashi2020 세 개의 네트워크 라인 테스트"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}i-abc 다기능 속도 테스트 스크립트"
-	  echo -e "${gl_kjlan}18.  ${gl_bai}NetQuality 네트워크 품질 확인 스크립트${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}TcpQuality TCP 재전송 감지 스크립트${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}네트워크 회선 속도 테스트"
+	  echo -e "${gl_minglan}11.  ${gl_bai}besttrace 3 네트워크 백홀 지연 라우팅 테스트"
+	  echo -e "${gl_minglan}12.  ${gl_bai}mtr_trace 삼중 네트워크 백홀 회선 테스트"
+	  echo -e "${gl_minglan}13.  ${gl_bai}초고속 트리플 네트워크 속도 테스트"
+	  echo -e "${gl_minglan}14.  ${gl_bai}nxtrace 빠른 백홀 테스트 스크립트"
+	  echo -e "${gl_minglan}15.  ${gl_bai}nxtrace는 IP 백홀 테스트 스크립트를 지정합니다."
+	  echo -e "${gl_minglan}16.  ${gl_bai}ludashi2020 세 개의 네트워크 라인 테스트"
+	  echo -e "${gl_minglan}17.  ${gl_bai}i-abc 다기능 속도 테스트 스크립트"
+	  echo -e "${gl_minglan}18.  ${gl_bai}NetQuality 네트워크 품질 확인 스크립트${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}19.  ${gl_bai}TcpQuality TCP 재전송 감지 스크립트${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}하드웨어 성능 테스트"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}Yabs 성능 테스트"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}icu/gb5 CPU 성능 테스트 스크립트"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}하드웨어 성능 테스트"
+	  echo -e "${gl_minglan}21.  ${gl_bai}Yabs 성능 테스트"
+	  echo -e "${gl_minglan}22.  ${gl_bai}icu/gb5 CPU 성능 테스트 스크립트"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}종합적인 테스트"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}벤치 성능 테스트"
-	  echo -e "${gl_kjlan}32.  ${gl_bai}spiritysdx 퓨전 몬스터 평가${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}Nodequality 융합 몬스터 평가${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}종합적인 테스트"
+	  echo -e "${gl_minglan}31.  ${gl_bai}벤치 성능 테스트"
+	  echo -e "${gl_minglan}32.  ${gl_bai}spiritysdx 퓨전 몬스터 평가${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}Nodequality 융합 몬스터 평가${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -8690,17 +8690,17 @@ linux_Oracle() {
 	 while true; do
 	  clear
 	  echo -e "Oracle Cloud 스크립트 컬렉션"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}유휴 머신 활성 스크립트 설치"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}유휴 컴퓨터에서 활성 스크립트 제거"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}DD 재설치 시스템 스크립트"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}R 형사 시작 스크립트"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}ROOT 비밀번호 로그인 모드 활성화"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}IPV6 복구 도구"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}유휴 머신 활성 스크립트 설치"
+	  echo -e "${gl_minglan}2.   ${gl_bai}유휴 컴퓨터에서 활성 스크립트 제거"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}DD 재설치 시스템 스크립트"
+	  echo -e "${gl_minglan}4.   ${gl_bai}R 형사 시작 스크립트"
+	  echo -e "${gl_minglan}5.   ${gl_bai}ROOT 비밀번호 로그인 모드 활성화"
+	  echo -e "${gl_minglan}6.   ${gl_bai}IPV6 복구 도구"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -8837,7 +8837,7 @@ docker_tato() {
 	local volume_count=$(docker volume ls -q 2>/dev/null | wc -l)
 
 	if command -v docker &> /dev/null; then
-		echo -e "${gl_kjlan}------------------------"
+		echo -e "${gl_minglan}------------------------"
 		echo -e "${gl_lv}환경이 설치되었습니다.${gl_bai}컨테이너:${gl_lv}$container_count${gl_bai}거울:${gl_lv}$image_count${gl_bai}회로망:${gl_lv}$network_count${gl_bai}연타:${gl_lv}$volume_count${gl_bai}"
 	fi
 }
@@ -9591,7 +9591,7 @@ linux_ldnmp() {
 	  clear
 
 	  local backup_filename="web_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  echo -e "${gl_kjlan}백업 중$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}백업 중$backup_filename ...${gl_bai}"
 	  cd /home/ && tar czvf "$backup_filename" web
 
 	  while true; do
@@ -9683,7 +9683,7 @@ linux_ldnmp() {
 		  docker compose down > /dev/null 2>&1
 		  rm -rf /home/web > /dev/null 2>&1
 
-		  echo -e "${gl_kjlan}압축 해제 중$filename ...${gl_bai}"
+			echo -e "${gl_minglan}압축 해제 중$filename ...${gl_bai}"
 		  cd /home/ && tar -xzf "$filename"
 
 		  install_dependency
@@ -14490,13 +14490,13 @@ except Exception as e:
 			echo "======================================="
 			openclaw_permission_render_status
 			echo "---------------------------------------"
-			echo -e "${gl_kjlan}1.${gl_bai}표준보안모드로 전환(일일권장, 팝업카드 승인)"
-			echo -e "${gl_kjlan}2.${gl_bai}개발 강화 모드로 전환(에이전트가 권한 승격을 신청할 수 있도록 허용)"
-			echo -e "${gl_kjlan}3.${gl_bai}완전 개방 모드로 전환(${gl_hong}위험! 모든 호스트 차단을 완전히 제거합니다.${gl_bai}）"
-			echo -e "${gl_kjlan}4.${gl_bai}공식 기본 샌드박스 방어 전략 복원"
-			echo -e "${gl_kjlan}5.${gl_bai}기본 보안 감사 및 자동 복구 실행"
-			echo -e "${gl_kjlan}6.${gl_bai}Exec 명령 화이트리스트 관리"
-			echo -e "${gl_kjlan}0.${gl_bai}이전 레벨로 돌아가기"
+			echo -e "${gl_minglan}1.${gl_bai}표준보안모드로 전환(일일권장, 팝업카드 승인)"
+			echo -e "${gl_minglan}2.${gl_bai}개발 강화 모드로 전환(에이전트가 권한 승격을 신청할 수 있도록 허용)"
+			echo -e "${gl_minglan}3.${gl_bai}완전 개방 모드로 전환(${gl_hong}위험! 모든 호스트 차단을 완전히 제거합니다.${gl_bai}）"
+			echo -e "${gl_minglan}4.${gl_bai}공식 기본 샌드박스 방어 전략 복원"
+			echo -e "${gl_minglan}5.${gl_bai}기본 보안 감사 및 자동 복구 실행"
+			echo -e "${gl_minglan}6.${gl_bai}Exec 명령 화이트리스트 관리"
+			echo -e "${gl_minglan}0.${gl_bai}이전 레벨로 돌아가기"
 			echo "---------------------------------------"
 			read -e -p "선택사항을 입력하세요:" perm_choice
 			case "$perm_choice" in
@@ -15112,7 +15112,7 @@ openclaw_backup_restore_menu() {
 		echo "https://${yuming}/#token=$token"
 		echo "먼저 URL에 액세스하여 장치 ID를 트리거한 다음 Enter를 눌러 페어링을 진행하세요."
 		read
-		echo -e "${gl_kjlan}기기 목록 로드 중...${gl_bai}"
+		echo -e "${gl_minglan}기기 목록 로드 중...${gl_bai}"
 		# allowedOrigins에 도메인 이름을 자동으로 추가합니다.
 		config_file=$(openclaw_get_config_file)
 		if [ -f "$config_file" ]; then
@@ -15121,7 +15121,7 @@ openclaw_backup_restore_menu() {
 			if command -v jq >/dev/null 2>&1; then
 				tmp_json=$(mktemp)
 				jq 'if .gateway.controlUi == null then .gateway.controlUi = {"allowedOrigins": ["http://127.0.0.1"]} else . end | if (.gateway.controlUi.allowedOrigins | contains([$origin]) | not) then .gateway.controlUi.allowedOrigins += [$origin] else . end' --arg origin "$new_origin" "$config_file" > "$tmp_json" && mv "$tmp_json" "$config_file"
-				echo -e "${gl_kjlan}도메인 이름이${yuming}allowedOrigins 구성 추가${gl_bai}"
+				echo -e "${gl_minglan}도메인 이름이${yuming}allowedOrigins 구성 추가${gl_bai}"
 				openclaw gateway restart >/dev/null 2>&1
 			fi
 		fi
@@ -15231,7 +15231,7 @@ local sub_choice="$1"
 clear
 cd ~
 install git
-echo -e "${gl_kjlan}신청 목록이 업데이트 중입니다. 기다리세요...${gl_bai}"
+echo -e "${gl_minglan}신청 목록이 업데이트 중입니다. 기다리세요...${gl_bai}"
 if [ ! -d apps/.git ]; then
 	timeout 10s git clone ${ACTIVE_APPS_REPO_URL}
 else
@@ -15245,7 +15245,7 @@ while true; do
 	if [ -z "$sub_choice" ]; then
 	  clear
 	  echo -e "응용 시장"
-	  echo -e "${gl_kjlan}-------------------------"
+	  echo -e "${gl_minglan}-------------------------"
 
 	  local app_numbers=$([ -f /home/docker/appno.txt ] && cat /home/docker/appno.txt || echo "")
 
@@ -15258,78 +15258,78 @@ while true; do
 		  fi
 	  done
 
-	  echo -e "${gl_kjlan}1.   ${color1}파고다 패널 공식 버전${gl_kjlan}2.   ${color2}aaPanel Pagoda 국제 버전"
-	  echo -e "${gl_kjlan}3.   ${color3}1패널 차세대 관리 패널${gl_kjlan}4.   ${color4}NginxProxyManager 시각화 패널"
-	  echo -e "${gl_kjlan}5.   ${color5}OpenList 다중 저장소 파일 목록 프로그램${gl_kjlan}6.   ${color6}Ubuntu 원격 데스크톱 웹 버전"
-	  echo -e "${gl_kjlan}7.   ${color7}나타 프로브 VPS 모니터링 패널${gl_kjlan}8.   ${color8}QB 오프라인 BT 자기 다운로드 패널"
-	  echo -e "${gl_kjlan}9.   ${color9}Poste.io 메일 서버 프로그램${gl_kjlan}10.  ${color10}RocketChat 다자간 온라인 채팅 시스템"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}11.  ${color11}ZenTao 프로젝트 관리 소프트웨어${gl_kjlan}12.  ${color12}Qinglong 패널 예정된 작업 관리 플랫폼"
-	  echo -e "${gl_kjlan}13.  ${color13}Cloudreve 네트워크 디스크${gl_huang}★${gl_bai}                     ${gl_kjlan}14.  ${color14}간단한 그림 침대 그림 관리 프로그램"
-	  echo -e "${gl_kjlan}15.  ${color15}emby 멀티미디어 관리 시스템${gl_kjlan}16.  ${color16}Speedtest 속도 테스트 패널"
-	  echo -e "${gl_kjlan}17.  ${color17}AdGuardHome은 애드웨어를 제거합니다${gl_kjlan}18.  ${color18}onlyoffice온라인 오피스 OFFICE"
-	  echo -e "${gl_kjlan}19.  ${color19}Leichi WAF 방화벽 패널${gl_kjlan}20.  ${color20}포테이너 컨테이너 관리 패널"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}21.  ${color21}VScode 웹 버전${gl_kjlan}22.  ${color22}UptimeKuma 모니터링 도구"
-	  echo -e "${gl_kjlan}23.  ${color23}메모 웹 메모${gl_kjlan}24.  ${color24}Webtop 원격 데스크톱 웹 버전${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}25.  ${color25}Nextcloud 네트워크 디스크${gl_kjlan}26.  ${color26}QD-오늘 예약된 작업 관리 프레임워크"
-	  echo -e "${gl_kjlan}27.  ${color27}Dockge 컨테이너 스택 관리 패널${gl_kjlan}28.  ${color28}LibreSpeed ​​​​속도 테스트 도구"
-	  echo -e "${gl_kjlan}29.  ${color29}searxng 집계 검색 스테이션${gl_huang}★${gl_bai}                 ${gl_kjlan}30.  ${color30}PhotoPrism 개인 앨범 시스템"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}31.  ${color31}StirlingPDF 도구 모음${gl_kjlan}32.  ${color32}drawio 무료 온라인 차트 작성 소프트웨어${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${color33}Sun 패널 탐색 패널${gl_kjlan}34.  ${color34}Pingvin-Share 파일 공유 플랫폼"
-	  echo -e "${gl_kjlan}35.  ${color35}미니멀리스트 친구들${gl_kjlan}36.  ${color36}LobeChatAI 채팅 집계 웹사이트"
-	  echo -e "${gl_kjlan}37.  ${color37}MyIP 도구 상자${gl_huang}★${gl_bai}                        ${gl_kjlan}38.  ${color38}Xiaoya alist 가족 버킷"
-	  echo -e "${gl_kjlan}39.  ${color39}Bililive 라이브 방송 녹음 도구${gl_kjlan}40.  ${color40}webssh 웹 버전 SSH 연결 도구"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}41.  ${color41}마우스 관리 패널${gl_kjlan}42.  ${color42}Nexterm 원격 연결 도구"
-	  echo -e "${gl_kjlan}43.  ${color43}RustDesk 원격 데스크톱(서버)${gl_huang}★${gl_bai}          ${gl_kjlan}44.  ${color44}RustDesk 원격 데스크톱(릴레이)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}45.  ${color45}도커 가속 스테이션${gl_kjlan}46.  ${color46}GitHub 가속 스테이션${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}47.  ${color47}프로메테우스 모니터링${gl_kjlan}48.  ${color48}프로메테우스(호스트 모니터링)"
-	  echo -e "${gl_kjlan}49.  ${color49}프로메테우스(컨테이너 모니터링)${gl_kjlan}50.  ${color50}보충 모니터링 도구"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}51.  ${color51}PVE 오픈 병아리 패널${gl_kjlan}52.  ${color52}DPanel 컨테이너 관리 패널"
-	  echo -e "${gl_kjlan}53.  ${color53}라마3 채팅 AI 대형 모델${gl_kjlan}54.  ${color54}AMH 호스트 웹사이트 구축 관리 패널"
-	  echo -e "${gl_kjlan}55.  ${color55}FRP 인트라넷 침투(서버)${gl_huang}★${gl_bai}	         ${gl_kjlan}56.  ${color56}FRP 인트라넷 침투(클라이언트)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}57.  ${color57}Deepseek 채팅 AI 대형 모델${gl_kjlan}58.  ${color58}대규모 모델 지식 기반 확장${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}59.  ${color59}NewAPI 대형 모델 자산 관리${gl_kjlan}60.  ${color60}JumpServer 오픈 소스 요새 머신"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}61.  ${color61}온라인 번역 서버${gl_kjlan}62.  ${color62}RAGFlow 대규모 모델 지식 기반"
-	  echo -e "${gl_kjlan}63.  ${color63}OpenWebUI 자체 호스팅 AI 플랫폼${gl_huang}★${gl_bai}             ${gl_kjlan}64.  ${color64}it-tools 도구 상자"
-	  echo -e "${gl_kjlan}65.  ${color65}n8n 자동화된 워크플로우 플랫폼${gl_huang}★${gl_bai}               ${gl_kjlan}66.  ${color66}yt-dlp 비디오 다운로드 도구"
-	  echo -e "${gl_kjlan}67.  ${color67}ddns-go 동적 DNS 관리 도구${gl_huang}★${gl_bai}            ${gl_kjlan}68.  ${color68}AllinSSL 인증서 관리 플랫폼"
-	  echo -e "${gl_kjlan}69.  ${color69}SFTPGo 파일 전송 도구${gl_kjlan}70.  ${color70}AstrBot 챗봇 프레임워크"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}71.  ${color71}Navidrome 개인 음악 서버${gl_kjlan}72.  ${color72}비트워드 비밀번호 관리자${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}73.  ${color73}LibreTV 개인 영화${gl_kjlan}74.  ${color74}MoonTV 개인 영화"
-	  echo -e "${gl_kjlan}75.  ${color75}멜로디 음악 마법사${gl_kjlan}76.  ${color76}온라인 DOS 오래된 게임"
-	  echo -e "${gl_kjlan}77.  ${color77}Thunder 오프라인 다운로드 도구${gl_kjlan}78.  ${color78}PandaWiki 지능형 문서 관리 시스템"
-	  echo -e "${gl_kjlan}79.  ${color79}베젤 서버 모니터링${gl_kjlan}80.  ${color80}링크워든 북마크 관리"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}81.  ${color81}JitsiMeet 화상 회의${gl_kjlan}82.  ${color82}gpt-load 고성능 AI 투명 프록시"
-	  echo -e "${gl_kjlan}83.  ${color83}코마리 서버 모니터링 도구${gl_kjlan}84.  ${color84}Wallos 개인 재무 관리 도구"
-	  echo -e "${gl_kjlan}85.  ${color85}이미치 픽처 비디오 매니저${gl_kjlan}86.  ${color86}젤리핀 미디어 관리 시스템"
-	  echo -e "${gl_kjlan}87.  ${color87}SyncTV는 함께 영화를 볼 수 있는 훌륭한 도구입니다${gl_kjlan}88.  ${color88}Owncast 자체 호스팅 라이브 스트리밍 플랫폼"
-	  echo -e "${gl_kjlan}89.  ${color89}FileCodeBox 파일 익스프레스${gl_kjlan}90.  ${color90}매트릭스 분산형 채팅 프로토콜"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}91.  ${color91}gitea 비공개 코드 저장소${gl_kjlan}92.  ${color92}FileBrowser 파일 관리자"
-	  echo -e "${gl_kjlan}93.  ${color93}Dufs 미니멀리스트 정적 파일 서버${gl_kjlan}94.  ${color94}Gopeed 고속 다운로드 도구"
-	  echo -e "${gl_kjlan}95.  ${color95}종이 없는 문서 관리 플랫폼${gl_kjlan}96.  ${color96}2FAuth 자체 호스팅 2단계 인증자"
-	  echo -e "${gl_kjlan}97.  ${color97}WireGuard 네트워킹(서버)${gl_kjlan}98.  ${color98}WireGuard 네트워킹(클라이언트)"
-	  echo -e "${gl_kjlan}99.  ${color99}DSM Synology 가상 컴퓨터${gl_kjlan}100. ${color100}P2P 파일 동기화 도구 동기화"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}101. ${color101}AI 영상 생성 도구${gl_kjlan}102. ${color102}VoceChat 다자간 온라인 채팅 시스템"
-	  echo -e "${gl_kjlan}103. ${color103}Umami 웹사이트 통계 도구${gl_kjlan}104. ${color104}스트림 4계층 프록시 전달 도구"
-	  echo -e "${gl_kjlan}105. ${color105}쓰위안 노트${gl_kjlan}106. ${color106}Drawix 오픈 소스 화이트보드 도구"
-	  echo -e "${gl_kjlan}107. ${color107}PanSou 네트워크 디스크 검색${gl_kjlan}108. ${color108}LangBot 챗봇"
-	  echo -e "${gl_kjlan}109. ${color109}ZFile 온라인 네트워크 디스크${gl_kjlan}110. ${color110}Karakeep 북마크 관리"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}111. ${color111}다중 형식 파일 변환 도구${gl_kjlan}112. ${color112}행운의 대형 인트라넷 침투 도구"
-	  echo -e "${gl_kjlan}113. ${color113}파이어폭스 브라우저${gl_kjlan}114. ${color114}OpenClaw机器人管理工具${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}115. ${color115}Hermes机器人管理工具${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}타사 애플리케이션 목록"
-  	  echo -e "${gl_kjlan}귀하의 앱이 여기에 표시되기를 원하십니까? 개발자 가이드를 확인하세요.${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
+	  echo -e "${gl_minglan}1.   ${color1}파고다 패널 공식 버전${gl_minglan}2.   ${color2}aaPanel Pagoda 국제 버전"
+	  echo -e "${gl_minglan}3.   ${color3}1패널 차세대 관리 패널${gl_minglan}4.   ${color4}NginxProxyManager 시각화 패널"
+	  echo -e "${gl_minglan}5.   ${color5}OpenList 다중 저장소 파일 목록 프로그램${gl_minglan}6.   ${color6}Ubuntu 원격 데스크톱 웹 버전"
+	  echo -e "${gl_minglan}7.   ${color7}나타 프로브 VPS 모니터링 패널${gl_minglan}8.   ${color8}QB 오프라인 BT 자기 다운로드 패널"
+	  echo -e "${gl_minglan}9.   ${color9}Poste.io 메일 서버 프로그램${gl_minglan}10.  ${color10}RocketChat 다자간 온라인 채팅 시스템"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}11.  ${color11}ZenTao 프로젝트 관리 소프트웨어${gl_minglan}12.  ${color12}Qinglong 패널 예정된 작업 관리 플랫폼"
+	  echo -e "${gl_minglan}13.  ${color13}Cloudreve 네트워크 디스크${gl_huang}★${gl_bai}                     ${gl_minglan}14.  ${color14}간단한 그림 침대 그림 관리 프로그램"
+	  echo -e "${gl_minglan}15.  ${color15}emby 멀티미디어 관리 시스템${gl_minglan}16.  ${color16}Speedtest 속도 테스트 패널"
+	  echo -e "${gl_minglan}17.  ${color17}AdGuardHome은 애드웨어를 제거합니다${gl_minglan}18.  ${color18}onlyoffice온라인 오피스 OFFICE"
+	  echo -e "${gl_minglan}19.  ${color19}Leichi WAF 방화벽 패널${gl_minglan}20.  ${color20}포테이너 컨테이너 관리 패널"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}21.  ${color21}VScode 웹 버전${gl_minglan}22.  ${color22}UptimeKuma 모니터링 도구"
+	  echo -e "${gl_minglan}23.  ${color23}메모 웹 메모${gl_minglan}24.  ${color24}Webtop 원격 데스크톱 웹 버전${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}25.  ${color25}Nextcloud 네트워크 디스크${gl_minglan}26.  ${color26}QD-오늘 예약된 작업 관리 프레임워크"
+	  echo -e "${gl_minglan}27.  ${color27}Dockge 컨테이너 스택 관리 패널${gl_minglan}28.  ${color28}LibreSpeed ​​​​속도 테스트 도구"
+	  echo -e "${gl_minglan}29.  ${color29}searxng 집계 검색 스테이션${gl_huang}★${gl_bai}                 ${gl_minglan}30.  ${color30}PhotoPrism 개인 앨범 시스템"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}31.  ${color31}StirlingPDF 도구 모음${gl_minglan}32.  ${color32}drawio 무료 온라인 차트 작성 소프트웨어${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${color33}Sun 패널 탐색 패널${gl_minglan}34.  ${color34}Pingvin-Share 파일 공유 플랫폼"
+	  echo -e "${gl_minglan}35.  ${color35}미니멀리스트 친구들${gl_minglan}36.  ${color36}LobeChatAI 채팅 집계 웹사이트"
+	  echo -e "${gl_minglan}37.  ${color37}MyIP 도구 상자${gl_huang}★${gl_bai}                        ${gl_minglan}38.  ${color38}Xiaoya alist 가족 버킷"
+	  echo -e "${gl_minglan}39.  ${color39}Bililive 라이브 방송 녹음 도구${gl_minglan}40.  ${color40}webssh 웹 버전 SSH 연결 도구"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}41.  ${color41}마우스 관리 패널${gl_minglan}42.  ${color42}Nexterm 원격 연결 도구"
+	  echo -e "${gl_minglan}43.  ${color43}RustDesk 원격 데스크톱(서버)${gl_huang}★${gl_bai}          ${gl_minglan}44.  ${color44}RustDesk 원격 데스크톱(릴레이)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}45.  ${color45}도커 가속 스테이션${gl_minglan}46.  ${color46}GitHub 가속 스테이션${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}47.  ${color47}프로메테우스 모니터링${gl_minglan}48.  ${color48}프로메테우스(호스트 모니터링)"
+	  echo -e "${gl_minglan}49.  ${color49}프로메테우스(컨테이너 모니터링)${gl_minglan}50.  ${color50}보충 모니터링 도구"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}51.  ${color51}PVE 오픈 병아리 패널${gl_minglan}52.  ${color52}DPanel 컨테이너 관리 패널"
+	  echo -e "${gl_minglan}53.  ${color53}라마3 채팅 AI 대형 모델${gl_minglan}54.  ${color54}AMH 호스트 웹사이트 구축 관리 패널"
+	  echo -e "${gl_minglan}55.  ${color55}FRP 인트라넷 침투(서버)${gl_huang}★${gl_bai}	         ${gl_minglan}56.  ${color56}FRP 인트라넷 침투(클라이언트)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}57.  ${color57}Deepseek 채팅 AI 대형 모델${gl_minglan}58.  ${color58}대규모 모델 지식 기반 확장${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}59.  ${color59}NewAPI 대형 모델 자산 관리${gl_minglan}60.  ${color60}JumpServer 오픈 소스 요새 머신"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}61.  ${color61}온라인 번역 서버${gl_minglan}62.  ${color62}RAGFlow 대규모 모델 지식 기반"
+	  echo -e "${gl_minglan}63.  ${color63}OpenWebUI 자체 호스팅 AI 플랫폼${gl_huang}★${gl_bai}             ${gl_minglan}64.  ${color64}it-tools 도구 상자"
+	  echo -e "${gl_minglan}65.  ${color65}n8n 자동화된 워크플로우 플랫폼${gl_huang}★${gl_bai}               ${gl_minglan}66.  ${color66}yt-dlp 비디오 다운로드 도구"
+	  echo -e "${gl_minglan}67.  ${color67}ddns-go 동적 DNS 관리 도구${gl_huang}★${gl_bai}            ${gl_minglan}68.  ${color68}AllinSSL 인증서 관리 플랫폼"
+	  echo -e "${gl_minglan}69.  ${color69}SFTPGo 파일 전송 도구${gl_minglan}70.  ${color70}AstrBot 챗봇 프레임워크"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}71.  ${color71}Navidrome 개인 음악 서버${gl_minglan}72.  ${color72}비트워드 비밀번호 관리자${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}73.  ${color73}LibreTV 개인 영화${gl_minglan}74.  ${color74}MoonTV 개인 영화"
+	  echo -e "${gl_minglan}75.  ${color75}멜로디 음악 마법사${gl_minglan}76.  ${color76}온라인 DOS 오래된 게임"
+	  echo -e "${gl_minglan}77.  ${color77}Thunder 오프라인 다운로드 도구${gl_minglan}78.  ${color78}PandaWiki 지능형 문서 관리 시스템"
+	  echo -e "${gl_minglan}79.  ${color79}베젤 서버 모니터링${gl_minglan}80.  ${color80}링크워든 북마크 관리"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}81.  ${color81}JitsiMeet 화상 회의${gl_minglan}82.  ${color82}gpt-load 고성능 AI 투명 프록시"
+	  echo -e "${gl_minglan}83.  ${color83}코마리 서버 모니터링 도구${gl_minglan}84.  ${color84}Wallos 개인 재무 관리 도구"
+	  echo -e "${gl_minglan}85.  ${color85}이미치 픽처 비디오 매니저${gl_minglan}86.  ${color86}젤리핀 미디어 관리 시스템"
+	  echo -e "${gl_minglan}87.  ${color87}SyncTV는 함께 영화를 볼 수 있는 훌륭한 도구입니다${gl_minglan}88.  ${color88}Owncast 자체 호스팅 라이브 스트리밍 플랫폼"
+	  echo -e "${gl_minglan}89.  ${color89}FileCodeBox 파일 익스프레스${gl_minglan}90.  ${color90}매트릭스 분산형 채팅 프로토콜"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}91.  ${color91}gitea 비공개 코드 저장소${gl_minglan}92.  ${color92}FileBrowser 파일 관리자"
+	  echo -e "${gl_minglan}93.  ${color93}Dufs 미니멀리스트 정적 파일 서버${gl_minglan}94.  ${color94}Gopeed 고속 다운로드 도구"
+	  echo -e "${gl_minglan}95.  ${color95}종이 없는 문서 관리 플랫폼${gl_minglan}96.  ${color96}2FAuth 자체 호스팅 2단계 인증자"
+	  echo -e "${gl_minglan}97.  ${color97}WireGuard 네트워킹(서버)${gl_minglan}98.  ${color98}WireGuard 네트워킹(클라이언트)"
+	  echo -e "${gl_minglan}99.  ${color99}DSM Synology 가상 컴퓨터${gl_minglan}100. ${color100}P2P 파일 동기화 도구 동기화"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}101. ${color101}AI 영상 생성 도구${gl_minglan}102. ${color102}VoceChat 다자간 온라인 채팅 시스템"
+	  echo -e "${gl_minglan}103. ${color103}Umami 웹사이트 통계 도구${gl_minglan}104. ${color104}스트림 4계층 프록시 전달 도구"
+	  echo -e "${gl_minglan}105. ${color105}쓰위안 노트${gl_minglan}106. ${color106}Drawix 오픈 소스 화이트보드 도구"
+	  echo -e "${gl_minglan}107. ${color107}PanSou 네트워크 디스크 검색${gl_minglan}108. ${color108}LangBot 챗봇"
+	  echo -e "${gl_minglan}109. ${color109}ZFile 온라인 네트워크 디스크${gl_minglan}110. ${color110}Karakeep 북마크 관리"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}111. ${color111}다중 형식 파일 변환 도구${gl_minglan}112. ${color112}행운의 대형 인트라넷 침투 도구"
+	  echo -e "${gl_minglan}113. ${color113}파이어폭스 브라우저${gl_minglan}114. ${color114}OpenClaw机器人管理工具${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}115. ${color115}Hermes机器人管理工具${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}타사 애플리케이션 목록"
+	  echo -e "${gl_minglan}귀하의 앱이 여기에 표시되기를 원하십니까? 개발자 가이드를 확인하세요.${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
 
 	  for f in "$HOME"/apps/*.conf; do
 		  [ -e "$f" ] || continue
@@ -15341,20 +15341,20 @@ while true; do
 		  # 여기서는 appno.txt에 기록되는 내용이 base_name(즉, 파일 이름)이라고 가정합니다.
 		  if echo "$app_numbers" | grep -q "^$base_name$"; then
 			  # 설치된 경우: show base_name - 설명 [설치됨](녹색)
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - ${gl_lv}${app_text}[설치됨]${gl_bai}"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - ${gl_lv}${app_text}[설치됨]${gl_bai}"
 		  else
 			  # 설치되지 않은 경우: 정상적으로 표시됩니다.
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - $app_text"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - $app_text"
 		  fi
 	  done
 
 
 
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}b.   ${gl_bai}모든 애플리케이션 데이터 백업${gl_kjlan}r.   ${gl_bai}모든 앱 데이터 복원"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}b.   ${gl_bai}모든 애플리케이션 데이터 백업${gl_minglan}r.   ${gl_bai}모든 앱 데이터 복원"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 	fi
 
@@ -19011,7 +19011,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	clear
 
 	  	local backup_filename="app_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  	echo -e "${gl_kjlan}백업 중$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}백업 중$backup_filename ...${gl_bai}"
 	  	cd / && tar czvf "$backup_filename" home
 
 	  	while true; do
@@ -19062,7 +19062,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	fi
 
 	  	if [ -n "$filename" ]; then
-		  	  echo -e "${gl_kjlan}압축 해제 중$filename ...${gl_bai}"
+			echo -e "${gl_minglan}압축 해제 중$filename ...${gl_bai}"
 		  	  cd / && tar -xzf "$filename"
 			  echo "애플리케이션 데이터가 복원되었습니다. 현재 해당 애플리케이션을 복원하려면 지정된 애플리케이션 메뉴에 수동으로 진입한 후 애플리케이션을 업데이트하시기 바랍니다."
 	  	else
@@ -19108,29 +19108,29 @@ linux_work() {
 	  echo -e "시스템은 장기간 작업을 수행하는 데 사용할 수 있는 백그라운드에서 영구적으로 실행될 수 있는 작업 공간을 제공합니다."
 	  echo -e "SSH 연결을 끊더라도 작업 공간의 작업은 중단되지 않으며 백그라운드 작업은 유지됩니다."
 	  echo -e "${gl_huang}힌트:${gl_bai}워크스페이스 진입 후 Ctrl+b를 누른 후 d만 눌러 워크스페이스를 종료하세요!"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  echo "현재 존재하는 작업공간 목록"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  tmux list-sessions
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}작업 영역 1"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}작업 영역 2"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}작업 영역 3"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}작업 영역 4"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}작업 영역 5"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}작업 영역 6"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}작업 영역 7"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}작업 영역 8"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}작업 공간 9호"
-	  echo -e "${gl_kjlan}10.  ${gl_bai}작업공간 10"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}SSH 상주 모드${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}작업공간 생성/입력"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}백그라운드 작업 공간에 명령 삽입"
-	  echo -e "${gl_kjlan}24.  ${gl_bai}지정된 작업공간 삭제"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}작업 영역 1"
+	  echo -e "${gl_minglan}2.   ${gl_bai}작업 영역 2"
+	  echo -e "${gl_minglan}3.   ${gl_bai}작업 영역 3"
+	  echo -e "${gl_minglan}4.   ${gl_bai}작업 영역 4"
+	  echo -e "${gl_minglan}5.   ${gl_bai}작업 영역 5"
+	  echo -e "${gl_minglan}6.   ${gl_bai}작업 영역 6"
+	  echo -e "${gl_minglan}7.   ${gl_bai}작업 영역 7"
+	  echo -e "${gl_minglan}8.   ${gl_bai}작업 영역 8"
+	  echo -e "${gl_minglan}9.   ${gl_bai}작업 공간 9호"
+	  echo -e "${gl_minglan}10.  ${gl_bai}작업공간 10"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}SSH 상주 모드${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}22.  ${gl_bai}작업공간 생성/입력"
+	  echo -e "${gl_minglan}23.  ${gl_bai}백그라운드 작업 공간에 명령 삽입"
+	  echo -e "${gl_minglan}24.  ${gl_bai}지정된 작업공간 삭제"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -19752,39 +19752,39 @@ linux_Settings() {
 	while true; do
 	  clear
 	  echo -e "시스템 도구"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}스크립트 시작 단축키 설정${gl_kjlan}2.   ${gl_bai}로그인 비밀번호 변경"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}사용자 비밀번호 로그인 모드${gl_kjlan}4.   ${gl_bai}지정된 Python 버전을 설치합니다."
-	  echo -e "${gl_kjlan}5.   ${gl_bai}모든 포트 열기${gl_kjlan}6.   ${gl_bai}SSH 연결 포트 수정"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}DNS 주소 최적화${gl_kjlan}8.   ${gl_bai}한 번의 클릭으로 시스템을 다시 설치${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}ROOT 계정을 비활성화하고 새 계정을 만듭니다.${gl_kjlan}10.  ${gl_bai}우선 순위 ipv4/ipv6 전환"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}항만점유현황 확인${gl_kjlan}12.  ${gl_bai}가상 메모리 크기 수정"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}사용자 관리${gl_kjlan}14.  ${gl_bai}사용자/비밀번호 생성기"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}시스템 시간대 조정${gl_kjlan}16.  ${gl_bai}BBR3 가속 설정"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}방화벽 고급 관리자${gl_kjlan}18.  ${gl_bai}호스트 이름 수정"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}시스템 업데이트 소스 전환${gl_kjlan}20.  ${gl_bai}예약된 작업 관리"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}기본 호스트 확인${gl_kjlan}22.  ${gl_bai}SSH 방어 프로그램"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}전류 제한 자동 종료${gl_kjlan}24.  ${gl_bai}사용자 키 로그인 모드"
-	  echo -e "${gl_kjlan}25.  ${gl_bai}TG-bot 시스템 모니터링 및 조기경보${gl_kjlan}26.  ${gl_bai}OpenSSH 고위험 취약점 수정"
-	  echo -e "${gl_kjlan}27.  ${gl_bai}Red Hat Linux 커널 업그레이드${gl_kjlan}28.  ${gl_bai}Linux 시스템 커널 매개변수 최적화${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}29.  ${gl_bai}바이러스 검사 도구${gl_huang}★${gl_bai}                     ${gl_kjlan}30.  ${gl_bai}파일 관리자"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}시스템 언어 전환${gl_kjlan}32.  ${gl_bai}명령줄 미화 도구${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}시스템 휴지통 설정${gl_kjlan}34.  ${gl_bai}시스템 백업 및 복구"
-	  echo -e "${gl_kjlan}35.  ${gl_bai}SSH 원격 연결 도구${gl_kjlan}36.  ${gl_bai}하드 디스크 파티션 관리 도구"
-	  echo -e "${gl_kjlan}37.  ${gl_bai}명령줄 기록${gl_kjlan}38.  ${gl_bai}rsync 원격 동기화 도구"
-	  echo -e "${gl_kjlan}39.  ${gl_bai}명령 즐겨찾기${gl_huang}★${gl_bai}                       ${gl_kjlan}40.  ${gl_bai}네트워크 카드 관리 도구"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}시스템 로그 관리 도구${gl_huang}★${gl_bai}                 ${gl_kjlan}42.  ${gl_bai}시스템 변수 관리 도구"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}61.  ${gl_bai}Project support                      ${gl_kjlan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}99.  ${gl_bai}서버를 다시 시작하세요"
-	  echo -e "${gl_kjlan}101. ${gl_bai}${PROJECT_COMMAND} 명령의 고급 사용법${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}${PROJECT_NAME} 제거"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}스크립트 시작 단축키 설정${gl_minglan}2.   ${gl_bai}로그인 비밀번호 변경"
+	  echo -e "${gl_minglan}3.   ${gl_bai}사용자 비밀번호 로그인 모드${gl_minglan}4.   ${gl_bai}지정된 Python 버전을 설치합니다."
+	  echo -e "${gl_minglan}5.   ${gl_bai}모든 포트 열기${gl_minglan}6.   ${gl_bai}SSH 연결 포트 수정"
+	  echo -e "${gl_minglan}7.   ${gl_bai}DNS 주소 최적화${gl_minglan}8.   ${gl_bai}한 번의 클릭으로 시스템을 다시 설치${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}9.   ${gl_bai}ROOT 계정을 비활성화하고 새 계정을 만듭니다.${gl_minglan}10.  ${gl_bai}우선 순위 ipv4/ipv6 전환"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}항만점유현황 확인${gl_minglan}12.  ${gl_bai}가상 메모리 크기 수정"
+	  echo -e "${gl_minglan}13.  ${gl_bai}사용자 관리${gl_minglan}14.  ${gl_bai}사용자/비밀번호 생성기"
+	  echo -e "${gl_minglan}15.  ${gl_bai}시스템 시간대 조정${gl_minglan}16.  ${gl_bai}BBR3 가속 설정"
+	  echo -e "${gl_minglan}17.  ${gl_bai}방화벽 고급 관리자${gl_minglan}18.  ${gl_bai}호스트 이름 수정"
+	  echo -e "${gl_minglan}19.  ${gl_bai}시스템 업데이트 소스 전환${gl_minglan}20.  ${gl_bai}예약된 작업 관리"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}기본 호스트 확인${gl_minglan}22.  ${gl_bai}SSH 방어 프로그램"
+	  echo -e "${gl_minglan}23.  ${gl_bai}전류 제한 자동 종료${gl_minglan}24.  ${gl_bai}사용자 키 로그인 모드"
+	  echo -e "${gl_minglan}25.  ${gl_bai}TG-bot 시스템 모니터링 및 조기경보${gl_minglan}26.  ${gl_bai}OpenSSH 고위험 취약점 수정"
+	  echo -e "${gl_minglan}27.  ${gl_bai}Red Hat Linux 커널 업그레이드${gl_minglan}28.  ${gl_bai}Linux 시스템 커널 매개변수 최적화${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}29.  ${gl_bai}바이러스 검사 도구${gl_huang}★${gl_bai}                     ${gl_minglan}30.  ${gl_bai}파일 관리자"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}시스템 언어 전환${gl_minglan}32.  ${gl_bai}명령줄 미화 도구${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}시스템 휴지통 설정${gl_minglan}34.  ${gl_bai}시스템 백업 및 복구"
+	  echo -e "${gl_minglan}35.  ${gl_bai}SSH 원격 연결 도구${gl_minglan}36.  ${gl_bai}하드 디스크 파티션 관리 도구"
+	  echo -e "${gl_minglan}37.  ${gl_bai}명령줄 기록${gl_minglan}38.  ${gl_bai}rsync 원격 동기화 도구"
+	  echo -e "${gl_minglan}39.  ${gl_bai}명령 즐겨찾기${gl_huang}★${gl_bai}                       ${gl_minglan}40.  ${gl_bai}네트워크 카드 관리 도구"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}시스템 로그 관리 도구${gl_huang}★${gl_bai}                 ${gl_minglan}42.  ${gl_bai}시스템 변수 관리 도구"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}61.  ${gl_bai}Project support                      ${gl_minglan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}99.  ${gl_bai}서버를 다시 시작하세요"
+	  echo -e "${gl_minglan}101. ${gl_bai}${PROJECT_COMMAND} 명령의 고급 사용법${gl_huang}★${gl_bai}                    ${gl_minglan}102. ${gl_bai}${PROJECT_NAME} 제거"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -20474,8 +20474,8 @@ EOF
 				echo "------------------------------------------------"
 				echo "서버가 다시 시작되면 현재 트래픽 사용량이 지워집니다!"
 				output_status
-				echo -e "${gl_kjlan}받은 총액:${gl_bai}$rx"
-				echo -e "${gl_kjlan}보낸 총액:${gl_bai}$tx"
+				echo -e "${gl_minglan}받은 총액:${gl_bai}$rx"
+				echo -e "${gl_minglan}보낸 총액:${gl_bai}$tx"
 
 				# Limiting_Shut_down.sh 파일이 있는지 확인하세요.
 				if [ -f ~/Limiting_Shut_down.sh ]; then
@@ -21043,18 +21043,18 @@ while true; do
 	  echo "서버 클러스터 제어"
 	  cat ~/cluster/servers.py
 	  echo
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}서버 목록 관리${gl_bai}"
-	  echo -e "${gl_kjlan}1.  ${gl_bai}서버 추가${gl_kjlan}2.  ${gl_bai}서버 삭제${gl_kjlan}3.  ${gl_bai}서버 편집"
-	  echo -e "${gl_kjlan}4.  ${gl_bai}백업 클러스터${gl_kjlan}5.  ${gl_bai}클러스터 복원"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}일괄적으로 작업 실행${gl_bai}"
-	  echo -e "${gl_kjlan}11. ${gl_bai}Deployment guide (disabled)       ${gl_kjlan}12. ${gl_bai}Update system         ${gl_kjlan}13. ${gl_bai}Clean system"
-	  echo -e "${gl_kjlan}14. ${gl_bai}도커 설치${gl_kjlan}15. ${gl_bai}BBR3 설치${gl_kjlan}16. ${gl_bai}1G 가상 메모리 설정"
-	  echo -e "${gl_kjlan}17. ${gl_bai}시간대를 상하이로 설정${gl_kjlan}18. ${gl_bai}모든 포트 열기${gl_kjlan}51. ${gl_bai}사용자 정의 지시어"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}0.  ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}서버 목록 관리${gl_bai}"
+	  echo -e "${gl_minglan}1.  ${gl_bai}서버 추가${gl_minglan}2.  ${gl_bai}서버 삭제${gl_minglan}3.  ${gl_bai}서버 편집"
+	  echo -e "${gl_minglan}4.  ${gl_bai}백업 클러스터${gl_minglan}5.  ${gl_bai}클러스터 복원"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}일괄적으로 작업 실행${gl_bai}"
+	  echo -e "${gl_minglan}11. ${gl_bai}Deployment guide (disabled)       ${gl_minglan}12. ${gl_bai}Update system         ${gl_minglan}13. ${gl_bai}Clean system"
+	  echo -e "${gl_minglan}14. ${gl_bai}도커 설치${gl_minglan}15. ${gl_bai}BBR3 설치${gl_minglan}16. ${gl_bai}1G 가상 메모리 설정"
+	  echo -e "${gl_minglan}17. ${gl_bai}시간대를 상하이로 설정${gl_minglan}18. ${gl_bai}모든 포트 열기${gl_minglan}51. ${gl_bai}사용자 정의 지시어"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}0.  ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -21152,12 +21152,12 @@ games_server_tools() {
 	while true; do
 	  clear
 	  echo -e "게임 서버 오프닝 스크립트 모음"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1. ${gl_bai}Eudemons Parlu 서버 오픈 스크립트"
-	  echo -e "${gl_kjlan}2. ${gl_bai}Minecraft 서버 열기 스크립트"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0. ${gl_bai}메인 메뉴로 돌아가기"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1. ${gl_bai}Eudemons Parlu 서버 오픈 스크립트"
+	  echo -e "${gl_minglan}2. ${gl_bai}Minecraft 서버 열기 스크립트"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0. ${gl_bai}메인 메뉴로 돌아가기"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "선택사항을 입력하세요:" sub_choice
 
 	  case $sub_choice in
@@ -21217,31 +21217,31 @@ project_update() {
 main_menu() {
 while true; do
 clear
-echo -e "${gl_kjlan}"
+echo -e "${gl_minglan}"
 echo -e "${PROJECT_NAME} v${PROJECT_VERSION}"
-echo -e "명령줄 입력${gl_huang}${PROJECT_COMMAND}${gl_kjlan}빠른 시작 스크립트${gl_bai}"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}1.   ${gl_bai}시스템 정보 쿼리"
-echo -e "${gl_kjlan}2.   ${gl_bai}시스템 업데이트"
-echo -e "${gl_kjlan}3.   ${gl_bai}시스템 정리"
-echo -e "${gl_kjlan}4.   ${gl_bai}기본 도구"
-echo -e "${gl_kjlan}5.   ${gl_bai}BBR 관리"
-echo -e "${gl_kjlan}6.   ${gl_bai}도커 관리"
-echo -e "${gl_kjlan}7.   ${gl_bai}워프 관리"
-echo -e "${gl_kjlan}8.   ${gl_bai}테스트 스크립트 수집"
-echo -e "${gl_kjlan}9.   ${gl_bai}Oracle Cloud 스크립트 컬렉션"
+echo -e "명령줄 입력${gl_huang}${PROJECT_COMMAND}${gl_minglan}빠른 시작 스크립트${gl_bai}"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}1.   ${gl_bai}시스템 정보 쿼리"
+echo -e "${gl_minglan}2.   ${gl_bai}시스템 업데이트"
+echo -e "${gl_minglan}3.   ${gl_bai}시스템 정리"
+echo -e "${gl_minglan}4.   ${gl_bai}기본 도구"
+echo -e "${gl_minglan}5.   ${gl_bai}BBR 관리"
+echo -e "${gl_minglan}6.   ${gl_bai}도커 관리"
+echo -e "${gl_minglan}7.   ${gl_bai}워프 관리"
+echo -e "${gl_minglan}8.   ${gl_bai}테스트 스크립트 수집"
+echo -e "${gl_minglan}9.   ${gl_bai}Oracle Cloud 스크립트 컬렉션"
 echo -e "${gl_huang}10.  ${gl_bai}LDNMP 웹사이트 구축"
-echo -e "${gl_kjlan}11.  ${gl_bai}응용 시장"
-echo -e "${gl_kjlan}12.  ${gl_bai}백엔드 작업공간"
-echo -e "${gl_kjlan}13.  ${gl_bai}시스템 도구"
-echo -e "${gl_kjlan}14.  ${gl_bai}서버 클러스터 제어"
-echo -e "${gl_kjlan}15.  ${gl_bai}Project information"
-echo -e "${gl_kjlan}16.  ${gl_bai}게임 서버 오프닝 스크립트 모음"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}00.  ${gl_bai}Project update (disabled)"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}0.   ${gl_bai}스크립트 종료"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
+echo -e "${gl_minglan}11.  ${gl_bai}응용 시장"
+echo -e "${gl_minglan}12.  ${gl_bai}백엔드 작업공간"
+echo -e "${gl_minglan}13.  ${gl_bai}시스템 도구"
+echo -e "${gl_minglan}14.  ${gl_bai}서버 클러스터 제어"
+echo -e "${gl_minglan}15.  ${gl_bai}Project information"
+echo -e "${gl_minglan}16.  ${gl_bai}게임 서버 오프닝 스크립트 모음"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}00.  ${gl_bai}Project update (disabled)"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}0.   ${gl_bai}스크립트 종료"
+echo -e "${gl_minglan}------------------------${gl_bai}"
 read -e -p "선택사항을 입력하세요:" choice
 
 case $choice in

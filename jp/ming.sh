@@ -113,7 +113,7 @@ gl_huang='\033[33m'
 gl_lan='\033[34m'
 gl_bai='\033[0m'
 gl_zi='\033[35m'
-gl_kjlan='\033[96m'
+gl_minglan='\033[96m'
 
 
 canshu="default"
@@ -211,7 +211,7 @@ CheckFirstRun_false() {
 # ユーザーに規約への同意を求めるプロンプトを表示する
 UserLicenseAgreement() {
 	clear
-	echo -e "${gl_kjlan}${PROJECT_NAME} ツールボックスへようこそ${gl_bai}"
+	echo -e "${gl_minglan}${PROJECT_NAME} ツールボックスへようこそ${gl_bai}"
 	echo "初めてスクリプトを使用する場合は、ユーザー使用許諾契約を読み、同意してください。"
 	echo "License: ${UPSTREAM_LICENSE}; ${PROJECT_LICENSE_URL}"
 	echo -e "----------------------"
@@ -271,7 +271,7 @@ install() {
 
 	for package in "$@"; do
 		if ! command -v "$package" &>/dev/null; then
-			echo -e "${gl_kjlan}インストール中$package...${gl_bai}"
+			echo -e "${gl_minglan}インストール中$package...${gl_bai}"
 			if command -v dnf &>/dev/null; then
 				dnf -y update
 				dnf install -y epel-release
@@ -345,7 +345,7 @@ remove() {
 	fi
 
 	for package in "$@"; do
-		echo -e "${gl_kjlan}アンインストール中$package...${gl_bai}"
+		echo -e "${gl_minglan}アンインストール中$package...${gl_bai}"
 		if command -v dnf &>/dev/null; then
 			dnf remove -y "$package"
 		elif command -v yum &>/dev/null; then
@@ -541,7 +541,7 @@ install_add_docker_cn
 
 
 install_add_docker() {
-	echo -e "${gl_kjlan}Docker 環境をインストールしています...${gl_bai}"
+	echo -e "${gl_minglan}Docker 環境をインストールしています...${gl_bai}"
 	if command -v apt &>/dev/null || command -v yum &>/dev/null || command -v dnf &>/dev/null; then
 		linuxmirrors_install_docker
 	else
@@ -710,14 +710,14 @@ while true; do
 		1)
 			read -e -p "イメージ名を入力してください (複数のイメージ名はスペースで区切ってください):" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}画像の取得：$name${gl_bai}"
+				echo -e "${gl_minglan}画像の取得：$name${gl_bai}"
 				docker pull $name
 			done
 			;;
 		2)
 			read -e -p "イメージ名を入力してください (複数のイメージ名はスペースで区切ってください):" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}画像の更新:$name${gl_bai}"
+				echo -e "${gl_minglan}画像の更新:$name${gl_bai}"
 				docker pull $name
 			done
 			;;
@@ -4641,7 +4641,7 @@ fix_dpkg() {
 
 
 linux_update() {
-	echo -e "${gl_kjlan}システムアップデート中です...${gl_bai}"
+	echo -e "${gl_minglan}システムアップデート中です...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		dnf -y update
 	elif command -v yum &>/dev/null; then
@@ -4668,7 +4668,7 @@ linux_update() {
 
 
 linux_clean() {
-	echo -e "${gl_kjlan}システムクリーニング中...${gl_bai}"
+	echo -e "${gl_minglan}システムクリーニング中...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		rpm --rebuilddb
 		dnf autoremove -y
@@ -5844,7 +5844,7 @@ elrepo() {
 
 
 clamav_freshclam() {
-	echo -e "${gl_kjlan}ウイルスデータベースを更新しています...${gl_bai}"
+	echo -e "${gl_minglan}ウイルスデータベースを更新しています...${gl_bai}"
 	docker run --rm \
 		--name clamav \
 		--mount source=clam_db,target=/var/lib/clamav \
@@ -5858,7 +5858,7 @@ clamav_scan() {
 		return
 	fi
 
-	echo -e "${gl_kjlan}ディレクトリ $* をスキャンしています...${gl_bai}"
+	echo -e "${gl_minglan}ディレクトリ $* をスキャンしています...${gl_bai}"
 
 	# ビルドマウントパラメータ
 	local MOUNT_PARAMS=""
@@ -5905,7 +5905,7 @@ clamav() {
 				echo "これは、主にさまざまな種類のマルウェアを検出して削除するために使用されるオープンソースのウイルス対策ソフトウェア ツールです。"
 				echo "ウイルス、トロイの木馬、スパイウェア、悪意のあるスクリプト、その他の有害なソフトウェアが含まれます。"
 				echo "------------------------"
-				echo -e "${gl_lv}1.フルスキャン${gl_bai}             ${gl_huang}2. 重要なディレクトリをスキャンする${gl_bai}            ${gl_kjlan}3. カスタムディレクトリスキャン${gl_bai}"
+				echo -e "${gl_lv}1.フルスキャン${gl_bai}             ${gl_huang}2. 重要なディレクトリをスキャンする${gl_bai}            ${gl_minglan}3. カスタムディレクトリスキャン${gl_bai}"
 				echo "------------------------"
 				echo "0. 前のメニューに戻る"
 				echo "------------------------"
@@ -7480,7 +7480,7 @@ linux_info() {
 
 
 	clear
-	echo -e "${gl_kjlan}システム情報を問い合わせています...${gl_bai}"
+	echo -e "${gl_minglan}システム情報を問い合わせています...${gl_bai}"
 
 	ip_address
 
@@ -7533,41 +7533,41 @@ linux_info() {
 
 	clear
 	echo -e "システム情報の問い合わせ"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}ホスト名:${gl_bai}$hostname"
-	echo -e "${gl_kjlan}システムバージョン:${gl_bai}$os_info"
-	echo -e "${gl_kjlan}Linux バージョン:${gl_bai}$kernel_version"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU アーキテクチャ:${gl_bai}$cpu_arch"
-	echo -e "${gl_kjlan}CPUモデル:${gl_bai}$cpu_info"
-	echo -e "${gl_kjlan}CPUコアの数:${gl_bai}$cpu_cores"
-	echo -e "${gl_kjlan}CPU周波数:${gl_bai}$cpu_freq"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU使用率:${gl_bai}$cpu_usage_percent%"
-	echo -e "${gl_kjlan}システム負荷:${gl_bai}$load"
-	echo -e "${gl_kjlan}TCP|UDP 接続の数:${gl_bai}$tcp_count|$udp_count"
-	echo -e "${gl_kjlan}物理メモリ:${gl_bai}$mem_info"
-	echo -e "${gl_kjlan}仮想メモリ:${gl_bai}$swap_info"
-	echo -e "${gl_kjlan}ハードドライブの使用状況:${gl_bai}$disk_info"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}受け取った合計:${gl_bai}$rx"
-	echo -e "${gl_kjlan}送信合計:${gl_bai}$tx"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}ネットワークアルゴリズム:${gl_bai}$congestion_algorithm $queue_algorithm"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}オペレーター：${gl_bai}$isp_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}ホスト名:${gl_bai}$hostname"
+	echo -e "${gl_minglan}システムバージョン:${gl_bai}$os_info"
+	echo -e "${gl_minglan}Linux バージョン:${gl_bai}$kernel_version"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU アーキテクチャ:${gl_bai}$cpu_arch"
+	echo -e "${gl_minglan}CPUモデル:${gl_bai}$cpu_info"
+	echo -e "${gl_minglan}CPUコアの数:${gl_bai}$cpu_cores"
+	echo -e "${gl_minglan}CPU周波数:${gl_bai}$cpu_freq"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU使用率:${gl_bai}$cpu_usage_percent%"
+	echo -e "${gl_minglan}システム負荷:${gl_bai}$load"
+	echo -e "${gl_minglan}TCP|UDP 接続の数:${gl_bai}$tcp_count|$udp_count"
+	echo -e "${gl_minglan}物理メモリ:${gl_bai}$mem_info"
+	echo -e "${gl_minglan}仮想メモリ:${gl_bai}$swap_info"
+	echo -e "${gl_minglan}ハードドライブの使用状況:${gl_bai}$disk_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}受け取った合計:${gl_bai}$rx"
+	echo -e "${gl_minglan}送信合計:${gl_bai}$tx"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}ネットワークアルゴリズム:${gl_bai}$congestion_algorithm $queue_algorithm"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}オペレーター：${gl_bai}$isp_info"
 	if [ -n "$ipv4_address" ]; then
-		echo -e "${gl_kjlan}IPv4アドレス:${gl_bai}$ipv4_address"
+		echo -e "${gl_minglan}IPv4アドレス:${gl_bai}$ipv4_address"
 	fi
 
 	if [ -n "$ipv6_address" ]; then
-		echo -e "${gl_kjlan}IPv6アドレス:${gl_bai}$ipv6_address"
+		echo -e "${gl_minglan}IPv6アドレス:${gl_bai}$ipv6_address"
 	fi
-	echo -e "${gl_kjlan}DNS アドレス:${gl_bai}$dns_addresses"
-	echo -e "${gl_kjlan}位置：${gl_bai}$country $city"
-	echo -e "${gl_kjlan}システム時間:${gl_bai}$timezone $current_time"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}実行時間:${gl_bai}$runtime"
+	echo -e "${gl_minglan}DNS アドレス:${gl_bai}$dns_addresses"
+	echo -e "${gl_minglan}位置：${gl_bai}$country $city"
+	echo -e "${gl_minglan}システム時間:${gl_bai}$timezone $current_time"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}実行時間:${gl_bai}$runtime"
 	echo
 
 
@@ -7610,7 +7610,7 @@ linux_tools() {
 	  fi
 
 	  echo "📦 パッケージマネージャーを使用します:$PM"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 
 	  for ((i=0; i<${#tools[@]}; i+=2)); do
 		# 左の列
@@ -7633,29 +7633,29 @@ linux_tools() {
 		fi
 	  done
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}カールダウンロードツール${gl_huang}★${gl_bai}                   ${gl_kjlan}2.   ${gl_bai}wgetダウンロードツール${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}sudo スーパー管理者特権ツール${gl_kjlan}4.   ${gl_bai}socat通信接続ツール"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}htop システム監視ツール${gl_kjlan}6.   ${gl_bai}iftop ネットワークトラフィック監視ツール"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}unzip ZIP圧縮・解凍ツール${gl_kjlan}8.   ${gl_bai}tar GZ 圧縮および解凍ツール"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}tmux マルチチャネル バックグラウンド実行ツール${gl_kjlan}10.  ${gl_bai}ffmpeg ビデオエンコードライブストリーミングツール"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}btop 最新の監視ツール${gl_huang}★${gl_bai}             ${gl_kjlan}12.  ${gl_bai}レンジャーファイル管理ツール"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}ncdu ディスク使用量表示ツール${gl_kjlan}14.  ${gl_bai}fzf グローバル検索ツール"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}vim テキストエディタ${gl_kjlan}16.  ${gl_bai}ナノテキストエディタ${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}git バージョン管理システム${gl_kjlan}18.  ${gl_bai}opencode AI プログラミング アシスタント${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}マトリックス スクリーンセーバー${gl_kjlan}22.  ${gl_bai}走る電車のスクリーンセーバー"
-	  echo -e "${gl_kjlan}26.  ${gl_bai}テトリスのミニゲーム${gl_kjlan}27.  ${gl_bai}ヘビのミニゲーム"
-	  echo -e "${gl_kjlan}28.  ${gl_bai}スペースインベーダーのミニゲーム"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}すべてインストールする${gl_kjlan}32.  ${gl_bai}すべてインストール (スクリーンセーバーとゲームを除く)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}すべてアンインストールする"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}指定されたツールをインストールする${gl_kjlan}42.  ${gl_bai}指定されたツールをアンインストールします"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}カールダウンロードツール${gl_huang}★${gl_bai}                   ${gl_minglan}2.   ${gl_bai}wgetダウンロードツール${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}3.   ${gl_bai}sudo スーパー管理者特権ツール${gl_minglan}4.   ${gl_bai}socat通信接続ツール"
+	  echo -e "${gl_minglan}5.   ${gl_bai}htop システム監視ツール${gl_minglan}6.   ${gl_bai}iftop ネットワークトラフィック監視ツール"
+	  echo -e "${gl_minglan}7.   ${gl_bai}unzip ZIP圧縮・解凍ツール${gl_minglan}8.   ${gl_bai}tar GZ 圧縮および解凍ツール"
+	  echo -e "${gl_minglan}9.   ${gl_bai}tmux マルチチャネル バックグラウンド実行ツール${gl_minglan}10.  ${gl_bai}ffmpeg ビデオエンコードライブストリーミングツール"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}btop 最新の監視ツール${gl_huang}★${gl_bai}             ${gl_minglan}12.  ${gl_bai}レンジャーファイル管理ツール"
+	  echo -e "${gl_minglan}13.  ${gl_bai}ncdu ディスク使用量表示ツール${gl_minglan}14.  ${gl_bai}fzf グローバル検索ツール"
+	  echo -e "${gl_minglan}15.  ${gl_bai}vim テキストエディタ${gl_minglan}16.  ${gl_bai}ナノテキストエディタ${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}17.  ${gl_bai}git バージョン管理システム${gl_minglan}18.  ${gl_bai}opencode AI プログラミング アシスタント${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}マトリックス スクリーンセーバー${gl_minglan}22.  ${gl_bai}走る電車のスクリーンセーバー"
+	  echo -e "${gl_minglan}26.  ${gl_bai}テトリスのミニゲーム${gl_minglan}27.  ${gl_bai}ヘビのミニゲーム"
+	  echo -e "${gl_minglan}28.  ${gl_bai}スペースインベーダーのミニゲーム"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}すべてインストールする${gl_minglan}32.  ${gl_bai}すべてインストール (スクリーンセーバーとゲームを除く)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}すべてアンインストールする"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}指定されたツールをインストールする${gl_minglan}42.  ${gl_bai}指定されたツールをアンインストールします"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -7929,7 +7929,7 @@ docker_ssh_migration() {
 
 	list_backups() {
 		local BACKUP_ROOT="/tmp"
-		echo -e "${gl_kjlan}現在のバックアップ リスト:${gl_bai}"
+		echo -e "${gl_minglan}現在のバックアップ リスト:${gl_bai}"
 		ls -1dt ${BACKUP_ROOT}/docker_backup_* 2>/dev/null || echo "バックアップなし"
 	}
 
@@ -7940,7 +7940,7 @@ docker_ssh_migration() {
 	# ----------------------------
 	backup_docker() {
 
-		echo -e "${gl_kjlan}Docker コンテナをバックアップしています...${gl_bai}"
+		echo -e "${gl_minglan}Docker コンテナをバックアップしています...${gl_bai}"
 		docker ps --format '{{.Names}}'
 		read -e -p  "バックアップするコンテナの名前を入力してください (実行中のすべてのコンテナをバックアップするには、複数のスペースを区切って Enter キーを押します)。" containers
 
@@ -7974,7 +7974,7 @@ docker_ssh_migration() {
 			docker inspect "$c" > "$inspect_file"
 
 			if is_compose_container "$c"; then
-				echo -e "${gl_kjlan}検出されました$cdocker-compose コンテナーです${gl_bai}"
+				echo -e "${gl_minglan}検出されました$cdocker-compose コンテナーです${gl_bai}"
 				local project_dir=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project.working_dir"] // empty')
 				local project_name=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project"] // empty')
 
@@ -8042,7 +8042,7 @@ docker_ssh_migration() {
 
 		# /home/docker 下のすべてのファイルをバックアップします (サブディレクトリを除く)。
 		if [ -d "/home/docker" ]; then
-			echo -e "${gl_kjlan}/home/docker 下のファイルをバックアップします...${gl_bai}"
+			echo -e "${gl_minglan}/home/docker 下のファイルをバックアップします...${gl_bai}"
 			find /home/docker -maxdepth 1 -type f | tar -czf "${BACKUP_DIR}/home_docker_files.tar.gz" -T -
 			echo -e "${gl_lv}/home/docker 下のファイルは次のようにパッケージ化されています。${BACKUP_DIR}/home_docker_files.tar.gz${gl_bai}"
 		fi
@@ -8062,7 +8062,7 @@ docker_ssh_migration() {
 		read -e -p  "復元するバックアップ ディレクトリを入力してください:" BACKUP_DIR
 		[[ ! -d "$BACKUP_DIR" ]] && { echo -e "${gl_hong}バックアップディレクトリが存在しません${gl_bai}"; return; }
 
-		echo -e "${gl_kjlan}復元操作を開始しています...${gl_bai}"
+		echo -e "${gl_minglan}復元操作を開始しています...${gl_bai}"
 
 		install tar jq gzip
 		install_docker
@@ -8098,7 +8098,7 @@ docker_ssh_migration() {
 		done
 
 		# --------- 通常のコンテナの復元を続行 ---------
-		echo -e "${gl_kjlan}通常の Docker コンテナを確認して復元します...${gl_bai}"
+		echo -e "${gl_minglan}通常の Docker コンテナを確認して復元します...${gl_bai}"
 		local has_container=false
 		for json in "$BACKUP_DIR"/*_inspect.json; do
 			[[ ! -f "$json" ]] && continue
@@ -8161,7 +8161,7 @@ docker_ssh_migration() {
 
 		# /home/docker 下のファイルを復元します
 		if [ -f "$BACKUP_DIR/home_docker_files.tar.gz" ]; then
-			echo -e "${gl_kjlan}/home/docker の下にファイルを復元しています...${gl_bai}"
+			echo -e "${gl_minglan}/home/docker の下にファイルを復元しています...${gl_bai}"
 			mkdir -p /home/docker
 			tar -xzf "$BACKUP_DIR/home_docker_files.tar.gz" -C /
 			echo -e "${gl_lv}/home/docker 下のファイルが復元されました${gl_bai}"
@@ -8251,29 +8251,29 @@ linux_docker() {
 	  clear
 	  echo -e "Docker管理"
 	  docker_tato
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}Docker環境のインストールと更新${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}Docker のグローバル ステータスを表示する${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}Dockerコンテナ管理${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}Dockerイメージ管理"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}Dockerネットワーク管理"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}Docker ボリューム管理"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}不要な Docker コンテナをクリーンアップし、ネットワーク データ ボリュームをミラーリングします"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}Dockerソースを変更する"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}daemon.json ファイルを編集する"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}Docker-ipv6 アクセスを有効にする"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}Docker-ipv6 アクセスをオフにする"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}Docker環境のバックアップ/移行/復元"
-	  echo -e "${gl_kjlan}20.  ${gl_bai}Docker環境をアンインストールする"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}Docker環境のインストールと更新${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}2.   ${gl_bai}Docker のグローバル ステータスを表示する${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}Dockerコンテナ管理${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}4.   ${gl_bai}Dockerイメージ管理"
+	  echo -e "${gl_minglan}5.   ${gl_bai}Dockerネットワーク管理"
+	  echo -e "${gl_minglan}6.   ${gl_bai}Docker ボリューム管理"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}7.   ${gl_bai}不要な Docker コンテナをクリーンアップし、ネットワーク データ ボリュームをミラーリングします"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}8.   ${gl_bai}Dockerソースを変更する"
+	  echo -e "${gl_minglan}9.   ${gl_bai}daemon.json ファイルを編集する"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}Docker-ipv6 アクセスを有効にする"
+	  echo -e "${gl_minglan}12.  ${gl_bai}Docker-ipv6 アクセスをオフにする"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}19.  ${gl_bai}Docker環境のバックアップ/移行/復元"
+	  echo -e "${gl_minglan}20.  ${gl_bai}Docker環境をアンインストールする"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -8523,38 +8523,38 @@ linux_test() {
 	while true; do
 	  clear
 	  echo -e "テストスクリプト集"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}IPおよびロック解除ステータスの検出"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}ChatGPTロック解除状態検出"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}リージョンストリーミングメディアロック解除テスト"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}Yeawu ストリーミング メディアのロック解除の検出"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}xykt IP 品質チェック スクリプト${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}IPおよびロック解除ステータスの検出"
+	  echo -e "${gl_minglan}1.   ${gl_bai}ChatGPTロック解除状態検出"
+	  echo -e "${gl_minglan}2.   ${gl_bai}リージョンストリーミングメディアロック解除テスト"
+	  echo -e "${gl_minglan}3.   ${gl_bai}Yeawu ストリーミング メディアのロック解除の検出"
+	  echo -e "${gl_minglan}4.   ${gl_bai}xykt IP 品質チェック スクリプト${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}ネットワーク回線速度テスト"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}besttrace 3 ネットワーク バックホール遅延ルーティング テスト"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}mtr_trace トリプルネットワークバックホール回線テスト"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}超高速トリプルネットワーク速度テスト"
-	  echo -e "${gl_kjlan}14.  ${gl_bai}nxtrace 高速バックホール テスト スクリプト"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}nxtrace は IP バックホール テスト スクリプトを指定します"
-	  echo -e "${gl_kjlan}16.  ${gl_bai}ludashi2020 3つのネットワーク回線テスト"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}i-abc 多機能速度テスト スクリプト"
-	  echo -e "${gl_kjlan}18.  ${gl_bai}NetQuality ネットワーク品質チェック スクリプト${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}TcpQuality TCP 再送検出スクリプト${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}ネットワーク回線速度テスト"
+	  echo -e "${gl_minglan}11.  ${gl_bai}besttrace 3 ネットワーク バックホール遅延ルーティング テスト"
+	  echo -e "${gl_minglan}12.  ${gl_bai}mtr_trace トリプルネットワークバックホール回線テスト"
+	  echo -e "${gl_minglan}13.  ${gl_bai}超高速トリプルネットワーク速度テスト"
+	  echo -e "${gl_minglan}14.  ${gl_bai}nxtrace 高速バックホール テスト スクリプト"
+	  echo -e "${gl_minglan}15.  ${gl_bai}nxtrace は IP バックホール テスト スクリプトを指定します"
+	  echo -e "${gl_minglan}16.  ${gl_bai}ludashi2020 3つのネットワーク回線テスト"
+	  echo -e "${gl_minglan}17.  ${gl_bai}i-abc 多機能速度テスト スクリプト"
+	  echo -e "${gl_minglan}18.  ${gl_bai}NetQuality ネットワーク品質チェック スクリプト${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}19.  ${gl_bai}TcpQuality TCP 再送検出スクリプト${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}ハードウェアパフォーマンステスト"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}yabsパフォーマンステスト"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}icu/gb5 CPU パフォーマンステストスクリプト"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}ハードウェアパフォーマンステスト"
+	  echo -e "${gl_minglan}21.  ${gl_bai}yabsパフォーマンステスト"
+	  echo -e "${gl_minglan}22.  ${gl_bai}icu/gb5 CPU パフォーマンステストスクリプト"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}総合的なテスト"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}ベンチパフォーマンステスト"
-	  echo -e "${gl_kjlan}32.  ${gl_bai}Spiritysdx融合モンスターの評価${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}ノードクオリティ融合モンスターの評価${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}総合的なテスト"
+	  echo -e "${gl_minglan}31.  ${gl_bai}ベンチパフォーマンステスト"
+	  echo -e "${gl_minglan}32.  ${gl_bai}Spiritysdx融合モンスターの評価${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}ノードクオリティ融合モンスターの評価${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -8690,17 +8690,17 @@ linux_Oracle() {
 	 while true; do
 	  clear
 	  echo -e "Oracle Cloudスクリプト・コレクション"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}アイドル状態のマシンのアクティブ スクリプトをインストールする"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}アイドル状態のマシンからアクティブなスクリプトをアンインストールする"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}DD 再インストール システム スクリプト"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}探偵R起動スクリプト"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}ROOTパスワードログインモードを有効にする"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}IPV6回復ツール"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}アイドル状態のマシンのアクティブ スクリプトをインストールする"
+	  echo -e "${gl_minglan}2.   ${gl_bai}アイドル状態のマシンからアクティブなスクリプトをアンインストールする"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}DD 再インストール システム スクリプト"
+	  echo -e "${gl_minglan}4.   ${gl_bai}探偵R起動スクリプト"
+	  echo -e "${gl_minglan}5.   ${gl_bai}ROOTパスワードログインモードを有効にする"
+	  echo -e "${gl_minglan}6.   ${gl_bai}IPV6回復ツール"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -8837,7 +8837,7 @@ docker_tato() {
 	local volume_count=$(docker volume ls -q 2>/dev/null | wc -l)
 
 	if command -v docker &> /dev/null; then
-		echo -e "${gl_kjlan}------------------------"
+		echo -e "${gl_minglan}------------------------"
 		echo -e "${gl_lv}環境がインストールされました${gl_bai}容器：${gl_lv}$container_count${gl_bai}鏡：${gl_lv}$image_count${gl_bai}ネットワーク：${gl_lv}$network_count${gl_bai}ロール：${gl_lv}$volume_count${gl_bai}"
 	fi
 }
@@ -9591,7 +9591,7 @@ linux_ldnmp() {
 	  clear
 
 	  local backup_filename="web_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  echo -e "${gl_kjlan}バックアップ中$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}バックアップ中$backup_filename ...${gl_bai}"
 	  cd /home/ && tar czvf "$backup_filename" web
 
 	  while true; do
@@ -9683,7 +9683,7 @@ linux_ldnmp() {
 		  docker compose down > /dev/null 2>&1
 		  rm -rf /home/web > /dev/null 2>&1
 
-		  echo -e "${gl_kjlan}解凍中$filename ...${gl_bai}"
+			echo -e "${gl_minglan}解凍中$filename ...${gl_bai}"
 		  cd /home/ && tar -xzf "$filename"
 
 		  install_dependency
@@ -14490,13 +14490,13 @@ except Exception as e:
 			echo "======================================="
 			openclaw_permission_render_status
 			echo "---------------------------------------"
-			echo -e "${gl_kjlan}1.${gl_bai}標準セキュリティ モードに切り替える (毎日の推奨事項、ポップアップ カードの承認)"
-			echo -e "${gl_kjlan}2.${gl_bai}開発拡張モードに切り替える (エージェントが権限昇格を申請できるようにする)"
-			echo -e "${gl_kjlan}3.${gl_bai}全開モードに切り替えます（${gl_hong}ハイリスク！すべてのホストインターセプトを完全に削除します${gl_bai}）"
-			echo -e "${gl_kjlan}4.${gl_bai}公式のデフォルトのサンドボックス防御戦略を復元する"
-			echo -e "${gl_kjlan}5.${gl_bai}基盤となるセキュリティ監査と自動修復を実行する"
-			echo -e "${gl_kjlan}6.${gl_bai}Execコマンドのホワイトリストを管理する"
-			echo -e "${gl_kjlan}0.${gl_bai}前のレベルに戻る"
+			echo -e "${gl_minglan}1.${gl_bai}標準セキュリティ モードに切り替える (毎日の推奨事項、ポップアップ カードの承認)"
+			echo -e "${gl_minglan}2.${gl_bai}開発拡張モードに切り替える (エージェントが権限昇格を申請できるようにする)"
+			echo -e "${gl_minglan}3.${gl_bai}全開モードに切り替えます（${gl_hong}ハイリスク！すべてのホストインターセプトを完全に削除します${gl_bai}）"
+			echo -e "${gl_minglan}4.${gl_bai}公式のデフォルトのサンドボックス防御戦略を復元する"
+			echo -e "${gl_minglan}5.${gl_bai}基盤となるセキュリティ監査と自動修復を実行する"
+			echo -e "${gl_minglan}6.${gl_bai}Execコマンドのホワイトリストを管理する"
+			echo -e "${gl_minglan}0.${gl_bai}前のレベルに戻る"
 			echo "---------------------------------------"
 			read -e -p "選択肢を入力してください:" perm_choice
 			case "$perm_choice" in
@@ -15112,7 +15112,7 @@ openclaw_backup_restore_menu() {
 		echo "https://${yuming}/#token=$token"
 		echo "まず URL にアクセスしてデバイス ID をトリガーし、Enter キーを押してペアリングを続行します。"
 		read
-		echo -e "${gl_kjlan}デバイスリストをロード中...${gl_bai}"
+		echo -e "${gl_minglan}デバイスリストをロード中...${gl_bai}"
 		# ドメイン名を allowedOrigins に自動的に追加する
 		config_file=$(openclaw_get_config_file)
 		if [ -f "$config_file" ]; then
@@ -15121,7 +15121,7 @@ openclaw_backup_restore_menu() {
 			if command -v jq >/dev/null 2>&1; then
 				tmp_json=$(mktemp)
 				jq 'if .gateway.controlUi == null then .gateway.controlUi = {"allowedOrigins": ["http://127.0.0.1"]} else . end | if (.gateway.controlUi.allowedOrigins | contains([$origin]) | not) then .gateway.controlUi.allowedOrigins += [$origin] else . end' --arg origin "$new_origin" "$config_file" > "$tmp_json" && mv "$tmp_json" "$config_file"
-				echo -e "${gl_kjlan}ドメイン名は${yuming}allowedOrigins 構成を追加する${gl_bai}"
+				echo -e "${gl_minglan}ドメイン名は${yuming}allowedOrigins 構成を追加する${gl_bai}"
 				openclaw gateway restart >/dev/null 2>&1
 			fi
 		fi
@@ -15231,7 +15231,7 @@ local sub_choice="$1"
 clear
 cd ~
 install git
-echo -e "${gl_kjlan}アプリケーションリストは更新中です。お待ちください...${gl_bai}"
+echo -e "${gl_minglan}アプリケーションリストは更新中です。お待ちください...${gl_bai}"
 if [ ! -d apps/.git ]; then
 	timeout 10s git clone ${ACTIVE_APPS_REPO_URL}
 else
@@ -15245,7 +15245,7 @@ while true; do
 	if [ -z "$sub_choice" ]; then
 	  clear
 	  echo -e "アプリケーション市場"
-	  echo -e "${gl_kjlan}-------------------------"
+	  echo -e "${gl_minglan}-------------------------"
 
 	  local app_numbers=$([ -f /home/docker/appno.txt ] && cat /home/docker/appno.txt || echo "")
 
@@ -15258,78 +15258,78 @@ while true; do
 		  fi
 	  done
 
-	  echo -e "${gl_kjlan}1.   ${color1}パゴダパネル正式版${gl_kjlan}2.   ${color2}aaPanel パゴダ国際版"
-	  echo -e "${gl_kjlan}3.   ${color3}1Panel 新世代管理パネル${gl_kjlan}4.   ${color4}NginxProxyManager 視覚化パネル"
-	  echo -e "${gl_kjlan}5.   ${color5}OpenList マルチストア ファイル リスト プログラム${gl_kjlan}6.   ${color6}Ubuntu リモート デスクトップ Web バージョン"
-	  echo -e "${gl_kjlan}7.   ${color7}Nezha Probe VPS 監視パネル${gl_kjlan}8.   ${color8}QBオフラインBT磁気ダウンロードパネル"
-	  echo -e "${gl_kjlan}9.   ${color9}Poste.io メール サーバー プログラム${gl_kjlan}10.  ${color10}RocketChat 複数人オンライン チャット システム"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}11.  ${color11}ZenTao プロジェクト管理ソフトウェア${gl_kjlan}12.  ${color12}Qinglong パネルのスケジュールされたタスク管理プラットフォーム"
-	  echo -e "${gl_kjlan}13.  ${color13}Cloudreve ネットワークディスク${gl_huang}★${gl_bai}                     ${gl_kjlan}14.  ${color14}シンプルなピクチャーベッド画像管理プログラム"
-	  echo -e "${gl_kjlan}15.  ${color15}emby マルチメディア管理システム${gl_kjlan}16.  ${color16}Speedtest スピードテストパネル"
-	  echo -e "${gl_kjlan}17.  ${color17}AdGuardHome はアドウェアを削除します${gl_kjlan}18.  ${color18}Onlyofficeオンラインオフィス OFFICE"
-	  echo -e "${gl_kjlan}19.  ${color19}Leichi WAF ファイアウォール パネル${gl_kjlan}20.  ${color20}ポーターコンテナ管理パネル"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}21.  ${color21}VScode Web バージョン${gl_kjlan}22.  ${color22}UptimeKuma監視ツール"
-	  echo -e "${gl_kjlan}23.  ${color23}メモウェブメモ${gl_kjlan}24.  ${color24}Webtop リモート デスクトップ Web バージョン${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}25.  ${color25}Nextcloud ネットワーク ディスク${gl_kjlan}26.  ${color26}QD-Today スケジュールされたタスク管理フレームワーク"
-	  echo -e "${gl_kjlan}27.  ${color27}Dockge コンテナ スタック管理パネル${gl_kjlan}28.  ${color28}LibreSpeed 速度テストツール"
-	  echo -e "${gl_kjlan}29.  ${color29}searxng 集約検索ステーション${gl_huang}★${gl_bai}                 ${gl_kjlan}30.  ${color30}PhotoPrismプライベートアルバムシステム"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}31.  ${color31}StirlingPDF ツール コレクション${gl_kjlan}32.  ${color32}無料のオンライングラフ作成ソフトウェアdrawio${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${color33}Sun-Panel ナビゲーション パネル${gl_kjlan}34.  ${color34}Pingvin-Share ファイル共有プラットフォーム"
-	  echo -e "${gl_kjlan}35.  ${color35}ミニマリストの友達の輪${gl_kjlan}36.  ${color36}LobeChatAIチャットアグリゲーションサイト"
-	  echo -e "${gl_kjlan}37.  ${color37}MyIP ツールボックス${gl_huang}★${gl_bai}                        ${gl_kjlan}38.  ${color38}Xiaoya alistファミリーバケット"
-	  echo -e "${gl_kjlan}39.  ${color39}Bililive ライブ配信録画ツール${gl_kjlan}40.  ${color40}webssh Web版 SSH接続ツール"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}41.  ${color41}マウス管理パネル${gl_kjlan}42.  ${color42}Nexterm リモート接続ツール"
-	  echo -e "${gl_kjlan}43.  ${color43}RustDesk リモート デスクトップ (サーバー)${gl_huang}★${gl_bai}          ${gl_kjlan}44.  ${color44}RustDesk リモート デスクトップ (リレー)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}45.  ${color45}Docker アクセラレーション ステーション${gl_kjlan}46.  ${color46}GitHub アクセラレーション ステーション${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}47.  ${color47}プロメテウスの監視${gl_kjlan}48.  ${color48}Prometheus (ホスト監視)"
-	  echo -e "${gl_kjlan}49.  ${color49}Prometheus (コンテナ監視)${gl_kjlan}50.  ${color50}補充監視ツール"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}51.  ${color51}PVEオープンチックパネル${gl_kjlan}52.  ${color52}DPanel コンテナ管理パネル"
-	  echo -e "${gl_kjlan}53.  ${color53}llama3チャットAI大型モデル${gl_kjlan}54.  ${color54}AMH ホスト Web サイト構築管理パネル"
-	  echo -e "${gl_kjlan}55.  ${color55}FRPイントラネット普及（サーバー）${gl_huang}★${gl_bai}	         ${gl_kjlan}56.  ${color56}FRPイントラネット普及（クライアント）${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}57.  ${color57}ディープシークチャットAI大型モデル${gl_kjlan}58.  ${color58}Dify 大規模モデルのナレッジ ベース${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}59.  ${color59}NewAPI 大規模モデル資産管理${gl_kjlan}60.  ${color60}JumpServer オープンソース要塞マシン"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}61.  ${color61}オンライン翻訳サーバー${gl_kjlan}62.  ${color62}RAGFlow 大規模モデルのナレッジ ベース"
-	  echo -e "${gl_kjlan}63.  ${color63}OpenWebUI セルフホスト型 AI プラットフォーム${gl_huang}★${gl_bai}             ${gl_kjlan}64.  ${color64}ITツールツールボックス"
-	  echo -e "${gl_kjlan}65.  ${color65}n8n自動ワークフロープラットフォーム${gl_huang}★${gl_bai}               ${gl_kjlan}66.  ${color66}yt-dlp ビデオ ダウンロード ツール"
-	  echo -e "${gl_kjlan}67.  ${color67}ddns-go ダイナミック DNS 管理ツール${gl_huang}★${gl_bai}            ${gl_kjlan}68.  ${color68}AllinSSL 証明書管理プラットフォーム"
-	  echo -e "${gl_kjlan}69.  ${color69}SFTPGo ファイル転送ツール${gl_kjlan}70.  ${color70}AstrBot チャットボット フレームワーク"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}71.  ${color71}Navidrome プライベート ミュージック サーバー${gl_kjlan}72.  ${color72}bitwarden パスワードマネージャー${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}73.  ${color73}LibreTV プライベートムービー${gl_kjlan}74.  ${color74}MoonTV のプライベート ムービー"
-	  echo -e "${gl_kjlan}75.  ${color75}メロディー音楽の魔法使い${gl_kjlan}76.  ${color76}オンライン DOS 古いゲーム"
-	  echo -e "${gl_kjlan}77.  ${color77}Thunder オフライン ダウンロード ツール${gl_kjlan}78.  ${color78}PandaWiki インテリジェント文書管理システム"
-	  echo -e "${gl_kjlan}79.  ${color79}Beszel サーバーの監視${gl_kjlan}80.  ${color80}リンクワーデンのブックマーク管理"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}81.  ${color81}JitsiMeet ビデオ会議${gl_kjlan}82.  ${color82}gpt-load 高性能 AI 透過プロキシ"
-	  echo -e "${gl_kjlan}83.  ${color83}komariサーバー監視ツール${gl_kjlan}84.  ${color84}Wallos の個人財務管理ツール"
-	  echo -e "${gl_kjlan}85.  ${color85}イミッチピクチャービデオマネージャー${gl_kjlan}86.  ${color86}ジェリーフィンメディア管理システム"
-	  echo -e "${gl_kjlan}87.  ${color87}SyncTV は一緒に映画を見るための素晴らしいツールです${gl_kjlan}88.  ${color88}Owncast の自己ホスト型ライブ ストリーミング プラットフォーム"
-	  echo -e "${gl_kjlan}89.  ${color89}FileCodeBox ファイルエクスプレス${gl_kjlan}90.  ${color90}マトリックス分散型チャットプロトコル"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}91.  ${color91}gitea プライベート コード リポジトリ${gl_kjlan}92.  ${color92}FileBrowser ファイルマネージャー"
-	  echo -e "${gl_kjlan}93.  ${color93}Dufs のミニマリスト静的ファイル サーバー${gl_kjlan}94.  ${color94}Gopeed高速ダウンロードツール"
-	  echo -e "${gl_kjlan}95.  ${color95}ペーパーレス文書管理プラットフォーム${gl_kjlan}96.  ${color96}2FAuth セルフホスト型 2 段階認証システム"
-	  echo -e "${gl_kjlan}97.  ${color97}WireGuard ネットワーキング (サーバー)${gl_kjlan}98.  ${color98}WireGuard ネットワーキング (クライアント)"
-	  echo -e "${gl_kjlan}99.  ${color99}DSM Synology 仮想マシン${gl_kjlan}100. ${color100}Syncthing ピアツーピア ファイル同期ツール"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}101. ${color101}AI動画生成ツール${gl_kjlan}102. ${color102}VoceChat 複数人オンライン チャット システム"
-	  echo -e "${gl_kjlan}103. ${color103}Umami ウェブサイト統計ツール${gl_kjlan}104. ${color104}ストリーム 4 層プロキシ転送ツール"
-	  echo -e "${gl_kjlan}105. ${color105}思源ノート${gl_kjlan}106. ${color106}Drawnix オープンソース ホワイトボード ツール"
-	  echo -e "${gl_kjlan}107. ${color107}PanSou ネットワークディスク検索${gl_kjlan}108. ${color108}LangBot チャットボット"
-	  echo -e "${gl_kjlan}109. ${color109}ZFileオンラインネットワークディスク${gl_kjlan}110. ${color110}カラオケのブックマーク管理"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}111. ${color111}マルチフォーマットファイル変換ツール${gl_kjlan}112. ${color112}Lucky 大規模イントラネット侵入ツール"
-	  echo -e "${gl_kjlan}113. ${color113}Firefoxブラウザ${gl_kjlan}114. ${color114}OpenClaw ボット管理ツール${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}115. ${color115}ヘルメスロボット管理ツール${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}サードパーティ製アプリケーションのリスト"
-  	  echo -e "${gl_kjlan}あなたのアプリをここに表示したいですか?開発者ガイドを確認してください。${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
+	  echo -e "${gl_minglan}1.   ${color1}パゴダパネル正式版${gl_minglan}2.   ${color2}aaPanel パゴダ国際版"
+	  echo -e "${gl_minglan}3.   ${color3}1Panel 新世代管理パネル${gl_minglan}4.   ${color4}NginxProxyManager 視覚化パネル"
+	  echo -e "${gl_minglan}5.   ${color5}OpenList マルチストア ファイル リスト プログラム${gl_minglan}6.   ${color6}Ubuntu リモート デスクトップ Web バージョン"
+	  echo -e "${gl_minglan}7.   ${color7}Nezha Probe VPS 監視パネル${gl_minglan}8.   ${color8}QBオフラインBT磁気ダウンロードパネル"
+	  echo -e "${gl_minglan}9.   ${color9}Poste.io メール サーバー プログラム${gl_minglan}10.  ${color10}RocketChat 複数人オンライン チャット システム"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}11.  ${color11}ZenTao プロジェクト管理ソフトウェア${gl_minglan}12.  ${color12}Qinglong パネルのスケジュールされたタスク管理プラットフォーム"
+	  echo -e "${gl_minglan}13.  ${color13}Cloudreve ネットワークディスク${gl_huang}★${gl_bai}                     ${gl_minglan}14.  ${color14}シンプルなピクチャーベッド画像管理プログラム"
+	  echo -e "${gl_minglan}15.  ${color15}emby マルチメディア管理システム${gl_minglan}16.  ${color16}Speedtest スピードテストパネル"
+	  echo -e "${gl_minglan}17.  ${color17}AdGuardHome はアドウェアを削除します${gl_minglan}18.  ${color18}Onlyofficeオンラインオフィス OFFICE"
+	  echo -e "${gl_minglan}19.  ${color19}Leichi WAF ファイアウォール パネル${gl_minglan}20.  ${color20}ポーターコンテナ管理パネル"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}21.  ${color21}VScode Web バージョン${gl_minglan}22.  ${color22}UptimeKuma監視ツール"
+	  echo -e "${gl_minglan}23.  ${color23}メモウェブメモ${gl_minglan}24.  ${color24}Webtop リモート デスクトップ Web バージョン${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}25.  ${color25}Nextcloud ネットワーク ディスク${gl_minglan}26.  ${color26}QD-Today スケジュールされたタスク管理フレームワーク"
+	  echo -e "${gl_minglan}27.  ${color27}Dockge コンテナ スタック管理パネル${gl_minglan}28.  ${color28}LibreSpeed 速度テストツール"
+	  echo -e "${gl_minglan}29.  ${color29}searxng 集約検索ステーション${gl_huang}★${gl_bai}                 ${gl_minglan}30.  ${color30}PhotoPrismプライベートアルバムシステム"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}31.  ${color31}StirlingPDF ツール コレクション${gl_minglan}32.  ${color32}無料のオンライングラフ作成ソフトウェアdrawio${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${color33}Sun-Panel ナビゲーション パネル${gl_minglan}34.  ${color34}Pingvin-Share ファイル共有プラットフォーム"
+	  echo -e "${gl_minglan}35.  ${color35}ミニマリストの友達の輪${gl_minglan}36.  ${color36}LobeChatAIチャットアグリゲーションサイト"
+	  echo -e "${gl_minglan}37.  ${color37}MyIP ツールボックス${gl_huang}★${gl_bai}                        ${gl_minglan}38.  ${color38}Xiaoya alistファミリーバケット"
+	  echo -e "${gl_minglan}39.  ${color39}Bililive ライブ配信録画ツール${gl_minglan}40.  ${color40}webssh Web版 SSH接続ツール"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}41.  ${color41}マウス管理パネル${gl_minglan}42.  ${color42}Nexterm リモート接続ツール"
+	  echo -e "${gl_minglan}43.  ${color43}RustDesk リモート デスクトップ (サーバー)${gl_huang}★${gl_bai}          ${gl_minglan}44.  ${color44}RustDesk リモート デスクトップ (リレー)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}45.  ${color45}Docker アクセラレーション ステーション${gl_minglan}46.  ${color46}GitHub アクセラレーション ステーション${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}47.  ${color47}プロメテウスの監視${gl_minglan}48.  ${color48}Prometheus (ホスト監視)"
+	  echo -e "${gl_minglan}49.  ${color49}Prometheus (コンテナ監視)${gl_minglan}50.  ${color50}補充監視ツール"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}51.  ${color51}PVEオープンチックパネル${gl_minglan}52.  ${color52}DPanel コンテナ管理パネル"
+	  echo -e "${gl_minglan}53.  ${color53}llama3チャットAI大型モデル${gl_minglan}54.  ${color54}AMH ホスト Web サイト構築管理パネル"
+	  echo -e "${gl_minglan}55.  ${color55}FRPイントラネット普及（サーバー）${gl_huang}★${gl_bai}	         ${gl_minglan}56.  ${color56}FRPイントラネット普及（クライアント）${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}57.  ${color57}ディープシークチャットAI大型モデル${gl_minglan}58.  ${color58}Dify 大規模モデルのナレッジ ベース${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}59.  ${color59}NewAPI 大規模モデル資産管理${gl_minglan}60.  ${color60}JumpServer オープンソース要塞マシン"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}61.  ${color61}オンライン翻訳サーバー${gl_minglan}62.  ${color62}RAGFlow 大規模モデルのナレッジ ベース"
+	  echo -e "${gl_minglan}63.  ${color63}OpenWebUI セルフホスト型 AI プラットフォーム${gl_huang}★${gl_bai}             ${gl_minglan}64.  ${color64}ITツールツールボックス"
+	  echo -e "${gl_minglan}65.  ${color65}n8n自動ワークフロープラットフォーム${gl_huang}★${gl_bai}               ${gl_minglan}66.  ${color66}yt-dlp ビデオ ダウンロード ツール"
+	  echo -e "${gl_minglan}67.  ${color67}ddns-go ダイナミック DNS 管理ツール${gl_huang}★${gl_bai}            ${gl_minglan}68.  ${color68}AllinSSL 証明書管理プラットフォーム"
+	  echo -e "${gl_minglan}69.  ${color69}SFTPGo ファイル転送ツール${gl_minglan}70.  ${color70}AstrBot チャットボット フレームワーク"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}71.  ${color71}Navidrome プライベート ミュージック サーバー${gl_minglan}72.  ${color72}bitwarden パスワードマネージャー${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}73.  ${color73}LibreTV プライベートムービー${gl_minglan}74.  ${color74}MoonTV のプライベート ムービー"
+	  echo -e "${gl_minglan}75.  ${color75}メロディー音楽の魔法使い${gl_minglan}76.  ${color76}オンライン DOS 古いゲーム"
+	  echo -e "${gl_minglan}77.  ${color77}Thunder オフライン ダウンロード ツール${gl_minglan}78.  ${color78}PandaWiki インテリジェント文書管理システム"
+	  echo -e "${gl_minglan}79.  ${color79}Beszel サーバーの監視${gl_minglan}80.  ${color80}リンクワーデンのブックマーク管理"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}81.  ${color81}JitsiMeet ビデオ会議${gl_minglan}82.  ${color82}gpt-load 高性能 AI 透過プロキシ"
+	  echo -e "${gl_minglan}83.  ${color83}komariサーバー監視ツール${gl_minglan}84.  ${color84}Wallos の個人財務管理ツール"
+	  echo -e "${gl_minglan}85.  ${color85}イミッチピクチャービデオマネージャー${gl_minglan}86.  ${color86}ジェリーフィンメディア管理システム"
+	  echo -e "${gl_minglan}87.  ${color87}SyncTV は一緒に映画を見るための素晴らしいツールです${gl_minglan}88.  ${color88}Owncast の自己ホスト型ライブ ストリーミング プラットフォーム"
+	  echo -e "${gl_minglan}89.  ${color89}FileCodeBox ファイルエクスプレス${gl_minglan}90.  ${color90}マトリックス分散型チャットプロトコル"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}91.  ${color91}gitea プライベート コード リポジトリ${gl_minglan}92.  ${color92}FileBrowser ファイルマネージャー"
+	  echo -e "${gl_minglan}93.  ${color93}Dufs のミニマリスト静的ファイル サーバー${gl_minglan}94.  ${color94}Gopeed高速ダウンロードツール"
+	  echo -e "${gl_minglan}95.  ${color95}ペーパーレス文書管理プラットフォーム${gl_minglan}96.  ${color96}2FAuth セルフホスト型 2 段階認証システム"
+	  echo -e "${gl_minglan}97.  ${color97}WireGuard ネットワーキング (サーバー)${gl_minglan}98.  ${color98}WireGuard ネットワーキング (クライアント)"
+	  echo -e "${gl_minglan}99.  ${color99}DSM Synology 仮想マシン${gl_minglan}100. ${color100}Syncthing ピアツーピア ファイル同期ツール"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}101. ${color101}AI動画生成ツール${gl_minglan}102. ${color102}VoceChat 複数人オンライン チャット システム"
+	  echo -e "${gl_minglan}103. ${color103}Umami ウェブサイト統計ツール${gl_minglan}104. ${color104}ストリーム 4 層プロキシ転送ツール"
+	  echo -e "${gl_minglan}105. ${color105}思源ノート${gl_minglan}106. ${color106}Drawnix オープンソース ホワイトボード ツール"
+	  echo -e "${gl_minglan}107. ${color107}PanSou ネットワークディスク検索${gl_minglan}108. ${color108}LangBot チャットボット"
+	  echo -e "${gl_minglan}109. ${color109}ZFileオンラインネットワークディスク${gl_minglan}110. ${color110}カラオケのブックマーク管理"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}111. ${color111}マルチフォーマットファイル変換ツール${gl_minglan}112. ${color112}Lucky 大規模イントラネット侵入ツール"
+	  echo -e "${gl_minglan}113. ${color113}Firefoxブラウザ${gl_minglan}114. ${color114}OpenClaw ボット管理ツール${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}115. ${color115}ヘルメスロボット管理ツール${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}サードパーティ製アプリケーションのリスト"
+	  echo -e "${gl_minglan}あなたのアプリをここに表示したいですか?開発者ガイドを確認してください。${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
 
 	  for f in "$HOME"/apps/*.conf; do
 		  [ -e "$f" ] || continue
@@ -15341,20 +15341,20 @@ while true; do
 		  # ここでは、appno.txtに記録されているのはbase_name（つまりファイル名）であると仮定します。
 		  if echo "$app_numbers" | grep -q "^$base_name$"; then
 			  # インストールされている場合: showbase_name - description [インストール済み] (緑色)
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - ${gl_lv}${app_text}[インストール済み]${gl_bai}"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - ${gl_lv}${app_text}[インストール済み]${gl_bai}"
 		  else
 			  # インストールされていない場合：通常通り表示
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - $app_text"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - $app_text"
 		  fi
 	  done
 
 
 
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}b.   ${gl_bai}すべてのアプリケーション データをバックアップする${gl_kjlan}r.   ${gl_bai}すべてのアプリデータを復元する"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}b.   ${gl_bai}すべてのアプリケーション データをバックアップする${gl_minglan}r.   ${gl_bai}すべてのアプリデータを復元する"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 	fi
 
@@ -19011,7 +19011,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	clear
 
 	  	local backup_filename="app_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  	echo -e "${gl_kjlan}バックアップ中$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}バックアップ中$backup_filename ...${gl_bai}"
 	  	cd / && tar czvf "$backup_filename" home
 
 	  	while true; do
@@ -19062,7 +19062,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	fi
 
 	  	if [ -n "$filename" ]; then
-		  	  echo -e "${gl_kjlan}解凍中$filename ...${gl_bai}"
+			echo -e "${gl_minglan}解凍中$filename ...${gl_bai}"
 		  	  cd / && tar -xzf "$filename"
 			  echo "アプリケーションデータが復元されました。現在、アプリケーションを復元するには、手動で指定されたアプリケーションメニューに入り、アプリケーションを更新してください。"
 	  	else
@@ -19108,29 +19108,29 @@ linux_work() {
 	  echo -e "システムは、バックグラウンドで永続的に実行できるワークスペースを提供し、長期的なタスクを実行するために使用できます。"
 	  echo -e "SSH を切断しても、ワークスペース内のタスクは中断されず、バックグラウンド タスクは継続されます。"
 	  echo -e "${gl_huang}ヒント：${gl_bai}ワークスペースに入ったら、Ctrl+b を使用し、次に d を単独で押してワークスペースを終了します。"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  echo "現在存在するワークスペースのリスト"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  tmux list-sessions
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}作業エリア1"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}作業エリア 2"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}作業エリア 3"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}作業エリア 4"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}作業エリア5"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}作業エリア6"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}作業エリア 7"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}作業エリア8"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}ワークスペースNo.9"
-	  echo -e "${gl_kjlan}10.  ${gl_bai}ワークスペース10"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}SSH常駐モード${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}ワークスペースの作成/入力"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}バックグラウンドワークスペースにコマンドを挿入する"
-	  echo -e "${gl_kjlan}24.  ${gl_bai}指定したワークスペースを削除します"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}作業エリア1"
+	  echo -e "${gl_minglan}2.   ${gl_bai}作業エリア 2"
+	  echo -e "${gl_minglan}3.   ${gl_bai}作業エリア 3"
+	  echo -e "${gl_minglan}4.   ${gl_bai}作業エリア 4"
+	  echo -e "${gl_minglan}5.   ${gl_bai}作業エリア5"
+	  echo -e "${gl_minglan}6.   ${gl_bai}作業エリア6"
+	  echo -e "${gl_minglan}7.   ${gl_bai}作業エリア 7"
+	  echo -e "${gl_minglan}8.   ${gl_bai}作業エリア8"
+	  echo -e "${gl_minglan}9.   ${gl_bai}ワークスペースNo.9"
+	  echo -e "${gl_minglan}10.  ${gl_bai}ワークスペース10"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}SSH常駐モード${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}22.  ${gl_bai}ワークスペースの作成/入力"
+	  echo -e "${gl_minglan}23.  ${gl_bai}バックグラウンドワークスペースにコマンドを挿入する"
+	  echo -e "${gl_minglan}24.  ${gl_bai}指定したワークスペースを削除します"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -19752,39 +19752,39 @@ linux_Settings() {
 	while true; do
 	  clear
 	  echo -e "システムツール"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}スクリプト起動のショートカットキーを設定する${gl_kjlan}2.   ${gl_bai}ログインパスワードを変更する"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}ユーザーパスワードログインモード${gl_kjlan}4.   ${gl_bai}指定されたバージョンの Python をインストールします"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}すべてのポートを開く${gl_kjlan}6.   ${gl_bai}SSH接続ポートを変更する"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}DNSアドレスを最適化する${gl_kjlan}8.   ${gl_bai}ワンクリックでシステムを再インストールします${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}ROOTアカウントを無効にして新しいアカウントを作成する${gl_kjlan}10.  ${gl_bai}スイッチ優先度 ipv4/ipv6"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}ポートの占有状況を確認する${gl_kjlan}12.  ${gl_bai}仮想メモリのサイズを変更する"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}ユーザー管理${gl_kjlan}14.  ${gl_bai}ユーザー/パスワード生成器"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}システムのタイムゾーン調整${gl_kjlan}16.  ${gl_bai}BBR3アクセラレーションの設定"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}ファイアウォール アドバンスト マネージャー${gl_kjlan}18.  ${gl_bai}ホスト名の変更"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}システムアップデート元の切り替え${gl_kjlan}20.  ${gl_bai}スケジュールされたタスクの管理"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}ネイティブホスト解像度${gl_kjlan}22.  ${gl_bai}SSH防御プログラム"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}電流制限自動シャットダウン${gl_kjlan}24.  ${gl_bai}ユーザーキーログインモード"
-	  echo -e "${gl_kjlan}25.  ${gl_bai}TG-bot システムの監視と早期警告${gl_kjlan}26.  ${gl_bai}OpenSSH の高リスク脆弱性を修正"
-	  echo -e "${gl_kjlan}27.  ${gl_bai}Red Hat Linux カーネルのアップグレード${gl_kjlan}28.  ${gl_bai}Linuxシステムのカーネルパラメータの最適化${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}29.  ${gl_bai}ウイルススキャンツール${gl_huang}★${gl_bai}                     ${gl_kjlan}30.  ${gl_bai}ファイルマネージャー"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}システム言語を切り替える${gl_kjlan}32.  ${gl_bai}コマンドライン美化ツール${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}システムのごみ箱をセットアップする${gl_kjlan}34.  ${gl_bai}システムのバックアップとリカバリ"
-	  echo -e "${gl_kjlan}35.  ${gl_bai}SSHリモート接続ツール${gl_kjlan}36.  ${gl_bai}ハードディスクパーティション管理ツール"
-	  echo -e "${gl_kjlan}37.  ${gl_bai}コマンドラインの履歴${gl_kjlan}38.  ${gl_bai}rsync リモート同期ツール"
-	  echo -e "${gl_kjlan}39.  ${gl_bai}コマンドのお気に入り${gl_huang}★${gl_bai}                       ${gl_kjlan}40.  ${gl_bai}ネットワークカード管理ツール"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}システムログ管理ツール${gl_huang}★${gl_bai}                 ${gl_kjlan}42.  ${gl_bai}システム変数管理ツール"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}61.  ${gl_bai}Project support                      ${gl_kjlan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}99.  ${gl_bai}サーバーを再起動します"
-	  echo -e "${gl_kjlan}101. ${gl_bai}${PROJECT_COMMAND} コマンドの高度な使用法${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}${PROJECT_NAME} をアンインストールする"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}スクリプト起動のショートカットキーを設定する${gl_minglan}2.   ${gl_bai}ログインパスワードを変更する"
+	  echo -e "${gl_minglan}3.   ${gl_bai}ユーザーパスワードログインモード${gl_minglan}4.   ${gl_bai}指定されたバージョンの Python をインストールします"
+	  echo -e "${gl_minglan}5.   ${gl_bai}すべてのポートを開く${gl_minglan}6.   ${gl_bai}SSH接続ポートを変更する"
+	  echo -e "${gl_minglan}7.   ${gl_bai}DNSアドレスを最適化する${gl_minglan}8.   ${gl_bai}ワンクリックでシステムを再インストールします${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}9.   ${gl_bai}ROOTアカウントを無効にして新しいアカウントを作成する${gl_minglan}10.  ${gl_bai}スイッチ優先度 ipv4/ipv6"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}ポートの占有状況を確認する${gl_minglan}12.  ${gl_bai}仮想メモリのサイズを変更する"
+	  echo -e "${gl_minglan}13.  ${gl_bai}ユーザー管理${gl_minglan}14.  ${gl_bai}ユーザー/パスワード生成器"
+	  echo -e "${gl_minglan}15.  ${gl_bai}システムのタイムゾーン調整${gl_minglan}16.  ${gl_bai}BBR3アクセラレーションの設定"
+	  echo -e "${gl_minglan}17.  ${gl_bai}ファイアウォール アドバンスト マネージャー${gl_minglan}18.  ${gl_bai}ホスト名の変更"
+	  echo -e "${gl_minglan}19.  ${gl_bai}システムアップデート元の切り替え${gl_minglan}20.  ${gl_bai}スケジュールされたタスクの管理"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}ネイティブホスト解像度${gl_minglan}22.  ${gl_bai}SSH防御プログラム"
+	  echo -e "${gl_minglan}23.  ${gl_bai}電流制限自動シャットダウン${gl_minglan}24.  ${gl_bai}ユーザーキーログインモード"
+	  echo -e "${gl_minglan}25.  ${gl_bai}TG-bot システムの監視と早期警告${gl_minglan}26.  ${gl_bai}OpenSSH の高リスク脆弱性を修正"
+	  echo -e "${gl_minglan}27.  ${gl_bai}Red Hat Linux カーネルのアップグレード${gl_minglan}28.  ${gl_bai}Linuxシステムのカーネルパラメータの最適化${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}29.  ${gl_bai}ウイルススキャンツール${gl_huang}★${gl_bai}                     ${gl_minglan}30.  ${gl_bai}ファイルマネージャー"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}システム言語を切り替える${gl_minglan}32.  ${gl_bai}コマンドライン美化ツール${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}システムのごみ箱をセットアップする${gl_minglan}34.  ${gl_bai}システムのバックアップとリカバリ"
+	  echo -e "${gl_minglan}35.  ${gl_bai}SSHリモート接続ツール${gl_minglan}36.  ${gl_bai}ハードディスクパーティション管理ツール"
+	  echo -e "${gl_minglan}37.  ${gl_bai}コマンドラインの履歴${gl_minglan}38.  ${gl_bai}rsync リモート同期ツール"
+	  echo -e "${gl_minglan}39.  ${gl_bai}コマンドのお気に入り${gl_huang}★${gl_bai}                       ${gl_minglan}40.  ${gl_bai}ネットワークカード管理ツール"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}システムログ管理ツール${gl_huang}★${gl_bai}                 ${gl_minglan}42.  ${gl_bai}システム変数管理ツール"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}61.  ${gl_bai}Project support                      ${gl_minglan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}99.  ${gl_bai}サーバーを再起動します"
+	  echo -e "${gl_minglan}101. ${gl_bai}${PROJECT_COMMAND} コマンドの高度な使用法${gl_huang}★${gl_bai}                    ${gl_minglan}102. ${gl_bai}${PROJECT_NAME} をアンインストールする"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -20474,8 +20474,8 @@ EOF
 				echo "------------------------------------------------"
 				echo "現在のトラフィック使用量は、サーバーが再起動されるとクリアされます。"
 				output_status
-				echo -e "${gl_kjlan}受け取った合計:${gl_bai}$rx"
-				echo -e "${gl_kjlan}送信合計:${gl_bai}$tx"
+				echo -e "${gl_minglan}受け取った合計:${gl_bai}$rx"
+				echo -e "${gl_minglan}送信合計:${gl_bai}$tx"
 
 				# Limiting_Shut_down.sh ファイルが存在するかどうかを確認します
 				if [ -f ~/Limiting_Shut_down.sh ]; then
@@ -21043,18 +21043,18 @@ while true; do
 	  echo "サーバークラスタ制御"
 	  cat ~/cluster/servers.py
 	  echo
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}サーバーリスト管理${gl_bai}"
-	  echo -e "${gl_kjlan}1.  ${gl_bai}サーバーの追加${gl_kjlan}2.  ${gl_bai}サーバーの削除${gl_kjlan}3.  ${gl_bai}サーバーの編集"
-	  echo -e "${gl_kjlan}4.  ${gl_bai}バックアップクラスター${gl_kjlan}5.  ${gl_bai}クラスタを復元する"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}タスクをバッチで実行する${gl_bai}"
-	  echo -e "${gl_kjlan}11. ${gl_bai}Deployment guide (disabled)       ${gl_kjlan}12. ${gl_bai}Update system         ${gl_kjlan}13. ${gl_bai}Clean system"
-	  echo -e "${gl_kjlan}14. ${gl_bai}ドッカーをインストールする${gl_kjlan}15. ${gl_bai}BBR3をインストールする${gl_kjlan}16. ${gl_bai}1Gの仮想メモリを設定する"
-	  echo -e "${gl_kjlan}17. ${gl_bai}タイムゾーンを上海に設定${gl_kjlan}18. ${gl_bai}すべてのポートを開く${gl_kjlan}51. ${gl_bai}カスタムディレクティブ"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}0.  ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}サーバーリスト管理${gl_bai}"
+	  echo -e "${gl_minglan}1.  ${gl_bai}サーバーの追加${gl_minglan}2.  ${gl_bai}サーバーの削除${gl_minglan}3.  ${gl_bai}サーバーの編集"
+	  echo -e "${gl_minglan}4.  ${gl_bai}バックアップクラスター${gl_minglan}5.  ${gl_bai}クラスタを復元する"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}タスクをバッチで実行する${gl_bai}"
+	  echo -e "${gl_minglan}11. ${gl_bai}Deployment guide (disabled)       ${gl_minglan}12. ${gl_bai}Update system         ${gl_minglan}13. ${gl_bai}Clean system"
+	  echo -e "${gl_minglan}14. ${gl_bai}ドッカーをインストールする${gl_minglan}15. ${gl_bai}BBR3をインストールする${gl_minglan}16. ${gl_bai}1Gの仮想メモリを設定する"
+	  echo -e "${gl_minglan}17. ${gl_bai}タイムゾーンを上海に設定${gl_minglan}18. ${gl_bai}すべてのポートを開く${gl_minglan}51. ${gl_bai}カスタムディレクティブ"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}0.  ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -21152,12 +21152,12 @@ games_server_tools() {
 	while true; do
 	  clear
 	  echo -e "ゲームサーバー起動スクリプト集"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1. ${gl_bai}Eudemons Parlu サーバー開始スクリプト"
-	  echo -e "${gl_kjlan}2. ${gl_bai}Minecraft サーバーを開くスクリプト"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0. ${gl_bai}メインメニューに戻る"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1. ${gl_bai}Eudemons Parlu サーバー開始スクリプト"
+	  echo -e "${gl_minglan}2. ${gl_bai}Minecraft サーバーを開くスクリプト"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0. ${gl_bai}メインメニューに戻る"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "選択肢を入力してください:" sub_choice
 
 	  case $sub_choice in
@@ -21217,31 +21217,31 @@ project_update() {
 main_menu() {
 while true; do
 clear
-echo -e "${gl_kjlan}"
+echo -e "${gl_minglan}"
 echo -e "${PROJECT_NAME} v${PROJECT_VERSION}"
-echo -e "コマンドライン入力${gl_huang}${PROJECT_COMMAND}${gl_kjlan}クイックスタートスクリプト${gl_bai}"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}1.   ${gl_bai}システム情報の問い合わせ"
-echo -e "${gl_kjlan}2.   ${gl_bai}システムアップデート"
-echo -e "${gl_kjlan}3.   ${gl_bai}システムのクリーンアップ"
-echo -e "${gl_kjlan}4.   ${gl_bai}基本的なツール"
-echo -e "${gl_kjlan}5.   ${gl_bai}BBR管理"
-echo -e "${gl_kjlan}6.   ${gl_bai}Docker管理"
-echo -e "${gl_kjlan}7.   ${gl_bai}ワープ管理"
-echo -e "${gl_kjlan}8.   ${gl_bai}テストスクリプト集"
-echo -e "${gl_kjlan}9.   ${gl_bai}Oracle Cloudスクリプト・コレクション"
+echo -e "コマンドライン入力${gl_huang}${PROJECT_COMMAND}${gl_minglan}クイックスタートスクリプト${gl_bai}"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}1.   ${gl_bai}システム情報の問い合わせ"
+echo -e "${gl_minglan}2.   ${gl_bai}システムアップデート"
+echo -e "${gl_minglan}3.   ${gl_bai}システムのクリーンアップ"
+echo -e "${gl_minglan}4.   ${gl_bai}基本的なツール"
+echo -e "${gl_minglan}5.   ${gl_bai}BBR管理"
+echo -e "${gl_minglan}6.   ${gl_bai}Docker管理"
+echo -e "${gl_minglan}7.   ${gl_bai}ワープ管理"
+echo -e "${gl_minglan}8.   ${gl_bai}テストスクリプト集"
+echo -e "${gl_minglan}9.   ${gl_bai}Oracle Cloudスクリプト・コレクション"
 echo -e "${gl_huang}10.  ${gl_bai}LDNMP Web サイトの構築"
-echo -e "${gl_kjlan}11.  ${gl_bai}アプリケーション市場"
-echo -e "${gl_kjlan}12.  ${gl_bai}バックエンドワークスペース"
-echo -e "${gl_kjlan}13.  ${gl_bai}システムツール"
-echo -e "${gl_kjlan}14.  ${gl_bai}サーバークラスタ制御"
-echo -e "${gl_kjlan}15.  ${gl_bai}Project information"
-echo -e "${gl_kjlan}16.  ${gl_bai}ゲームサーバー起動スクリプト集"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}00.  ${gl_bai}Project update (disabled)"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}0.   ${gl_bai}終了スクリプト"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
+echo -e "${gl_minglan}11.  ${gl_bai}アプリケーション市場"
+echo -e "${gl_minglan}12.  ${gl_bai}バックエンドワークスペース"
+echo -e "${gl_minglan}13.  ${gl_bai}システムツール"
+echo -e "${gl_minglan}14.  ${gl_bai}サーバークラスタ制御"
+echo -e "${gl_minglan}15.  ${gl_bai}Project information"
+echo -e "${gl_minglan}16.  ${gl_bai}ゲームサーバー起動スクリプト集"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}00.  ${gl_bai}Project update (disabled)"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}0.   ${gl_bai}終了スクリプト"
+echo -e "${gl_minglan}------------------------${gl_bai}"
 read -e -p "選択肢を入力してください:" choice
 
 case $choice in

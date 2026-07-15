@@ -113,7 +113,7 @@ gl_huang='\033[33m'
 gl_lan='\033[34m'
 gl_bai='\033[0m'
 gl_zi='\033[35m'
-gl_kjlan='\033[96m'
+gl_minglan='\033[96m'
 
 
 canshu="default"
@@ -211,7 +211,7 @@ CheckFirstRun_false() {
 # Prompt user to agree to terms
 UserLicenseAgreement() {
 	clear
-	echo -e "${gl_kjlan}Welcome to the ${PROJECT_NAME} toolbox${gl_bai}"
+	echo -e "${gl_minglan}Welcome to the ${PROJECT_NAME} toolbox${gl_bai}"
 	echo "When using the script for the first time, please read and agree to the User License Agreement."
 	echo "License: ${UPSTREAM_LICENSE}; ${PROJECT_LICENSE_URL}"
 	echo -e "----------------------"
@@ -271,7 +271,7 @@ install() {
 
 	for package in "$@"; do
 		if ! command -v "$package" &>/dev/null; then
-			echo -e "${gl_kjlan}Installing$package...${gl_bai}"
+			echo -e "${gl_minglan}Installing$package...${gl_bai}"
 			if command -v dnf &>/dev/null; then
 				dnf -y update
 				dnf install -y epel-release
@@ -345,7 +345,7 @@ remove() {
 	fi
 
 	for package in "$@"; do
-		echo -e "${gl_kjlan}Uninstalling$package...${gl_bai}"
+		echo -e "${gl_minglan}Uninstalling$package...${gl_bai}"
 		if command -v dnf &>/dev/null; then
 			dnf remove -y "$package"
 		elif command -v yum &>/dev/null; then
@@ -541,7 +541,7 @@ install_add_docker_cn
 
 
 install_add_docker() {
-	echo -e "${gl_kjlan}Installing docker environment...${gl_bai}"
+	echo -e "${gl_minglan}Installing docker environment...${gl_bai}"
 	if command -v apt &>/dev/null || command -v yum &>/dev/null || command -v dnf &>/dev/null; then
 		linuxmirrors_install_docker
 	else
@@ -710,14 +710,14 @@ while true; do
 		1)
 			read -e -p "Please enter the image name (please separate multiple image names with spaces):" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}Obtaining image:$name${gl_bai}"
+				echo -e "${gl_minglan}Obtaining image:$name${gl_bai}"
 				docker pull $name
 			done
 			;;
 		2)
 			read -e -p "Please enter the image name (please separate multiple image names with spaces):" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}Updating image:$name${gl_bai}"
+				echo -e "${gl_minglan}Updating image:$name${gl_bai}"
 				docker pull $name
 			done
 			;;
@@ -4641,7 +4641,7 @@ fix_dpkg() {
 
 
 linux_update() {
-	echo -e "${gl_kjlan}System update in progress...${gl_bai}"
+	echo -e "${gl_minglan}System update in progress...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		dnf -y update
 	elif command -v yum &>/dev/null; then
@@ -4668,7 +4668,7 @@ linux_update() {
 
 
 linux_clean() {
-	echo -e "${gl_kjlan}System cleaning in progress...${gl_bai}"
+	echo -e "${gl_minglan}System cleaning in progress...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		rpm --rebuilddb
 		dnf autoremove -y
@@ -5844,7 +5844,7 @@ elrepo() {
 
 
 clamav_freshclam() {
-	echo -e "${gl_kjlan}Updating virus database...${gl_bai}"
+	echo -e "${gl_minglan}Updating virus database...${gl_bai}"
 	docker run --rm \
 		--name clamav \
 		--mount source=clam_db,target=/var/lib/clamav \
@@ -5858,7 +5858,7 @@ clamav_scan() {
 		return
 	fi
 
-	echo -e "${gl_kjlan}Scanning directory $*...${gl_bai}"
+	echo -e "${gl_minglan}Scanning directory $*...${gl_bai}"
 
 	# Build mount parameters
 	local MOUNT_PARAMS=""
@@ -5905,7 +5905,7 @@ clamav() {
 				echo "It is an open source antivirus software tool mainly used to detect and remove various types of malware."
 				echo "Includes viruses, Trojan horses, spyware, malicious scripts and other harmful software."
 				echo "------------------------"
-				echo -e "${gl_lv}1. Full scan${gl_bai}             ${gl_huang}2. Scan important directories${gl_bai}            ${gl_kjlan}3. Custom directory scanning${gl_bai}"
+				echo -e "${gl_lv}1. Full scan${gl_bai}             ${gl_huang}2. Scan important directories${gl_bai}            ${gl_minglan}3. Custom directory scanning${gl_bai}"
 				echo "------------------------"
 				echo "0. Return to the previous menu"
 				echo "------------------------"
@@ -7480,7 +7480,7 @@ linux_info() {
 
 
 	clear
-	echo -e "${gl_kjlan}Querying system information...${gl_bai}"
+	echo -e "${gl_minglan}Querying system information...${gl_bai}"
 
 	ip_address
 
@@ -7533,41 +7533,41 @@ linux_info() {
 
 	clear
 	echo -e "System information query"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}Hostname:${gl_bai}$hostname"
-	echo -e "${gl_kjlan}System version:${gl_bai}$os_info"
-	echo -e "${gl_kjlan}Linux version:${gl_bai}$kernel_version"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU architecture:${gl_bai}$cpu_arch"
-	echo -e "${gl_kjlan}CPU model:${gl_bai}$cpu_info"
-	echo -e "${gl_kjlan}Number of CPU cores:${gl_bai}$cpu_cores"
-	echo -e "${gl_kjlan}CPU frequency:${gl_bai}$cpu_freq"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU usage:${gl_bai}$cpu_usage_percent%"
-	echo -e "${gl_kjlan}System load:${gl_bai}$load"
-	echo -e "${gl_kjlan}Number of TCP|UDP connections:${gl_bai}$tcp_count|$udp_count"
-	echo -e "${gl_kjlan}Physical memory:${gl_bai}$mem_info"
-	echo -e "${gl_kjlan}Virtual memory:${gl_bai}$swap_info"
-	echo -e "${gl_kjlan}Hard drive usage:${gl_bai}$disk_info"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}Total received:${gl_bai}$rx"
-	echo -e "${gl_kjlan}Total sent:${gl_bai}$tx"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}Network algorithm:${gl_bai}$congestion_algorithm $queue_algorithm"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}Operator:${gl_bai}$isp_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}Hostname:${gl_bai}$hostname"
+	echo -e "${gl_minglan}System version:${gl_bai}$os_info"
+	echo -e "${gl_minglan}Linux version:${gl_bai}$kernel_version"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU architecture:${gl_bai}$cpu_arch"
+	echo -e "${gl_minglan}CPU model:${gl_bai}$cpu_info"
+	echo -e "${gl_minglan}Number of CPU cores:${gl_bai}$cpu_cores"
+	echo -e "${gl_minglan}CPU frequency:${gl_bai}$cpu_freq"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU usage:${gl_bai}$cpu_usage_percent%"
+	echo -e "${gl_minglan}System load:${gl_bai}$load"
+	echo -e "${gl_minglan}Number of TCP|UDP connections:${gl_bai}$tcp_count|$udp_count"
+	echo -e "${gl_minglan}Physical memory:${gl_bai}$mem_info"
+	echo -e "${gl_minglan}Virtual memory:${gl_bai}$swap_info"
+	echo -e "${gl_minglan}Hard drive usage:${gl_bai}$disk_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}Total received:${gl_bai}$rx"
+	echo -e "${gl_minglan}Total sent:${gl_bai}$tx"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}Network algorithm:${gl_bai}$congestion_algorithm $queue_algorithm"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}Operator:${gl_bai}$isp_info"
 	if [ -n "$ipv4_address" ]; then
-		echo -e "${gl_kjlan}IPv4 address:${gl_bai}$ipv4_address"
+		echo -e "${gl_minglan}IPv4 address:${gl_bai}$ipv4_address"
 	fi
 
 	if [ -n "$ipv6_address" ]; then
-		echo -e "${gl_kjlan}IPv6 address:${gl_bai}$ipv6_address"
+		echo -e "${gl_minglan}IPv6 address:${gl_bai}$ipv6_address"
 	fi
-	echo -e "${gl_kjlan}DNS address:${gl_bai}$dns_addresses"
-	echo -e "${gl_kjlan}Location:${gl_bai}$country $city"
-	echo -e "${gl_kjlan}System time:${gl_bai}$timezone $current_time"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}Running time:${gl_bai}$runtime"
+	echo -e "${gl_minglan}DNS address:${gl_bai}$dns_addresses"
+	echo -e "${gl_minglan}Location:${gl_bai}$country $city"
+	echo -e "${gl_minglan}System time:${gl_bai}$timezone $current_time"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}Running time:${gl_bai}$runtime"
 	echo
 
 
@@ -7610,7 +7610,7 @@ linux_tools() {
 	  fi
 
 	  echo "📦 Use a package manager:$PM"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 
 	  for ((i=0; i<${#tools[@]}; i+=2)); do
 		# left column
@@ -7633,29 +7633,29 @@ linux_tools() {
 		fi
 	  done
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}curl download tool${gl_huang}★${gl_bai}                   ${gl_kjlan}2.   ${gl_bai}wget download tool${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}sudo super administrative privilege tool${gl_kjlan}4.   ${gl_bai}socat communication connection tool"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}htop system monitoring tool${gl_kjlan}6.   ${gl_bai}iftop network traffic monitoring tool"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}unzip ZIP compression and decompression tool${gl_kjlan}8.   ${gl_bai}tar GZ compression and decompression tool"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}tmux multi-channel background running tool${gl_kjlan}10.  ${gl_bai}ffmpeg video encoding live streaming tool"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}btop modern monitoring tool${gl_huang}★${gl_bai}             ${gl_kjlan}12.  ${gl_bai}ranger file management tool"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}ncdu disk usage viewing tool${gl_kjlan}14.  ${gl_bai}fzf global search tool"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}vim text editor${gl_kjlan}16.  ${gl_bai}nano text editor${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}git version control system${gl_kjlan}18.  ${gl_bai}opencode AI programming assistant${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}The Matrix Screensaver${gl_kjlan}22.  ${gl_bai}Running train screensaver"
-	  echo -e "${gl_kjlan}26.  ${gl_bai}Tetris mini game${gl_kjlan}27.  ${gl_bai}Snake mini game"
-	  echo -e "${gl_kjlan}28.  ${gl_bai}space invaders mini game"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}Install all${gl_kjlan}32.  ${gl_bai}Install all (excluding screensavers and games)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}Uninstall all"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}Install specified tools${gl_kjlan}42.  ${gl_bai}Uninstall the specified tool"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}curl download tool${gl_huang}★${gl_bai}                   ${gl_minglan}2.   ${gl_bai}wget download tool${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}3.   ${gl_bai}sudo super administrative privilege tool${gl_minglan}4.   ${gl_bai}socat communication connection tool"
+	  echo -e "${gl_minglan}5.   ${gl_bai}htop system monitoring tool${gl_minglan}6.   ${gl_bai}iftop network traffic monitoring tool"
+	  echo -e "${gl_minglan}7.   ${gl_bai}unzip ZIP compression and decompression tool${gl_minglan}8.   ${gl_bai}tar GZ compression and decompression tool"
+	  echo -e "${gl_minglan}9.   ${gl_bai}tmux multi-channel background running tool${gl_minglan}10.  ${gl_bai}ffmpeg video encoding live streaming tool"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}btop modern monitoring tool${gl_huang}★${gl_bai}             ${gl_minglan}12.  ${gl_bai}ranger file management tool"
+	  echo -e "${gl_minglan}13.  ${gl_bai}ncdu disk usage viewing tool${gl_minglan}14.  ${gl_bai}fzf global search tool"
+	  echo -e "${gl_minglan}15.  ${gl_bai}vim text editor${gl_minglan}16.  ${gl_bai}nano text editor${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}17.  ${gl_bai}git version control system${gl_minglan}18.  ${gl_bai}opencode AI programming assistant${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}The Matrix Screensaver${gl_minglan}22.  ${gl_bai}Running train screensaver"
+	  echo -e "${gl_minglan}26.  ${gl_bai}Tetris mini game${gl_minglan}27.  ${gl_bai}Snake mini game"
+	  echo -e "${gl_minglan}28.  ${gl_bai}space invaders mini game"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}Install all${gl_minglan}32.  ${gl_bai}Install all (excluding screensavers and games)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}Uninstall all"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}Install specified tools${gl_minglan}42.  ${gl_bai}Uninstall the specified tool"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -7929,7 +7929,7 @@ docker_ssh_migration() {
 
 	list_backups() {
 		local BACKUP_ROOT="/tmp"
-		echo -e "${gl_kjlan}Current backup list:${gl_bai}"
+		echo -e "${gl_minglan}Current backup list:${gl_bai}"
 		ls -1dt ${BACKUP_ROOT}/docker_backup_* 2>/dev/null || echo "No backup"
 	}
 
@@ -7940,7 +7940,7 @@ docker_ssh_migration() {
 	# ----------------------------
 	backup_docker() {
 
-		echo -e "${gl_kjlan}Backing up Docker containers...${gl_bai}"
+		echo -e "${gl_minglan}Backing up Docker containers...${gl_bai}"
 		docker ps --format '{{.Names}}'
 		read -e -p  "Please enter the name of the container to be backed up (separate multiple spaces and press Enter to back up all running containers):" containers
 
@@ -7974,7 +7974,7 @@ docker_ssh_migration() {
 			docker inspect "$c" > "$inspect_file"
 
 			if is_compose_container "$c"; then
-				echo -e "${gl_kjlan}detected$cis a docker-compose container${gl_bai}"
+				echo -e "${gl_minglan}detected$cis a docker-compose container${gl_bai}"
 				local project_dir=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project.working_dir"] // empty')
 				local project_name=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project"] // empty')
 
@@ -8041,7 +8041,7 @@ docker_ssh_migration() {
 
 		# Back up all files under /home/docker (excluding subdirectories)
 		if [ -d "/home/docker" ]; then
-			echo -e "${gl_kjlan}Back up files under /home/docker...${gl_bai}"
+			echo -e "${gl_minglan}Back up files under /home/docker...${gl_bai}"
 			find /home/docker -maxdepth 1 -type f | tar -czf "${BACKUP_DIR}/home_docker_files.tar.gz" -T -
 			echo -e "${gl_lv}Files under /home/docker have been packaged to:${BACKUP_DIR}/home_docker_files.tar.gz${gl_bai}"
 		fi
@@ -8061,7 +8061,7 @@ docker_ssh_migration() {
 		read -e -p  "Please enter the backup directory to be restored:" BACKUP_DIR
 		[[ ! -d "$BACKUP_DIR" ]] && { echo -e "${gl_hong}The backup directory does not exist${gl_bai}"; return; }
 
-		echo -e "${gl_kjlan}Starting the restore operation...${gl_bai}"
+		echo -e "${gl_minglan}Starting the restore operation...${gl_bai}"
 
 		install tar jq gzip
 		install_docker
@@ -8097,7 +8097,7 @@ docker_ssh_migration() {
 		done
 
 		# --------- Continue to restore normal containers ---------
-		echo -e "${gl_kjlan}Check and restore normal Docker containers...${gl_bai}"
+		echo -e "${gl_minglan}Check and restore normal Docker containers...${gl_bai}"
 		local has_container=false
 		for json in "$BACKUP_DIR"/*_inspect.json; do
 			[[ ! -f "$json" ]] && continue
@@ -8160,7 +8160,7 @@ docker_ssh_migration() {
 
 		# Restore files under /home/docker
 		if [ -f "$BACKUP_DIR/home_docker_files.tar.gz" ]; then
-			echo -e "${gl_kjlan}Restoring files under /home/docker...${gl_bai}"
+			echo -e "${gl_minglan}Restoring files under /home/docker...${gl_bai}"
 			mkdir -p /home/docker
 			tar -xzf "$BACKUP_DIR/home_docker_files.tar.gz" -C /
 			echo -e "${gl_lv}Files under /home/docker have been restored${gl_bai}"
@@ -8250,29 +8250,29 @@ linux_docker() {
 	  clear
 	  echo -e "Docker management"
 	  docker_tato
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}Install and update the Docker environment${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}View Docker global status${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}Docker container management${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}Docker image management"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}Docker network management"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}Docker volume management"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}Clean up useless docker containers and mirror network data volumes"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}Change Docker source"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}Edit daemon.json file"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}Enable Docker-ipv6 access"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}Turn off Docker-ipv6 access"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}Backup/migrate/restore Docker environment"
-	  echo -e "${gl_kjlan}20.  ${gl_bai}Uninstall the Docker environment"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}Install and update the Docker environment${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}2.   ${gl_bai}View Docker global status${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}Docker container management${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}4.   ${gl_bai}Docker image management"
+	  echo -e "${gl_minglan}5.   ${gl_bai}Docker network management"
+	  echo -e "${gl_minglan}6.   ${gl_bai}Docker volume management"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}7.   ${gl_bai}Clean up useless docker containers and mirror network data volumes"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}8.   ${gl_bai}Change Docker source"
+	  echo -e "${gl_minglan}9.   ${gl_bai}Edit daemon.json file"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}Enable Docker-ipv6 access"
+	  echo -e "${gl_minglan}12.  ${gl_bai}Turn off Docker-ipv6 access"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}19.  ${gl_bai}Backup/migrate/restore Docker environment"
+	  echo -e "${gl_minglan}20.  ${gl_bai}Uninstall the Docker environment"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -8522,38 +8522,38 @@ linux_test() {
 	while true; do
 	  clear
 	  echo -e "Test script collection"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}IP and unlock status detection"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}ChatGPT unlock status detection"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}Region streaming media unlock test"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}yeahwu streaming media unlock detection"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}xykt IP quality check script${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}IP and unlock status detection"
+	  echo -e "${gl_minglan}1.   ${gl_bai}ChatGPT unlock status detection"
+	  echo -e "${gl_minglan}2.   ${gl_bai}Region streaming media unlock test"
+	  echo -e "${gl_minglan}3.   ${gl_bai}yeahwu streaming media unlock detection"
+	  echo -e "${gl_minglan}4.   ${gl_bai}xykt IP quality check script${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}Network line speed test"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}besttrace three network backhaul delay routing test"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}mtr_trace triple network backhaul line test"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}Superspeed triple network speed test"
-	  echo -e "${gl_kjlan}14.  ${gl_bai}nxtrace fast backhaul test script"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}nxtrace specifies IP backhaul test script"
-	  echo -e "${gl_kjlan}16.  ${gl_bai}ludashi2020 three network line test"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}i-abc multifunctional speed test script"
-	  echo -e "${gl_kjlan}18.  ${gl_bai}NetQuality network quality check script${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}TcpQuality TCP retransmission detection script${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}Network line speed test"
+	  echo -e "${gl_minglan}11.  ${gl_bai}besttrace three network backhaul delay routing test"
+	  echo -e "${gl_minglan}12.  ${gl_bai}mtr_trace triple network backhaul line test"
+	  echo -e "${gl_minglan}13.  ${gl_bai}Superspeed triple network speed test"
+	  echo -e "${gl_minglan}14.  ${gl_bai}nxtrace fast backhaul test script"
+	  echo -e "${gl_minglan}15.  ${gl_bai}nxtrace specifies IP backhaul test script"
+	  echo -e "${gl_minglan}16.  ${gl_bai}ludashi2020 three network line test"
+	  echo -e "${gl_minglan}17.  ${gl_bai}i-abc multifunctional speed test script"
+	  echo -e "${gl_minglan}18.  ${gl_bai}NetQuality network quality check script${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}19.  ${gl_bai}TcpQuality TCP retransmission detection script${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}Hardware performance testing"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}yabs performance test"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}icu/gb5 CPU performance test script"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}Hardware performance testing"
+	  echo -e "${gl_minglan}21.  ${gl_bai}yabs performance test"
+	  echo -e "${gl_minglan}22.  ${gl_bai}icu/gb5 CPU performance test script"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}Comprehensive testing"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}bench performance test"
-	  echo -e "${gl_kjlan}32.  ${gl_bai}spiritysdx fusion monster evaluation${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}nodequality fusion monster evaluation${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}Comprehensive testing"
+	  echo -e "${gl_minglan}31.  ${gl_bai}bench performance test"
+	  echo -e "${gl_minglan}32.  ${gl_bai}spiritysdx fusion monster evaluation${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}nodequality fusion monster evaluation${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -8689,17 +8689,17 @@ linux_Oracle() {
 	 while true; do
 	  clear
 	  echo -e "Oracle Cloud Script Collection"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}Install idle machine active script"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}Uninstall active scripts from idle machines"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}DD reinstall system script"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}Detective R startup script"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}Enable ROOT password login mode"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}IPV6 recovery tool"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}Install idle machine active script"
+	  echo -e "${gl_minglan}2.   ${gl_bai}Uninstall active scripts from idle machines"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}DD reinstall system script"
+	  echo -e "${gl_minglan}4.   ${gl_bai}Detective R startup script"
+	  echo -e "${gl_minglan}5.   ${gl_bai}Enable ROOT password login mode"
+	  echo -e "${gl_minglan}6.   ${gl_bai}IPV6 recovery tool"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -8836,7 +8836,7 @@ docker_tato() {
 	local volume_count=$(docker volume ls -q 2>/dev/null | wc -l)
 
 	if command -v docker &> /dev/null; then
-		echo -e "${gl_kjlan}------------------------"
+		echo -e "${gl_minglan}------------------------"
 		echo -e "${gl_lv}The environment has been installed${gl_bai}container:${gl_lv}$container_count${gl_bai}Mirror:${gl_lv}$image_count${gl_bai}network:${gl_lv}$network_count${gl_bai}roll:${gl_lv}$volume_count${gl_bai}"
 	fi
 }
@@ -9590,7 +9590,7 @@ linux_ldnmp() {
 	  clear
 
 	  local backup_filename="web_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  echo -e "${gl_kjlan}Backing up$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}Backing up$backup_filename ...${gl_bai}"
 	  cd /home/ && tar czvf "$backup_filename" web
 
 	  while true; do
@@ -9682,7 +9682,7 @@ linux_ldnmp() {
 		  docker compose down > /dev/null 2>&1
 		  rm -rf /home/web > /dev/null 2>&1
 
-		  echo -e "${gl_kjlan}Unzipping$filename ...${gl_bai}"
+			echo -e "${gl_minglan}Unzipping$filename ...${gl_bai}"
 		  cd /home/ && tar -xzf "$filename"
 
 		  install_dependency
@@ -14489,13 +14489,13 @@ except Exception as e:
 			echo "======================================="
 			openclaw_permission_render_status
 			echo "---------------------------------------"
-			echo -e "${gl_kjlan}1.${gl_bai}Switch to standard security mode (daily recommendations, pop-up card approval)"
-			echo -e "${gl_kjlan}2.${gl_bai}Switch to development enhancement mode (allowing agents to apply for privilege escalation)"
-			echo -e "${gl_kjlan}3.${gl_bai}Switch to fully open mode (${gl_hong}High risk! Completely remove all host interceptions${gl_bai}）"
-			echo -e "${gl_kjlan}4.${gl_bai}Restore the official default sandbox defense strategy"
-			echo -e "${gl_kjlan}5.${gl_bai}Run underlying security audits and automatic repairs"
-			echo -e "${gl_kjlan}6.${gl_bai}Manage Exec command whitelist"
-			echo -e "${gl_kjlan}0.${gl_bai}Return to previous level"
+			echo -e "${gl_minglan}1.${gl_bai}Switch to standard security mode (daily recommendations, pop-up card approval)"
+			echo -e "${gl_minglan}2.${gl_bai}Switch to development enhancement mode (allowing agents to apply for privilege escalation)"
+			echo -e "${gl_minglan}3.${gl_bai}Switch to fully open mode (${gl_hong}High risk! Completely remove all host interceptions${gl_bai}）"
+			echo -e "${gl_minglan}4.${gl_bai}Restore the official default sandbox defense strategy"
+			echo -e "${gl_minglan}5.${gl_bai}Run underlying security audits and automatic repairs"
+			echo -e "${gl_minglan}6.${gl_bai}Manage Exec command whitelist"
+			echo -e "${gl_minglan}0.${gl_bai}Return to previous level"
 			echo "---------------------------------------"
 			read -e -p "Please enter your choice:" perm_choice
 			case "$perm_choice" in
@@ -15111,7 +15111,7 @@ openclaw_backup_restore_menu() {
 		echo "https://${yuming}/#token=$token"
 		echo "First access the URL to trigger the device ID, then press Enter to proceed with pairing."
 		read
-		echo -e "${gl_kjlan}Loading device list...${gl_bai}"
+		echo -e "${gl_minglan}Loading device list...${gl_bai}"
 		# Automatically add domain names to allowedOrigins
 		config_file=$(openclaw_get_config_file)
 		if [ -f "$config_file" ]; then
@@ -15120,7 +15120,7 @@ openclaw_backup_restore_menu() {
 			if command -v jq >/dev/null 2>&1; then
 				tmp_json=$(mktemp)
 				jq 'if .gateway.controlUi == null then .gateway.controlUi = {"allowedOrigins": ["http://127.0.0.1"]} else . end | if (.gateway.controlUi.allowedOrigins | contains([$origin]) | not) then .gateway.controlUi.allowedOrigins += [$origin] else . end' --arg origin "$new_origin" "$config_file" > "$tmp_json" && mv "$tmp_json" "$config_file"
-				echo -e "${gl_kjlan}Domain name has been${yuming}Add allowedOrigins configuration${gl_bai}"
+				echo -e "${gl_minglan}Domain name has been${yuming}Add allowedOrigins configuration${gl_bai}"
 				openclaw gateway restart >/dev/null 2>&1
 			fi
 		fi
@@ -15230,7 +15230,7 @@ local sub_choice="$1"
 clear
 cd ~
 install git
-echo -e "${gl_kjlan}The application list is being updated. Please wait...${gl_bai}"
+echo -e "${gl_minglan}The application list is being updated. Please wait...${gl_bai}"
 if [ ! -d apps/.git ]; then
 	timeout 10s git clone ${ACTIVE_APPS_REPO_URL}
 else
@@ -15244,7 +15244,7 @@ while true; do
 	if [ -z "$sub_choice" ]; then
 	  clear
 	  echo -e "application market"
-	  echo -e "${gl_kjlan}-------------------------"
+	  echo -e "${gl_minglan}-------------------------"
 
 	  local app_numbers=$([ -f /home/docker/appno.txt ] && cat /home/docker/appno.txt || echo "")
 
@@ -15257,78 +15257,78 @@ while true; do
 		  fi
 	  done
 
-	  echo -e "${gl_kjlan}1.   ${color1}Pagoda panel official version${gl_kjlan}2.   ${color2}aaPanel Pagoda International Version"
-	  echo -e "${gl_kjlan}3.   ${color3}1Panel new generation management panel${gl_kjlan}4.   ${color4}NginxProxyManager visualization panel"
-	  echo -e "${gl_kjlan}5.   ${color5}OpenList multi-store file list program${gl_kjlan}6.   ${color6}Ubuntu Remote Desktop Web Version"
-	  echo -e "${gl_kjlan}7.   ${color7}Nezha Probe VPS Monitoring Panel${gl_kjlan}8.   ${color8}QB offline BT magnetic download panel"
-	  echo -e "${gl_kjlan}9.   ${color9}Poste.io mail server program${gl_kjlan}10.  ${color10}RocketChat multi-person online chat system"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}11.  ${color11}ZenTao project management software${gl_kjlan}12.  ${color12}Qinglong panel scheduled task management platform"
-	  echo -e "${gl_kjlan}13.  ${color13}Cloudreve network disk${gl_huang}★${gl_bai}                     ${gl_kjlan}14.  ${color14}Simple picture bed picture management program"
-	  echo -e "${gl_kjlan}15.  ${color15}emby multimedia management system${gl_kjlan}16.  ${color16}Speedtest speed test panel"
-	  echo -e "${gl_kjlan}17.  ${color17}AdGuardHome removes adware${gl_kjlan}18.  ${color18}onlyofficeOnline office OFFICE"
-	  echo -e "${gl_kjlan}19.  ${color19}Leichi WAF firewall panel${gl_kjlan}20.  ${color20}portainer container management panel"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}21.  ${color21}VScode web version${gl_kjlan}22.  ${color22}UptimeKuma monitoring tool"
-	  echo -e "${gl_kjlan}23.  ${color23}Memos web memo${gl_kjlan}24.  ${color24}Webtop remote desktop web version${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}25.  ${color25}Nextcloud network disk${gl_kjlan}26.  ${color26}QD-Today scheduled task management framework"
-	  echo -e "${gl_kjlan}27.  ${color27}Dockge container stack management panel${gl_kjlan}28.  ${color28}LibreSpeed ​​speed test tool"
-	  echo -e "${gl_kjlan}29.  ${color29}searxng aggregated search station${gl_huang}★${gl_bai}                 ${gl_kjlan}30.  ${color30}PhotoPrism Private Album System"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}31.  ${color31}StirlingPDF Tools Collection${gl_kjlan}32.  ${color32}drawio free online charting software${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${color33}Sun-Panel Navigation Panel${gl_kjlan}34.  ${color34}Pingvin-Share file sharing platform"
-	  echo -e "${gl_kjlan}35.  ${color35}Minimalist circle of friends${gl_kjlan}36.  ${color36}LobeChatAI chat aggregation website"
-	  echo -e "${gl_kjlan}37.  ${color37}MyIP Toolbox${gl_huang}★${gl_bai}                        ${gl_kjlan}38.  ${color38}Xiaoya alist family bucket"
-	  echo -e "${gl_kjlan}39.  ${color39}Bililive live broadcast recording tool${gl_kjlan}40.  ${color40}webssh web version SSH connection tool"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}41.  ${color41}Mouse management panel${gl_kjlan}42.  ${color42}Nexterm remote connection tool"
-	  echo -e "${gl_kjlan}43.  ${color43}RustDesk remote desktop (server)${gl_huang}★${gl_bai}          ${gl_kjlan}44.  ${color44}RustDesk remote desktop (relay)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}45.  ${color45}Docker acceleration station${gl_kjlan}46.  ${color46}GitHub acceleration station${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}47.  ${color47}Prometheus monitoring${gl_kjlan}48.  ${color48}Prometheus (host monitoring)"
-	  echo -e "${gl_kjlan}49.  ${color49}Prometheus (container monitoring)${gl_kjlan}50.  ${color50}Replenishment monitoring tools"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}51.  ${color51}PVE open chick panel${gl_kjlan}52.  ${color52}DPanel container management panel"
-	  echo -e "${gl_kjlan}53.  ${color53}llama3 chat AI large model${gl_kjlan}54.  ${color54}AMH host website building management panel"
-	  echo -e "${gl_kjlan}55.  ${color55}FRP intranet penetration (server)${gl_huang}★${gl_bai}	         ${gl_kjlan}56.  ${color56}FRP intranet penetration (client)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}57.  ${color57}Deepseek chat AI large model${gl_kjlan}58.  ${color58}Dify large model knowledge base${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}59.  ${color59}NewAPI large model asset management${gl_kjlan}60.  ${color60}JumpServer open source bastion machine"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}61.  ${color61}Online translation server${gl_kjlan}62.  ${color62}RAGFlow large model knowledge base"
-	  echo -e "${gl_kjlan}63.  ${color63}OpenWebUI self-hosted AI platform${gl_huang}★${gl_bai}             ${gl_kjlan}64.  ${color64}it-tools toolbox"
-	  echo -e "${gl_kjlan}65.  ${color65}n8n automated workflow platform${gl_huang}★${gl_bai}               ${gl_kjlan}66.  ${color66}yt-dlp video download tool"
-	  echo -e "${gl_kjlan}67.  ${color67}ddns-go dynamic DNS management tool${gl_huang}★${gl_bai}            ${gl_kjlan}68.  ${color68}AllinSSL certificate management platform"
-	  echo -e "${gl_kjlan}69.  ${color69}SFTPGo file transfer tool${gl_kjlan}70.  ${color70}AstrBot chatbot framework"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}71.  ${color71}Navidrome private music server${gl_kjlan}72.  ${color72}bitwarden password manager${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}73.  ${color73}LibreTV Private Movies${gl_kjlan}74.  ${color74}MoonTV private movies"
-	  echo -e "${gl_kjlan}75.  ${color75}Melody music wizard${gl_kjlan}76.  ${color76}Online DOS old games"
-	  echo -e "${gl_kjlan}77.  ${color77}Thunder offline download tool${gl_kjlan}78.  ${color78}PandaWiki intelligent document management system"
-	  echo -e "${gl_kjlan}79.  ${color79}Beszel server monitoring${gl_kjlan}80.  ${color80}linkwarden bookmark management"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}81.  ${color81}JitsiMeet video conference${gl_kjlan}82.  ${color82}gpt-load high-performance AI transparent proxy"
-	  echo -e "${gl_kjlan}83.  ${color83}komari server monitoring tool${gl_kjlan}84.  ${color84}Wallos personal financial management tool"
-	  echo -e "${gl_kjlan}85.  ${color85}immich picture video manager${gl_kjlan}86.  ${color86}jellyfin media management system"
-	  echo -e "${gl_kjlan}87.  ${color87}SyncTV is a great tool for watching movies together${gl_kjlan}88.  ${color88}Owncast self-hosted live streaming platform"
-	  echo -e "${gl_kjlan}89.  ${color89}FileCodeBox file express${gl_kjlan}90.  ${color90}matrix decentralized chat protocol"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}91.  ${color91}gitea private code repository${gl_kjlan}92.  ${color92}FileBrowser file manager"
-	  echo -e "${gl_kjlan}93.  ${color93}Dufs minimalist static file server${gl_kjlan}94.  ${color94}Gopeed high-speed download tool"
-	  echo -e "${gl_kjlan}95.  ${color95}paperless document management platform${gl_kjlan}96.  ${color96}2FAuth self-hosted two-step authenticator"
-	  echo -e "${gl_kjlan}97.  ${color97}WireGuard networking (server)${gl_kjlan}98.  ${color98}WireGuard networking (client)"
-	  echo -e "${gl_kjlan}99.  ${color99}DSM Synology Virtual Machine${gl_kjlan}100. ${color100}Syncthing peer-to-peer file synchronization tool"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}101. ${color101}AI video generation tool${gl_kjlan}102. ${color102}VoceChat multi-person online chat system"
-	  echo -e "${gl_kjlan}103. ${color103}Umami website statistics tool${gl_kjlan}104. ${color104}Stream four-layer proxy forwarding tool"
-	  echo -e "${gl_kjlan}105. ${color105}Siyuan Notes${gl_kjlan}106. ${color106}Drawnix open source whiteboard tool"
-	  echo -e "${gl_kjlan}107. ${color107}PanSou network disk search${gl_kjlan}108. ${color108}LangBot chatbot"
-	  echo -e "${gl_kjlan}109. ${color109}ZFile online network disk${gl_kjlan}110. ${color110}Karakeep bookmark management"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}111. ${color111}Multi-format file conversion tool${gl_kjlan}112. ${color112}Lucky large intranet penetration tool"
-	  echo -e "${gl_kjlan}113. ${color113}Firefox browser${gl_kjlan}114. ${color114}OpenClaw bot management tool${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}115. ${color115}Hermes robot management tool${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}Third-party application list"
-  	  echo -e "${gl_kjlan}Want your app to appear here? Check out the developer guide:${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
+	  echo -e "${gl_minglan}1.   ${color1}Pagoda panel official version${gl_minglan}2.   ${color2}aaPanel Pagoda International Version"
+	  echo -e "${gl_minglan}3.   ${color3}1Panel new generation management panel${gl_minglan}4.   ${color4}NginxProxyManager visualization panel"
+	  echo -e "${gl_minglan}5.   ${color5}OpenList multi-store file list program${gl_minglan}6.   ${color6}Ubuntu Remote Desktop Web Version"
+	  echo -e "${gl_minglan}7.   ${color7}Nezha Probe VPS Monitoring Panel${gl_minglan}8.   ${color8}QB offline BT magnetic download panel"
+	  echo -e "${gl_minglan}9.   ${color9}Poste.io mail server program${gl_minglan}10.  ${color10}RocketChat multi-person online chat system"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}11.  ${color11}ZenTao project management software${gl_minglan}12.  ${color12}Qinglong panel scheduled task management platform"
+	  echo -e "${gl_minglan}13.  ${color13}Cloudreve network disk${gl_huang}★${gl_bai}                     ${gl_minglan}14.  ${color14}Simple picture bed picture management program"
+	  echo -e "${gl_minglan}15.  ${color15}emby multimedia management system${gl_minglan}16.  ${color16}Speedtest speed test panel"
+	  echo -e "${gl_minglan}17.  ${color17}AdGuardHome removes adware${gl_minglan}18.  ${color18}onlyofficeOnline office OFFICE"
+	  echo -e "${gl_minglan}19.  ${color19}Leichi WAF firewall panel${gl_minglan}20.  ${color20}portainer container management panel"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}21.  ${color21}VScode web version${gl_minglan}22.  ${color22}UptimeKuma monitoring tool"
+	  echo -e "${gl_minglan}23.  ${color23}Memos web memo${gl_minglan}24.  ${color24}Webtop remote desktop web version${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}25.  ${color25}Nextcloud network disk${gl_minglan}26.  ${color26}QD-Today scheduled task management framework"
+	  echo -e "${gl_minglan}27.  ${color27}Dockge container stack management panel${gl_minglan}28.  ${color28}LibreSpeed ​​speed test tool"
+	  echo -e "${gl_minglan}29.  ${color29}searxng aggregated search station${gl_huang}★${gl_bai}                 ${gl_minglan}30.  ${color30}PhotoPrism Private Album System"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}31.  ${color31}StirlingPDF Tools Collection${gl_minglan}32.  ${color32}drawio free online charting software${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${color33}Sun-Panel Navigation Panel${gl_minglan}34.  ${color34}Pingvin-Share file sharing platform"
+	  echo -e "${gl_minglan}35.  ${color35}Minimalist circle of friends${gl_minglan}36.  ${color36}LobeChatAI chat aggregation website"
+	  echo -e "${gl_minglan}37.  ${color37}MyIP Toolbox${gl_huang}★${gl_bai}                        ${gl_minglan}38.  ${color38}Xiaoya alist family bucket"
+	  echo -e "${gl_minglan}39.  ${color39}Bililive live broadcast recording tool${gl_minglan}40.  ${color40}webssh web version SSH connection tool"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}41.  ${color41}Mouse management panel${gl_minglan}42.  ${color42}Nexterm remote connection tool"
+	  echo -e "${gl_minglan}43.  ${color43}RustDesk remote desktop (server)${gl_huang}★${gl_bai}          ${gl_minglan}44.  ${color44}RustDesk remote desktop (relay)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}45.  ${color45}Docker acceleration station${gl_minglan}46.  ${color46}GitHub acceleration station${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}47.  ${color47}Prometheus monitoring${gl_minglan}48.  ${color48}Prometheus (host monitoring)"
+	  echo -e "${gl_minglan}49.  ${color49}Prometheus (container monitoring)${gl_minglan}50.  ${color50}Replenishment monitoring tools"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}51.  ${color51}PVE open chick panel${gl_minglan}52.  ${color52}DPanel container management panel"
+	  echo -e "${gl_minglan}53.  ${color53}llama3 chat AI large model${gl_minglan}54.  ${color54}AMH host website building management panel"
+	  echo -e "${gl_minglan}55.  ${color55}FRP intranet penetration (server)${gl_huang}★${gl_bai}	         ${gl_minglan}56.  ${color56}FRP intranet penetration (client)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}57.  ${color57}Deepseek chat AI large model${gl_minglan}58.  ${color58}Dify large model knowledge base${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}59.  ${color59}NewAPI large model asset management${gl_minglan}60.  ${color60}JumpServer open source bastion machine"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}61.  ${color61}Online translation server${gl_minglan}62.  ${color62}RAGFlow large model knowledge base"
+	  echo -e "${gl_minglan}63.  ${color63}OpenWebUI self-hosted AI platform${gl_huang}★${gl_bai}             ${gl_minglan}64.  ${color64}it-tools toolbox"
+	  echo -e "${gl_minglan}65.  ${color65}n8n automated workflow platform${gl_huang}★${gl_bai}               ${gl_minglan}66.  ${color66}yt-dlp video download tool"
+	  echo -e "${gl_minglan}67.  ${color67}ddns-go dynamic DNS management tool${gl_huang}★${gl_bai}            ${gl_minglan}68.  ${color68}AllinSSL certificate management platform"
+	  echo -e "${gl_minglan}69.  ${color69}SFTPGo file transfer tool${gl_minglan}70.  ${color70}AstrBot chatbot framework"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}71.  ${color71}Navidrome private music server${gl_minglan}72.  ${color72}bitwarden password manager${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}73.  ${color73}LibreTV Private Movies${gl_minglan}74.  ${color74}MoonTV private movies"
+	  echo -e "${gl_minglan}75.  ${color75}Melody music wizard${gl_minglan}76.  ${color76}Online DOS old games"
+	  echo -e "${gl_minglan}77.  ${color77}Thunder offline download tool${gl_minglan}78.  ${color78}PandaWiki intelligent document management system"
+	  echo -e "${gl_minglan}79.  ${color79}Beszel server monitoring${gl_minglan}80.  ${color80}linkwarden bookmark management"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}81.  ${color81}JitsiMeet video conference${gl_minglan}82.  ${color82}gpt-load high-performance AI transparent proxy"
+	  echo -e "${gl_minglan}83.  ${color83}komari server monitoring tool${gl_minglan}84.  ${color84}Wallos personal financial management tool"
+	  echo -e "${gl_minglan}85.  ${color85}immich picture video manager${gl_minglan}86.  ${color86}jellyfin media management system"
+	  echo -e "${gl_minglan}87.  ${color87}SyncTV is a great tool for watching movies together${gl_minglan}88.  ${color88}Owncast self-hosted live streaming platform"
+	  echo -e "${gl_minglan}89.  ${color89}FileCodeBox file express${gl_minglan}90.  ${color90}matrix decentralized chat protocol"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}91.  ${color91}gitea private code repository${gl_minglan}92.  ${color92}FileBrowser file manager"
+	  echo -e "${gl_minglan}93.  ${color93}Dufs minimalist static file server${gl_minglan}94.  ${color94}Gopeed high-speed download tool"
+	  echo -e "${gl_minglan}95.  ${color95}paperless document management platform${gl_minglan}96.  ${color96}2FAuth self-hosted two-step authenticator"
+	  echo -e "${gl_minglan}97.  ${color97}WireGuard networking (server)${gl_minglan}98.  ${color98}WireGuard networking (client)"
+	  echo -e "${gl_minglan}99.  ${color99}DSM Synology Virtual Machine${gl_minglan}100. ${color100}Syncthing peer-to-peer file synchronization tool"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}101. ${color101}AI video generation tool${gl_minglan}102. ${color102}VoceChat multi-person online chat system"
+	  echo -e "${gl_minglan}103. ${color103}Umami website statistics tool${gl_minglan}104. ${color104}Stream four-layer proxy forwarding tool"
+	  echo -e "${gl_minglan}105. ${color105}Siyuan Notes${gl_minglan}106. ${color106}Drawnix open source whiteboard tool"
+	  echo -e "${gl_minglan}107. ${color107}PanSou network disk search${gl_minglan}108. ${color108}LangBot chatbot"
+	  echo -e "${gl_minglan}109. ${color109}ZFile online network disk${gl_minglan}110. ${color110}Karakeep bookmark management"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}111. ${color111}Multi-format file conversion tool${gl_minglan}112. ${color112}Lucky large intranet penetration tool"
+	  echo -e "${gl_minglan}113. ${color113}Firefox browser${gl_minglan}114. ${color114}OpenClaw bot management tool${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}115. ${color115}Hermes robot management tool${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}Third-party application list"
+	  echo -e "${gl_minglan}Want your app to appear here? Check out the developer guide:${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
 
 	  for f in "$HOME"/apps/*.conf; do
 		  [ -e "$f" ] || continue
@@ -15340,20 +15340,20 @@ while true; do
 		  # It is assumed here that what is recorded in appno.txt is base_name (i.e. file name)
 		  if echo "$app_numbers" | grep -q "^$base_name$"; then
 			  # If installed: show base_name - description [Installed] (green)
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - ${gl_lv}${app_text}[Installed]${gl_bai}"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - ${gl_lv}${app_text}[Installed]${gl_bai}"
 		  else
 			  # If not installed: display normally
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - $app_text"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - $app_text"
 		  fi
 	  done
 
 
 
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}b.   ${gl_bai}Back up all application data${gl_kjlan}r.   ${gl_bai}Restore all app data"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}b.   ${gl_bai}Back up all application data${gl_minglan}r.   ${gl_bai}Restore all app data"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 	fi
 
@@ -19010,7 +19010,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	clear
 
 	  	local backup_filename="app_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  	echo -e "${gl_kjlan}Backing up$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}Backing up$backup_filename ...${gl_bai}"
 	  	cd / && tar czvf "$backup_filename" home
 
 	  	while true; do
@@ -19061,7 +19061,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	fi
 
 	  	if [ -n "$filename" ]; then
-		  	  echo -e "${gl_kjlan}Unzipping$filename ...${gl_bai}"
+			echo -e "${gl_minglan}Unzipping$filename ...${gl_bai}"
 		  	  cd / && tar -xzf "$filename"
 			  echo "The application data has been restored. Currently, please manually enter the specified application menu and update the application to restore the application."
 	  	else
@@ -19107,29 +19107,29 @@ linux_work() {
 	  echo -e "The system will provide you with a workspace that can run permanently in the background, which you can use to perform long-term tasks."
 	  echo -e "Even if you disconnect SSH, the tasks in the workspace will not be interrupted, and the background tasks will persist."
 	  echo -e "${gl_huang}hint:${gl_bai}After entering the workspace, use Ctrl+b and then press d alone to exit the workspace!"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  echo "List of currently existing workspaces"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  tmux list-sessions
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}Work Area 1"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}Work Area 2"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}Work Area 3"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}Work Area 4"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}Work Area 5"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}Work Area 6"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}Work Area 7"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}Work Area 8"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}Workspace No. 9"
-	  echo -e "${gl_kjlan}10.  ${gl_bai}Workspace 10"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}SSH resident mode${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}Create/enter workspace"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}Inject commands into the background workspace"
-	  echo -e "${gl_kjlan}24.  ${gl_bai}Delete specified workspace"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}Work Area 1"
+	  echo -e "${gl_minglan}2.   ${gl_bai}Work Area 2"
+	  echo -e "${gl_minglan}3.   ${gl_bai}Work Area 3"
+	  echo -e "${gl_minglan}4.   ${gl_bai}Work Area 4"
+	  echo -e "${gl_minglan}5.   ${gl_bai}Work Area 5"
+	  echo -e "${gl_minglan}6.   ${gl_bai}Work Area 6"
+	  echo -e "${gl_minglan}7.   ${gl_bai}Work Area 7"
+	  echo -e "${gl_minglan}8.   ${gl_bai}Work Area 8"
+	  echo -e "${gl_minglan}9.   ${gl_bai}Workspace No. 9"
+	  echo -e "${gl_minglan}10.  ${gl_bai}Workspace 10"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}SSH resident mode${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}22.  ${gl_bai}Create/enter workspace"
+	  echo -e "${gl_minglan}23.  ${gl_bai}Inject commands into the background workspace"
+	  echo -e "${gl_minglan}24.  ${gl_bai}Delete specified workspace"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -19751,39 +19751,39 @@ linux_Settings() {
 	while true; do
 	  clear
 	  echo -e "system tools"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}Set script startup shortcut key${gl_kjlan}2.   ${gl_bai}Change login password"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}User password login mode${gl_kjlan}4.   ${gl_bai}Install the specified version of Python"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}Open all ports${gl_kjlan}6.   ${gl_bai}Modify SSH connection port"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}Optimize DNS address${gl_kjlan}8.   ${gl_bai}Reinstall the system with one click${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}Disable ROOT account and create new account${gl_kjlan}10.  ${gl_bai}Switch priority ipv4/ipv6"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}Check port occupation status${gl_kjlan}12.  ${gl_bai}Modify virtual memory size"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}User management${gl_kjlan}14.  ${gl_bai}User/password generator"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}System time zone adjustment${gl_kjlan}16.  ${gl_bai}Set up BBR3 acceleration"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}Firewall Advanced Manager${gl_kjlan}18.  ${gl_bai}Modify hostname"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}Switch system update source${gl_kjlan}20.  ${gl_bai}Scheduled task management"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}Native host resolution${gl_kjlan}22.  ${gl_bai}SSH defense program"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}Current limiting automatic shutdown${gl_kjlan}24.  ${gl_bai}User key login mode"
-	  echo -e "${gl_kjlan}25.  ${gl_bai}TG-bot system monitoring and early warning${gl_kjlan}26.  ${gl_bai}Fix OpenSSH high-risk vulnerabilities"
-	  echo -e "${gl_kjlan}27.  ${gl_bai}Red Hat Linux kernel upgrade${gl_kjlan}28.  ${gl_bai}Linux system kernel parameter optimization${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}29.  ${gl_bai}Virus scanning tools${gl_huang}★${gl_bai}                     ${gl_kjlan}30.  ${gl_bai}file manager"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}Switch system language${gl_kjlan}32.  ${gl_bai}Command line beautification tool${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}Set up system recycle bin${gl_kjlan}34.  ${gl_bai}System backup and recovery"
-	  echo -e "${gl_kjlan}35.  ${gl_bai}ssh remote connection tool${gl_kjlan}36.  ${gl_bai}Hard disk partition management tool"
-	  echo -e "${gl_kjlan}37.  ${gl_bai}Command line history${gl_kjlan}38.  ${gl_bai}rsync remote synchronization tool"
-	  echo -e "${gl_kjlan}39.  ${gl_bai}Command Favorites${gl_huang}★${gl_bai}                       ${gl_kjlan}40.  ${gl_bai}Network card management tool"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}System log management tool${gl_huang}★${gl_bai}                 ${gl_kjlan}42.  ${gl_bai}System variable management tool"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}61.  ${gl_bai}Project support                      ${gl_kjlan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}99.  ${gl_bai}Restart the server"
-	  echo -e "${gl_kjlan}101. ${gl_bai}Advanced usage of ${PROJECT_COMMAND} command${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}Uninstall ${PROJECT_NAME}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}Set script startup shortcut key${gl_minglan}2.   ${gl_bai}Change login password"
+	  echo -e "${gl_minglan}3.   ${gl_bai}User password login mode${gl_minglan}4.   ${gl_bai}Install the specified version of Python"
+	  echo -e "${gl_minglan}5.   ${gl_bai}Open all ports${gl_minglan}6.   ${gl_bai}Modify SSH connection port"
+	  echo -e "${gl_minglan}7.   ${gl_bai}Optimize DNS address${gl_minglan}8.   ${gl_bai}Reinstall the system with one click${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}9.   ${gl_bai}Disable ROOT account and create new account${gl_minglan}10.  ${gl_bai}Switch priority ipv4/ipv6"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}Check port occupation status${gl_minglan}12.  ${gl_bai}Modify virtual memory size"
+	  echo -e "${gl_minglan}13.  ${gl_bai}User management${gl_minglan}14.  ${gl_bai}User/password generator"
+	  echo -e "${gl_minglan}15.  ${gl_bai}System time zone adjustment${gl_minglan}16.  ${gl_bai}Set up BBR3 acceleration"
+	  echo -e "${gl_minglan}17.  ${gl_bai}Firewall Advanced Manager${gl_minglan}18.  ${gl_bai}Modify hostname"
+	  echo -e "${gl_minglan}19.  ${gl_bai}Switch system update source${gl_minglan}20.  ${gl_bai}Scheduled task management"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}Native host resolution${gl_minglan}22.  ${gl_bai}SSH defense program"
+	  echo -e "${gl_minglan}23.  ${gl_bai}Current limiting automatic shutdown${gl_minglan}24.  ${gl_bai}User key login mode"
+	  echo -e "${gl_minglan}25.  ${gl_bai}TG-bot system monitoring and early warning${gl_minglan}26.  ${gl_bai}Fix OpenSSH high-risk vulnerabilities"
+	  echo -e "${gl_minglan}27.  ${gl_bai}Red Hat Linux kernel upgrade${gl_minglan}28.  ${gl_bai}Linux system kernel parameter optimization${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}29.  ${gl_bai}Virus scanning tools${gl_huang}★${gl_bai}                     ${gl_minglan}30.  ${gl_bai}file manager"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}Switch system language${gl_minglan}32.  ${gl_bai}Command line beautification tool${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}Set up system recycle bin${gl_minglan}34.  ${gl_bai}System backup and recovery"
+	  echo -e "${gl_minglan}35.  ${gl_bai}ssh remote connection tool${gl_minglan}36.  ${gl_bai}Hard disk partition management tool"
+	  echo -e "${gl_minglan}37.  ${gl_bai}Command line history${gl_minglan}38.  ${gl_bai}rsync remote synchronization tool"
+	  echo -e "${gl_minglan}39.  ${gl_bai}Command Favorites${gl_huang}★${gl_bai}                       ${gl_minglan}40.  ${gl_bai}Network card management tool"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}System log management tool${gl_huang}★${gl_bai}                 ${gl_minglan}42.  ${gl_bai}System variable management tool"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}61.  ${gl_bai}Project support                      ${gl_minglan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}99.  ${gl_bai}Restart the server"
+	  echo -e "${gl_minglan}101. ${gl_bai}Advanced usage of ${PROJECT_COMMAND} command${gl_huang}★${gl_bai}                    ${gl_minglan}102. ${gl_bai}Uninstall ${PROJECT_NAME}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -20473,8 +20473,8 @@ EOF
 				echo "------------------------------------------------"
 				echo "The current traffic usage will be cleared when the server is restarted!"
 				output_status
-				echo -e "${gl_kjlan}Total received:${gl_bai}$rx"
-				echo -e "${gl_kjlan}Total sent:${gl_bai}$tx"
+				echo -e "${gl_minglan}Total received:${gl_bai}$rx"
+				echo -e "${gl_minglan}Total sent:${gl_bai}$tx"
 
 				# Check if Limiting_Shut_down.sh file exists
 				if [ -f ~/Limiting_Shut_down.sh ]; then
@@ -21042,18 +21042,18 @@ while true; do
 	  echo "Server cluster control"
 	  cat ~/cluster/servers.py
 	  echo
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}Server list management${gl_bai}"
-	  echo -e "${gl_kjlan}1.  ${gl_bai}Add server${gl_kjlan}2.  ${gl_bai}Delete server${gl_kjlan}3.  ${gl_bai}Edit server"
-	  echo -e "${gl_kjlan}4.  ${gl_bai}Backup cluster${gl_kjlan}5.  ${gl_bai}Restore cluster"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}Execute tasks in batches${gl_bai}"
-	  echo -e "${gl_kjlan}11. ${gl_bai}Deployment guide (disabled)       ${gl_kjlan}12. ${gl_bai}Update system         ${gl_kjlan}13. ${gl_bai}Clean system"
-	  echo -e "${gl_kjlan}14. ${gl_bai}Install docker${gl_kjlan}15. ${gl_bai}Install BBR3${gl_kjlan}16. ${gl_bai}Set 1G virtual memory"
-	  echo -e "${gl_kjlan}17. ${gl_bai}Set time zone to Shanghai${gl_kjlan}18. ${gl_bai}Open all ports${gl_kjlan}51. ${gl_bai}custom directive"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}0.  ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}Server list management${gl_bai}"
+	  echo -e "${gl_minglan}1.  ${gl_bai}Add server${gl_minglan}2.  ${gl_bai}Delete server${gl_minglan}3.  ${gl_bai}Edit server"
+	  echo -e "${gl_minglan}4.  ${gl_bai}Backup cluster${gl_minglan}5.  ${gl_bai}Restore cluster"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}Execute tasks in batches${gl_bai}"
+	  echo -e "${gl_minglan}11. ${gl_bai}Deployment guide (disabled)       ${gl_minglan}12. ${gl_bai}Update system         ${gl_minglan}13. ${gl_bai}Clean system"
+	  echo -e "${gl_minglan}14. ${gl_bai}Install docker${gl_minglan}15. ${gl_bai}Install BBR3${gl_minglan}16. ${gl_bai}Set 1G virtual memory"
+	  echo -e "${gl_minglan}17. ${gl_bai}Set time zone to Shanghai${gl_minglan}18. ${gl_bai}Open all ports${gl_minglan}51. ${gl_bai}custom directive"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}0.  ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -21151,12 +21151,12 @@ games_server_tools() {
 	while true; do
 	  clear
 	  echo -e "Collection of game server opening scripts"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1. ${gl_bai}Eudemons Parlu server opening script"
-	  echo -e "${gl_kjlan}2. ${gl_bai}Minecraft server opening script"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0. ${gl_bai}Return to main menu"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1. ${gl_bai}Eudemons Parlu server opening script"
+	  echo -e "${gl_minglan}2. ${gl_bai}Minecraft server opening script"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0. ${gl_bai}Return to main menu"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "Please enter your choice:" sub_choice
 
 	  case $sub_choice in
@@ -21216,31 +21216,31 @@ project_update() {
 main_menu() {
 while true; do
 clear
-echo -e "${gl_kjlan}"
+echo -e "${gl_minglan}"
 echo -e "${PROJECT_NAME} v${PROJECT_VERSION}"
-echo -e "Command line input${gl_huang}${PROJECT_COMMAND}${gl_kjlan}Quick start script${gl_bai}"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}1.   ${gl_bai}System information query"
-echo -e "${gl_kjlan}2.   ${gl_bai}System update"
-echo -e "${gl_kjlan}3.   ${gl_bai}System cleanup"
-echo -e "${gl_kjlan}4.   ${gl_bai}basic tools"
-echo -e "${gl_kjlan}5.   ${gl_bai}BBR management"
-echo -e "${gl_kjlan}6.   ${gl_bai}Docker management"
-echo -e "${gl_kjlan}7.   ${gl_bai}WARP management"
-echo -e "${gl_kjlan}8.   ${gl_bai}Test script collection"
-echo -e "${gl_kjlan}9.   ${gl_bai}Oracle Cloud Script Collection"
+echo -e "Command line input${gl_huang}${PROJECT_COMMAND}${gl_minglan}Quick start script${gl_bai}"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}1.   ${gl_bai}System information query"
+echo -e "${gl_minglan}2.   ${gl_bai}System update"
+echo -e "${gl_minglan}3.   ${gl_bai}System cleanup"
+echo -e "${gl_minglan}4.   ${gl_bai}basic tools"
+echo -e "${gl_minglan}5.   ${gl_bai}BBR management"
+echo -e "${gl_minglan}6.   ${gl_bai}Docker management"
+echo -e "${gl_minglan}7.   ${gl_bai}WARP management"
+echo -e "${gl_minglan}8.   ${gl_bai}Test script collection"
+echo -e "${gl_minglan}9.   ${gl_bai}Oracle Cloud Script Collection"
 echo -e "${gl_huang}10.  ${gl_bai}LDNMP website building"
-echo -e "${gl_kjlan}11.  ${gl_bai}application market"
-echo -e "${gl_kjlan}12.  ${gl_bai}Backend workspace"
-echo -e "${gl_kjlan}13.  ${gl_bai}system tools"
-echo -e "${gl_kjlan}14.  ${gl_bai}Server cluster control"
-echo -e "${gl_kjlan}15.  ${gl_bai}Project information"
-echo -e "${gl_kjlan}16.  ${gl_bai}Collection of game server opening scripts"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}00.  ${gl_bai}Project update (disabled)"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}0.   ${gl_bai}Exit script"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
+echo -e "${gl_minglan}11.  ${gl_bai}application market"
+echo -e "${gl_minglan}12.  ${gl_bai}Backend workspace"
+echo -e "${gl_minglan}13.  ${gl_bai}system tools"
+echo -e "${gl_minglan}14.  ${gl_bai}Server cluster control"
+echo -e "${gl_minglan}15.  ${gl_bai}Project information"
+echo -e "${gl_minglan}16.  ${gl_bai}Collection of game server opening scripts"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}00.  ${gl_bai}Project update (disabled)"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}0.   ${gl_bai}Exit script"
+echo -e "${gl_minglan}------------------------${gl_bai}"
 read -e -p "Please enter your choice:" choice
 
 case $choice in

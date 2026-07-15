@@ -113,7 +113,7 @@ gl_huang='\033[33m'
 gl_lan='\033[34m'
 gl_bai='\033[0m'
 gl_zi='\033[35m'
-gl_kjlan='\033[96m'
+gl_minglan='\033[96m'
 
 
 canshu="default"
@@ -211,7 +211,7 @@ CheckFirstRun_false() {
 # 提示使用者同意條款
 UserLicenseAgreement() {
 	clear
-	echo -e "${gl_kjlan}歡迎使用 ${PROJECT_NAME} 工具箱${gl_bai}"
+	echo -e "${gl_minglan}歡迎使用 ${PROJECT_NAME} 工具箱${gl_bai}"
 	echo "首次使用腳本，請先閱讀並同意使用者授權協議。"
 	echo "License: ${UPSTREAM_LICENSE}; ${PROJECT_LICENSE_URL}"
 	echo -e "----------------------"
@@ -271,7 +271,7 @@ install() {
 
 	for package in "$@"; do
 		if ! command -v "$package" &>/dev/null; then
-			echo -e "${gl_kjlan}正在安裝$package...${gl_bai}"
+			echo -e "${gl_minglan}正在安裝$package...${gl_bai}"
 			if command -v dnf &>/dev/null; then
 				dnf -y update
 				dnf install -y epel-release
@@ -345,7 +345,7 @@ remove() {
 	fi
 
 	for package in "$@"; do
-		echo -e "${gl_kjlan}正在卸載$package...${gl_bai}"
+		echo -e "${gl_minglan}正在卸載$package...${gl_bai}"
 		if command -v dnf &>/dev/null; then
 			dnf remove -y "$package"
 		elif command -v yum &>/dev/null; then
@@ -541,7 +541,7 @@ install_add_docker_cn
 
 
 install_add_docker() {
-	echo -e "${gl_kjlan}正在安裝docker環境...${gl_bai}"
+	echo -e "${gl_minglan}正在安裝docker環境...${gl_bai}"
 	if command -v apt &>/dev/null || command -v yum &>/dev/null || command -v dnf &>/dev/null; then
 		linuxmirrors_install_docker
 	else
@@ -710,14 +710,14 @@ while true; do
 		1)
 			read -e -p "請輸入鏡像名稱（多個鏡像名稱請以空格分隔）:" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}正在取得鏡像:$name${gl_bai}"
+				echo -e "${gl_minglan}正在取得鏡像:$name${gl_bai}"
 				docker pull $name
 			done
 			;;
 		2)
 			read -e -p "請輸入鏡像名稱（多個鏡像名稱請以空格分隔）:" imagenames
 			for name in $imagenames; do
-				echo -e "${gl_kjlan}正在更新鏡像:$name${gl_bai}"
+				echo -e "${gl_minglan}正在更新鏡像:$name${gl_bai}"
 				docker pull $name
 			done
 			;;
@@ -4641,7 +4641,7 @@ fix_dpkg() {
 
 
 linux_update() {
-	echo -e "${gl_kjlan}正在系統更新...${gl_bai}"
+	echo -e "${gl_minglan}正在系統更新...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		dnf -y update
 	elif command -v yum &>/dev/null; then
@@ -4668,7 +4668,7 @@ linux_update() {
 
 
 linux_clean() {
-	echo -e "${gl_kjlan}正在系統清理...${gl_bai}"
+	echo -e "${gl_minglan}正在系統清理...${gl_bai}"
 	if command -v dnf &>/dev/null; then
 		rpm --rebuilddb
 		dnf autoremove -y
@@ -5844,7 +5844,7 @@ elrepo() {
 
 
 clamav_freshclam() {
-	echo -e "${gl_kjlan}正在更新病毒庫...${gl_bai}"
+	echo -e "${gl_minglan}正在更新病毒庫...${gl_bai}"
 	docker run --rm \
 		--name clamav \
 		--mount source=clam_db,target=/var/lib/clamav \
@@ -5858,7 +5858,7 @@ clamav_scan() {
 		return
 	fi
 
-	echo -e "${gl_kjlan}正在掃描目錄$*...${gl_bai}"
+	echo -e "${gl_minglan}正在掃描目錄$*...${gl_bai}"
 
 	# 建構 mount 參數
 	local MOUNT_PARAMS=""
@@ -5905,7 +5905,7 @@ clamav() {
 				echo "是一個開源的防毒軟體工具，主要用於偵測和刪除各種類型的惡意軟體。"
 				echo "包括病毒、木馬、間諜軟體、惡意腳本和其他有害軟體。"
 				echo "------------------------"
-				echo -e "${gl_lv}1. 全盤掃描${gl_bai}             ${gl_huang}2. 重要目錄掃描${gl_bai}            ${gl_kjlan}3. 自訂目錄掃描${gl_bai}"
+				echo -e "${gl_lv}1. 全盤掃描${gl_bai}             ${gl_huang}2. 重要目錄掃描${gl_bai}            ${gl_minglan}3. 自訂目錄掃描${gl_bai}"
 				echo "------------------------"
 				echo "0. 返回上一級選單"
 				echo "------------------------"
@@ -7480,7 +7480,7 @@ linux_info() {
 
 
 	clear
-	echo -e "${gl_kjlan}正在查詢系統資訊…${gl_bai}"
+	echo -e "${gl_minglan}正在查詢系統資訊…${gl_bai}"
 
 	ip_address
 
@@ -7533,41 +7533,41 @@ linux_info() {
 
 	clear
 	echo -e "系統資訊查詢"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}主機名稱:${gl_bai}$hostname"
-	echo -e "${gl_kjlan}系統版本:${gl_bai}$os_info"
-	echo -e "${gl_kjlan}Linux版本:${gl_bai}$kernel_version"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU架構:${gl_bai}$cpu_arch"
-	echo -e "${gl_kjlan}CPU型號:${gl_bai}$cpu_info"
-	echo -e "${gl_kjlan}CPU核心數:${gl_bai}$cpu_cores"
-	echo -e "${gl_kjlan}CPU頻率:${gl_bai}$cpu_freq"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}CPU佔用:${gl_bai}$cpu_usage_percent%"
-	echo -e "${gl_kjlan}系統負載:${gl_bai}$load"
-	echo -e "${gl_kjlan}TCP|UDP連線數:${gl_bai}$tcp_count|$udp_count"
-	echo -e "${gl_kjlan}實體記憶體:${gl_bai}$mem_info"
-	echo -e "${gl_kjlan}虛擬記憶體:${gl_bai}$swap_info"
-	echo -e "${gl_kjlan}硬碟佔用:${gl_bai}$disk_info"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}總接收:${gl_bai}$rx"
-	echo -e "${gl_kjlan}總發送:${gl_bai}$tx"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}網路演算法:${gl_bai}$congestion_algorithm $queue_algorithm"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}運營商:${gl_bai}$isp_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}主機名稱:${gl_bai}$hostname"
+	echo -e "${gl_minglan}系統版本:${gl_bai}$os_info"
+	echo -e "${gl_minglan}Linux版本:${gl_bai}$kernel_version"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU架構:${gl_bai}$cpu_arch"
+	echo -e "${gl_minglan}CPU型號:${gl_bai}$cpu_info"
+	echo -e "${gl_minglan}CPU核心數:${gl_bai}$cpu_cores"
+	echo -e "${gl_minglan}CPU頻率:${gl_bai}$cpu_freq"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}CPU佔用:${gl_bai}$cpu_usage_percent%"
+	echo -e "${gl_minglan}系統負載:${gl_bai}$load"
+	echo -e "${gl_minglan}TCP|UDP連線數:${gl_bai}$tcp_count|$udp_count"
+	echo -e "${gl_minglan}實體記憶體:${gl_bai}$mem_info"
+	echo -e "${gl_minglan}虛擬記憶體:${gl_bai}$swap_info"
+	echo -e "${gl_minglan}硬碟佔用:${gl_bai}$disk_info"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}總接收:${gl_bai}$rx"
+	echo -e "${gl_minglan}總發送:${gl_bai}$tx"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}網路演算法:${gl_bai}$congestion_algorithm $queue_algorithm"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}運營商:${gl_bai}$isp_info"
 	if [ -n "$ipv4_address" ]; then
-		echo -e "${gl_kjlan}IPv4位址:${gl_bai}$ipv4_address"
+		echo -e "${gl_minglan}IPv4位址:${gl_bai}$ipv4_address"
 	fi
 
 	if [ -n "$ipv6_address" ]; then
-		echo -e "${gl_kjlan}IPv6位址:${gl_bai}$ipv6_address"
+		echo -e "${gl_minglan}IPv6位址:${gl_bai}$ipv6_address"
 	fi
-	echo -e "${gl_kjlan}DNS位址:${gl_bai}$dns_addresses"
-	echo -e "${gl_kjlan}地理位置:${gl_bai}$country $city"
-	echo -e "${gl_kjlan}系統時間:${gl_bai}$timezone $current_time"
-	echo -e "${gl_kjlan}-------------"
-	echo -e "${gl_kjlan}運行時長:${gl_bai}$runtime"
+	echo -e "${gl_minglan}DNS位址:${gl_bai}$dns_addresses"
+	echo -e "${gl_minglan}地理位置:${gl_bai}$country $city"
+	echo -e "${gl_minglan}系統時間:${gl_bai}$timezone $current_time"
+	echo -e "${gl_minglan}-------------"
+	echo -e "${gl_minglan}運行時長:${gl_bai}$runtime"
 	echo
 
 
@@ -7610,7 +7610,7 @@ linux_tools() {
 	  fi
 
 	  echo "📦 使用套件管理器:$PM"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 
 	  for ((i=0; i<${#tools[@]}; i+=2)); do
 		# 左列
@@ -7633,29 +7633,29 @@ linux_tools() {
 		fi
 	  done
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}curl 下載工具${gl_huang}★${gl_bai}                   ${gl_kjlan}2.   ${gl_bai}wget 下載工具${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}sudo 超級管理權限工具${gl_kjlan}4.   ${gl_bai}socat 通訊連接工具"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}htop 系統監控工具${gl_kjlan}6.   ${gl_bai}iftop 網路流量監控工具"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}unzip ZIP壓縮解壓縮工具${gl_kjlan}8.   ${gl_bai}tar GZ壓縮解壓縮工具"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}tmux 多路後台運行工具${gl_kjlan}10.  ${gl_bai}ffmpeg 視訊編碼直播推流工具"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}btop 現代化監控工具${gl_huang}★${gl_bai}             ${gl_kjlan}12.  ${gl_bai}ranger 檔案管理工具"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}ncdu 磁碟佔用檢視工具${gl_kjlan}14.  ${gl_bai}fzf 全域搜尋工具"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}vim 文字編輯器${gl_kjlan}16.  ${gl_bai}nano 文字編輯器${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}git 版本控制系統${gl_kjlan}18.  ${gl_bai}opencode AI程式設計助手${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}駭客任務螢幕保${gl_kjlan}22.  ${gl_bai}跑火車屏保"
-	  echo -e "${gl_kjlan}26.  ${gl_bai}俄羅斯方塊小遊戲${gl_kjlan}27.  ${gl_bai}貪吃蛇小遊戲"
-	  echo -e "${gl_kjlan}28.  ${gl_bai}太空入侵者小遊戲"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}全部安裝${gl_kjlan}32.  ${gl_bai}全部安裝（不含螢幕保護程式和遊戲）${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}全部解除安裝"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}安裝指定工具${gl_kjlan}42.  ${gl_bai}解除安裝指定工具"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}curl 下載工具${gl_huang}★${gl_bai}                   ${gl_minglan}2.   ${gl_bai}wget 下載工具${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}3.   ${gl_bai}sudo 超級管理權限工具${gl_minglan}4.   ${gl_bai}socat 通訊連接工具"
+	  echo -e "${gl_minglan}5.   ${gl_bai}htop 系統監控工具${gl_minglan}6.   ${gl_bai}iftop 網路流量監控工具"
+	  echo -e "${gl_minglan}7.   ${gl_bai}unzip ZIP壓縮解壓縮工具${gl_minglan}8.   ${gl_bai}tar GZ壓縮解壓縮工具"
+	  echo -e "${gl_minglan}9.   ${gl_bai}tmux 多路後台運行工具${gl_minglan}10.  ${gl_bai}ffmpeg 視訊編碼直播推流工具"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}btop 現代化監控工具${gl_huang}★${gl_bai}             ${gl_minglan}12.  ${gl_bai}ranger 檔案管理工具"
+	  echo -e "${gl_minglan}13.  ${gl_bai}ncdu 磁碟佔用檢視工具${gl_minglan}14.  ${gl_bai}fzf 全域搜尋工具"
+	  echo -e "${gl_minglan}15.  ${gl_bai}vim 文字編輯器${gl_minglan}16.  ${gl_bai}nano 文字編輯器${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}17.  ${gl_bai}git 版本控制系統${gl_minglan}18.  ${gl_bai}opencode AI程式設計助手${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}駭客任務螢幕保${gl_minglan}22.  ${gl_bai}跑火車屏保"
+	  echo -e "${gl_minglan}26.  ${gl_bai}俄羅斯方塊小遊戲${gl_minglan}27.  ${gl_bai}貪吃蛇小遊戲"
+	  echo -e "${gl_minglan}28.  ${gl_bai}太空入侵者小遊戲"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}全部安裝${gl_minglan}32.  ${gl_bai}全部安裝（不含螢幕保護程式和遊戲）${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}全部解除安裝"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}安裝指定工具${gl_minglan}42.  ${gl_bai}解除安裝指定工具"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -7929,7 +7929,7 @@ docker_ssh_migration() {
 
 	list_backups() {
 		local BACKUP_ROOT="/tmp"
-		echo -e "${gl_kjlan}目前備份清單:${gl_bai}"
+		echo -e "${gl_minglan}目前備份清單:${gl_bai}"
 		ls -1dt ${BACKUP_ROOT}/docker_backup_* 2>/dev/null || echo "無備份"
 	}
 
@@ -7940,7 +7940,7 @@ docker_ssh_migration() {
 	# ----------------------------
 	backup_docker() {
 
-		echo -e "${gl_kjlan}正在備份 Docker 容器...${gl_bai}"
+		echo -e "${gl_minglan}正在備份 Docker 容器...${gl_bai}"
 		docker ps --format '{{.Names}}'
 		read -e -p  "請輸入要備份的容器名稱（多個空格分隔，回車備份全部運行中容器）:" containers
 
@@ -7974,7 +7974,7 @@ docker_ssh_migration() {
 			docker inspect "$c" > "$inspect_file"
 
 			if is_compose_container "$c"; then
-				echo -e "${gl_kjlan}檢測到$c是 docker-compose 容器${gl_bai}"
+				echo -e "${gl_minglan}檢測到$c是 docker-compose 容器${gl_bai}"
 				local project_dir=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project.working_dir"] // empty')
 				local project_name=$(docker inspect "$c" | jq -r '.[0].Config.Labels["com.docker.compose.project"] // empty')
 
@@ -8042,7 +8042,7 @@ docker_ssh_migration() {
 
 		# 備份 /home/docker 下的所有檔案（不含子目錄）
 		if [ -d "/home/docker" ]; then
-			echo -e "${gl_kjlan}備份 /home/docker 下的檔案...${gl_bai}"
+			echo -e "${gl_minglan}備份 /home/docker 下的檔案...${gl_bai}"
 			find /home/docker -maxdepth 1 -type f | tar -czf "${BACKUP_DIR}/home_docker_files.tar.gz" -T -
 			echo -e "${gl_lv}/home/docker 下的檔案已打包到:${BACKUP_DIR}/home_docker_files.tar.gz${gl_bai}"
 		fi
@@ -8062,7 +8062,7 @@ docker_ssh_migration() {
 		read -e -p  "請輸入要還原的備份目錄:" BACKUP_DIR
 		[[ ! -d "$BACKUP_DIR" ]] && { echo -e "${gl_hong}備份目錄不存在${gl_bai}"; return; }
 
-		echo -e "${gl_kjlan}開始執行還原操作...${gl_bai}"
+		echo -e "${gl_minglan}開始執行還原操作...${gl_bai}"
 
 		install tar jq gzip
 		install_docker
@@ -8098,7 +8098,7 @@ docker_ssh_migration() {
 		done
 
 		# --------- 繼續還原一般容器 ---------
-		echo -e "${gl_kjlan}檢查並還原普通 Docker 容器...${gl_bai}"
+		echo -e "${gl_minglan}檢查並還原普通 Docker 容器...${gl_bai}"
 		local has_container=false
 		for json in "$BACKUP_DIR"/*_inspect.json; do
 			[[ ! -f "$json" ]] && continue
@@ -8161,7 +8161,7 @@ docker_ssh_migration() {
 
 		# 還原 /home/docker 下的文件
 		if [ -f "$BACKUP_DIR/home_docker_files.tar.gz" ]; then
-			echo -e "${gl_kjlan}正在還原 /home/docker 下的檔案...${gl_bai}"
+			echo -e "${gl_minglan}正在還原 /home/docker 下的檔案...${gl_bai}"
 			mkdir -p /home/docker
 			tar -xzf "$BACKUP_DIR/home_docker_files.tar.gz" -C /
 			echo -e "${gl_lv}/home/docker 下的檔案已還原完成${gl_bai}"
@@ -8251,29 +8251,29 @@ linux_docker() {
 	  clear
 	  echo -e "Docker管理"
 	  docker_tato
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}安裝更新Docker環境${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}查看Docker全域狀態${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}Docker容器管理${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}Docker映像管理"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}Docker網路管理"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}Docker磁碟區管理"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}清理無用的docker容器和映像網路資料卷"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}更換Docker源"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}編輯daemon.json文件"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}開啟Docker-ipv6訪問"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}關閉Docker-ipv6訪問"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}備份/遷移/還原Docker環境"
-	  echo -e "${gl_kjlan}20.  ${gl_bai}解除安裝Docker環境"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}安裝更新Docker環境${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}2.   ${gl_bai}查看Docker全域狀態${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}Docker容器管理${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}4.   ${gl_bai}Docker映像管理"
+	  echo -e "${gl_minglan}5.   ${gl_bai}Docker網路管理"
+	  echo -e "${gl_minglan}6.   ${gl_bai}Docker磁碟區管理"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}7.   ${gl_bai}清理無用的docker容器和映像網路資料卷"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}8.   ${gl_bai}更換Docker源"
+	  echo -e "${gl_minglan}9.   ${gl_bai}編輯daemon.json文件"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}開啟Docker-ipv6訪問"
+	  echo -e "${gl_minglan}12.  ${gl_bai}關閉Docker-ipv6訪問"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}19.  ${gl_bai}備份/遷移/還原Docker環境"
+	  echo -e "${gl_minglan}20.  ${gl_bai}解除安裝Docker環境"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -8523,38 +8523,38 @@ linux_test() {
 	while true; do
 	  clear
 	  echo -e "測試腳本合集"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}IP及解鎖狀態偵測"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}ChatGPT 解鎖狀態偵測"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}Region 串流解鎖測試"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}yeahwu 串流媒體解鎖偵測"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}xykt IP品質體檢腳本${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}IP及解鎖狀態偵測"
+	  echo -e "${gl_minglan}1.   ${gl_bai}ChatGPT 解鎖狀態偵測"
+	  echo -e "${gl_minglan}2.   ${gl_bai}Region 串流解鎖測試"
+	  echo -e "${gl_minglan}3.   ${gl_bai}yeahwu 串流媒體解鎖偵測"
+	  echo -e "${gl_minglan}4.   ${gl_bai}xykt IP品質體檢腳本${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}網路線路測速"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}besttrace 三網回程延遲路由測試"
-	  echo -e "${gl_kjlan}12.  ${gl_bai}mtr_trace 三網回程線路測試"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}Superspeed 三網測速"
-	  echo -e "${gl_kjlan}14.  ${gl_bai}nxtrace 快速回程測試腳本"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}nxtrace 指定IP回程測試腳本"
-	  echo -e "${gl_kjlan}16.  ${gl_bai}ludashi2020 三線線路測試"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}i-abc 多功能測速腳本"
-	  echo -e "${gl_kjlan}18.  ${gl_bai}NetQuality 網路品質體檢腳本${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}TcpQuality TCP重傳偵測腳本${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}網路線路測速"
+	  echo -e "${gl_minglan}11.  ${gl_bai}besttrace 三網回程延遲路由測試"
+	  echo -e "${gl_minglan}12.  ${gl_bai}mtr_trace 三網回程線路測試"
+	  echo -e "${gl_minglan}13.  ${gl_bai}Superspeed 三網測速"
+	  echo -e "${gl_minglan}14.  ${gl_bai}nxtrace 快速回程測試腳本"
+	  echo -e "${gl_minglan}15.  ${gl_bai}nxtrace 指定IP回程測試腳本"
+	  echo -e "${gl_minglan}16.  ${gl_bai}ludashi2020 三線線路測試"
+	  echo -e "${gl_minglan}17.  ${gl_bai}i-abc 多功能測速腳本"
+	  echo -e "${gl_minglan}18.  ${gl_bai}NetQuality 網路品質體檢腳本${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}19.  ${gl_bai}TcpQuality TCP重傳偵測腳本${gl_huang}★${gl_bai}"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}硬體效能測試"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}yabs 效能測試"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}icu/gb5 CPU效能測試腳本"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}硬體效能測試"
+	  echo -e "${gl_minglan}21.  ${gl_bai}yabs 效能測試"
+	  echo -e "${gl_minglan}22.  ${gl_bai}icu/gb5 CPU效能測試腳本"
 
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}綜合性測試"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}bench 效能測試"
-	  echo -e "${gl_kjlan}32.  ${gl_bai}spiritysdx 融合怪測評${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}nodequality 融合怪測評${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}綜合性測試"
+	  echo -e "${gl_minglan}31.  ${gl_bai}bench 效能測試"
+	  echo -e "${gl_minglan}32.  ${gl_bai}spiritysdx 融合怪測評${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}nodequality 融合怪測評${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -8690,17 +8690,17 @@ linux_Oracle() {
 	 while true; do
 	  clear
 	  echo -e "甲骨文雲腳本合集"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}安裝閒置機器活躍腳本"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}卸載閒置機器活躍腳本"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}DD重裝系統腳本"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}R探長開機腳本"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}開啟ROOT密碼登入模式"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}IPV6恢復工具"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}安裝閒置機器活躍腳本"
+	  echo -e "${gl_minglan}2.   ${gl_bai}卸載閒置機器活躍腳本"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}3.   ${gl_bai}DD重裝系統腳本"
+	  echo -e "${gl_minglan}4.   ${gl_bai}R探長開機腳本"
+	  echo -e "${gl_minglan}5.   ${gl_bai}開啟ROOT密碼登入模式"
+	  echo -e "${gl_minglan}6.   ${gl_bai}IPV6恢復工具"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -8837,7 +8837,7 @@ docker_tato() {
 	local volume_count=$(docker volume ls -q 2>/dev/null | wc -l)
 
 	if command -v docker &> /dev/null; then
-		echo -e "${gl_kjlan}------------------------"
+		echo -e "${gl_minglan}------------------------"
 		echo -e "${gl_lv}環境已經安裝${gl_bai}容器:${gl_lv}$container_count${gl_bai}鏡像:${gl_lv}$image_count${gl_bai}網路:${gl_lv}$network_count${gl_bai}卷:${gl_lv}$volume_count${gl_bai}"
 	fi
 }
@@ -9591,7 +9591,7 @@ linux_ldnmp() {
 	  clear
 
 	  local backup_filename="web_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  echo -e "${gl_kjlan}正在備份$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}正在備份$backup_filename ...${gl_bai}"
 	  cd /home/ && tar czvf "$backup_filename" web
 
 	  while true; do
@@ -9683,7 +9683,7 @@ linux_ldnmp() {
 		  docker compose down > /dev/null 2>&1
 		  rm -rf /home/web > /dev/null 2>&1
 
-		  echo -e "${gl_kjlan}正在解壓縮$filename ...${gl_bai}"
+			echo -e "${gl_minglan}正在解壓縮$filename ...${gl_bai}"
 		  cd /home/ && tar -xzf "$filename"
 
 		  install_dependency
@@ -14490,13 +14490,13 @@ except Exception as e:
 			echo "======================================="
 			openclaw_permission_render_status
 			echo "---------------------------------------"
-			echo -e "${gl_kjlan}1.${gl_bai}切換為標準安全模式（日常推薦，彈卡核准）"
-			echo -e "${gl_kjlan}2.${gl_bai}切換為開發增強模式（允許智能體申請提權）"
-			echo -e "${gl_kjlan}3.${gl_bai}切換為完全開放模式（${gl_hong}高風險！徹底解除所有宿主機攔截${gl_bai}）"
-			echo -e "${gl_kjlan}4.${gl_bai}恢復官方預設沙盒防禦策略"
-			echo -e "${gl_kjlan}5.${gl_bai}運行底層安全審計與自動修復"
-			echo -e "${gl_kjlan}6.${gl_bai}管理 Exec 指令白名單"
-			echo -e "${gl_kjlan}0.${gl_bai}回上一級"
+			echo -e "${gl_minglan}1.${gl_bai}切換為標準安全模式（日常推薦，彈卡核准）"
+			echo -e "${gl_minglan}2.${gl_bai}切換為開發增強模式（允許智能體申請提權）"
+			echo -e "${gl_minglan}3.${gl_bai}切換為完全開放模式（${gl_hong}高風險！徹底解除所有宿主機攔截${gl_bai}）"
+			echo -e "${gl_minglan}4.${gl_bai}恢復官方預設沙盒防禦策略"
+			echo -e "${gl_minglan}5.${gl_bai}運行底層安全審計與自動修復"
+			echo -e "${gl_minglan}6.${gl_bai}管理 Exec 指令白名單"
+			echo -e "${gl_minglan}0.${gl_bai}回上一級"
 			echo "---------------------------------------"
 			read -e -p "請輸入你的選擇:" perm_choice
 			case "$perm_choice" in
@@ -15112,7 +15112,7 @@ openclaw_backup_restore_menu() {
 		echo "https://${yuming}/#token=$token"
 		echo "先造訪URL觸發設備ID，然後回車下一步進行配對。"
 		read
-		echo -e "${gl_kjlan}正在載入設備列表…${gl_bai}"
+		echo -e "${gl_minglan}正在載入設備列表…${gl_bai}"
 		# 自動新增網域到 allowedOrigins
 		config_file=$(openclaw_get_config_file)
 		if [ -f "$config_file" ]; then
@@ -15121,7 +15121,7 @@ openclaw_backup_restore_menu() {
 			if command -v jq >/dev/null 2>&1; then
 				tmp_json=$(mktemp)
 				jq 'if .gateway.controlUi == null then .gateway.controlUi = {"allowedOrigins": ["http://127.0.0.1"]} else . end | if (.gateway.controlUi.allowedOrigins | contains([$origin]) | not) then .gateway.controlUi.allowedOrigins += [$origin] else . end' --arg origin "$new_origin" "$config_file" > "$tmp_json" && mv "$tmp_json" "$config_file"
-				echo -e "${gl_kjlan}已將域名${yuming}加入 allowedOrigins 配置${gl_bai}"
+				echo -e "${gl_minglan}已將域名${yuming}加入 allowedOrigins 配置${gl_bai}"
 				openclaw gateway restart >/dev/null 2>&1
 			fi
 		fi
@@ -15231,7 +15231,7 @@ local sub_choice="$1"
 clear
 cd ~
 install git
-echo -e "${gl_kjlan}正在更新應用程式清單請稍等…${gl_bai}"
+echo -e "${gl_minglan}正在更新應用程式清單請稍等…${gl_bai}"
 if [ ! -d apps/.git ]; then
 	timeout 10s git clone ${ACTIVE_APPS_REPO_URL}
 else
@@ -15245,7 +15245,7 @@ while true; do
 	if [ -z "$sub_choice" ]; then
 	  clear
 	  echo -e "應用市場"
-	  echo -e "${gl_kjlan}-------------------------"
+	  echo -e "${gl_minglan}-------------------------"
 
 	  local app_numbers=$([ -f /home/docker/appno.txt ] && cat /home/docker/appno.txt || echo "")
 
@@ -15258,78 +15258,78 @@ while true; do
 		  fi
 	  done
 
-	  echo -e "${gl_kjlan}1.   ${color1}寶塔面板官方版${gl_kjlan}2.   ${color2}aaPanel寶塔國際版"
-	  echo -e "${gl_kjlan}3.   ${color3}1Panel新一代管理面板${gl_kjlan}4.   ${color4}NginxProxyManager視覺化面板"
-	  echo -e "${gl_kjlan}5.   ${color5}OpenList多重儲存文件列表程序${gl_kjlan}6.   ${color6}Ubuntu遠端桌面網頁版"
-	  echo -e "${gl_kjlan}7.   ${color7}哪吒探針VPS監控面板${gl_kjlan}8.   ${color8}QB離線BT磁力下載面板"
-	  echo -e "${gl_kjlan}9.   ${color9}Poste.io郵件伺服器程式${gl_kjlan}10.  ${color10}RocketChat多人線上聊天系統"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}11.  ${color11}禪道專案管理軟體${gl_kjlan}12.  ${color12}青龍面板定時任務管理平台"
-	  echo -e "${gl_kjlan}13.  ${color13}Cloudreve網盤${gl_huang}★${gl_bai}                     ${gl_kjlan}14.  ${color14}簡單圖床圖片管理程序"
-	  echo -e "${gl_kjlan}15.  ${color15}emby多媒體管理系統${gl_kjlan}16.  ${color16}Speedtest測速板"
-	  echo -e "${gl_kjlan}17.  ${color17}AdGuardHome去廣告軟體${gl_kjlan}18.  ${color18}onlyoffice線上辦公OFFICE"
-	  echo -e "${gl_kjlan}19.  ${color19}雷池WAF防火牆面板${gl_kjlan}20.  ${color20}portainer容器管理面板"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}21.  ${color21}VScode網頁版${gl_kjlan}22.  ${color22}UptimeKuma監控工具"
-	  echo -e "${gl_kjlan}23.  ${color23}Memos網頁備忘錄${gl_kjlan}24.  ${color24}Webtop遠端桌面網頁版${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}25.  ${color25}Nextcloud網站${gl_kjlan}26.  ${color26}QD-Today定時任務管理框架"
-	  echo -e "${gl_kjlan}27.  ${color27}Dockge容器堆疊管理面板${gl_kjlan}28.  ${color28}LibreSpeed測速工具"
-	  echo -e "${gl_kjlan}29.  ${color29}searxng聚合搜尋站${gl_huang}★${gl_bai}                 ${gl_kjlan}30.  ${color30}PhotoPrism私有相簿系統"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}31.  ${color31}StirlingPDF工具大全${gl_kjlan}32.  ${color32}drawio免費的線上圖表軟體${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${color33}Sun-Panel導航面板${gl_kjlan}34.  ${color34}Pingvin-Share文件分享平台"
-	  echo -e "${gl_kjlan}35.  ${color35}極簡朋友圈${gl_kjlan}36.  ${color36}LobeChatAI聊天聚合網站"
-	  echo -e "${gl_kjlan}37.  ${color37}MyIP工具箱${gl_huang}★${gl_bai}                        ${gl_kjlan}38.  ${color38}小雅alist全家桶"
-	  echo -e "${gl_kjlan}39.  ${color39}Bililive直播錄影工具${gl_kjlan}40.  ${color40}webssh網頁版SSH連線工具"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}41.  ${color41}耗子管理面板${gl_kjlan}42.  ${color42}Nexterm遠端連線工具"
-	  echo -e "${gl_kjlan}43.  ${color43}RustDesk遠端桌面(服務端)${gl_huang}★${gl_bai}          ${gl_kjlan}44.  ${color44}RustDesk遠端桌面(中繼端)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}45.  ${color45}Docker加速站${gl_kjlan}46.  ${color46}GitHub加速站${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}47.  ${color47}普羅米修斯監控${gl_kjlan}48.  ${color48}普羅米修斯(主機監控)"
-	  echo -e "${gl_kjlan}49.  ${color49}普羅米修斯(容器監控)${gl_kjlan}50.  ${color50}補貨監控工具"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}51.  ${color51}PVE開小雞面板${gl_kjlan}52.  ${color52}DPanel容器管理面板"
-	  echo -e "${gl_kjlan}53.  ${color53}llama3聊天AI大模型${gl_kjlan}54.  ${color54}AMH主機建站管理面板"
-	  echo -e "${gl_kjlan}55.  ${color55}FRP內網穿透(服務端)${gl_huang}★${gl_bai}	         ${gl_kjlan}56.  ${color56}FRP內網穿透(客戶端)${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}57.  ${color57}Deepseek聊天AI大模型${gl_kjlan}58.  ${color58}Dify大模型知識庫${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}59.  ${color59}NewAPI大模型資產管理${gl_kjlan}60.  ${color60}JumpServer開源堡壘機"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}61.  ${color61}線上翻譯伺服器${gl_kjlan}62.  ${color62}RAGFlow大模型知識庫"
-	  echo -e "${gl_kjlan}63.  ${color63}OpenWebUI自架AI平台${gl_huang}★${gl_bai}             ${gl_kjlan}64.  ${color64}it-tools工具箱"
-	  echo -e "${gl_kjlan}65.  ${color65}n8n自動化工作流程平台${gl_huang}★${gl_bai}               ${gl_kjlan}66.  ${color66}yt-dlp影片下載工具"
-	  echo -e "${gl_kjlan}67.  ${color67}ddns-go動態DNS管理工具${gl_huang}★${gl_bai}            ${gl_kjlan}68.  ${color68}AllinSSL憑證管理平台"
-	  echo -e "${gl_kjlan}69.  ${color69}SFTPGo檔案傳輸工具${gl_kjlan}70.  ${color70}AstrBot聊天機器人框架"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}71.  ${color71}Navidrome私有音樂伺服器${gl_kjlan}72.  ${color72}bitwarden密碼管理器${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}73.  ${color73}LibreTV私有影視${gl_kjlan}74.  ${color74}MoonTV私有影視"
-	  echo -e "${gl_kjlan}75.  ${color75}Melody音樂精靈${gl_kjlan}76.  ${color76}線上DOS老遊戲"
-	  echo -e "${gl_kjlan}77.  ${color77}迅雷離線下載工具${gl_kjlan}78.  ${color78}PandaWiki智慧文件管理系統"
-	  echo -e "${gl_kjlan}79.  ${color79}Beszel伺服器監控${gl_kjlan}80.  ${color80}linkwarden書籤管理"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}81.  ${color81}JitsiMeet視訊會議${gl_kjlan}82.  ${color82}gpt-load高性能AI透明代理"
-	  echo -e "${gl_kjlan}83.  ${color83}komari伺服器監控工具${gl_kjlan}84.  ${color84}Wallos個人財務管理工具"
-	  echo -e "${gl_kjlan}85.  ${color85}immich圖片影片管理器${gl_kjlan}86.  ${color86}jellyfin媒體管理系統"
-	  echo -e "${gl_kjlan}87.  ${color87}SyncTV一起看片神器${gl_kjlan}88.  ${color88}Owncast自架直播平台"
-	  echo -e "${gl_kjlan}89.  ${color89}FileCodeBox檔案快遞${gl_kjlan}90.  ${color90}matrix去中心化聊天協議"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}91.  ${color91}gitea私有程式碼倉庫${gl_kjlan}92.  ${color92}FileBrowser文件管理器"
-	  echo -e "${gl_kjlan}93.  ${color93}Dufs極簡靜態檔案伺服器${gl_kjlan}94.  ${color94}Gopeed高速下載工具"
-	  echo -e "${gl_kjlan}95.  ${color95}paperless文件管理平台${gl_kjlan}96.  ${color96}2FAuth自架二步驟驗證器"
-	  echo -e "${gl_kjlan}97.  ${color97}WireGuard組網(服務端)${gl_kjlan}98.  ${color98}WireGuard組網(客戶端)"
-	  echo -e "${gl_kjlan}99.  ${color99}DSM群暉虛擬機${gl_kjlan}100. ${color100}Syncthing點對點檔案同步工具"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}101. ${color101}AI影片生成工具${gl_kjlan}102. ${color102}VoceChat多人線上聊天系統"
-	  echo -e "${gl_kjlan}103. ${color103}Umami網站統計工具${gl_kjlan}104. ${color104}Stream四層代理轉送工具"
-	  echo -e "${gl_kjlan}105. ${color105}思源筆記${gl_kjlan}106. ${color106}Drawnix開源白板工具"
-	  echo -e "${gl_kjlan}107. ${color107}PanSou網盤搜尋${gl_kjlan}108. ${color108}LangBot聊天機器人"
-	  echo -e "${gl_kjlan}109. ${color109}ZFile線上網路磁碟${gl_kjlan}110. ${color110}Karakeep書籤管理"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}111. ${color111}多格式檔案轉換工具${gl_kjlan}112. ${color112}Lucky大內網穿透工具"
-	  echo -e "${gl_kjlan}113. ${color113}Firefox瀏覽器${gl_kjlan}114. ${color114}OpenClaw機器人管理工具${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}115. ${color115}Hermes機器人管理工具${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}第三方應用程式列表"
-  	  echo -e "${gl_kjlan}想要讓你的應用程式出現在這裡？查看開發者指南:${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
+	  echo -e "${gl_minglan}1.   ${color1}寶塔面板官方版${gl_minglan}2.   ${color2}aaPanel寶塔國際版"
+	  echo -e "${gl_minglan}3.   ${color3}1Panel新一代管理面板${gl_minglan}4.   ${color4}NginxProxyManager視覺化面板"
+	  echo -e "${gl_minglan}5.   ${color5}OpenList多重儲存文件列表程序${gl_minglan}6.   ${color6}Ubuntu遠端桌面網頁版"
+	  echo -e "${gl_minglan}7.   ${color7}哪吒探針VPS監控面板${gl_minglan}8.   ${color8}QB離線BT磁力下載面板"
+	  echo -e "${gl_minglan}9.   ${color9}Poste.io郵件伺服器程式${gl_minglan}10.  ${color10}RocketChat多人線上聊天系統"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}11.  ${color11}禪道專案管理軟體${gl_minglan}12.  ${color12}青龍面板定時任務管理平台"
+	  echo -e "${gl_minglan}13.  ${color13}Cloudreve網盤${gl_huang}★${gl_bai}                     ${gl_minglan}14.  ${color14}簡單圖床圖片管理程序"
+	  echo -e "${gl_minglan}15.  ${color15}emby多媒體管理系統${gl_minglan}16.  ${color16}Speedtest測速板"
+	  echo -e "${gl_minglan}17.  ${color17}AdGuardHome去廣告軟體${gl_minglan}18.  ${color18}onlyoffice線上辦公OFFICE"
+	  echo -e "${gl_minglan}19.  ${color19}雷池WAF防火牆面板${gl_minglan}20.  ${color20}portainer容器管理面板"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}21.  ${color21}VScode網頁版${gl_minglan}22.  ${color22}UptimeKuma監控工具"
+	  echo -e "${gl_minglan}23.  ${color23}Memos網頁備忘錄${gl_minglan}24.  ${color24}Webtop遠端桌面網頁版${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}25.  ${color25}Nextcloud網站${gl_minglan}26.  ${color26}QD-Today定時任務管理框架"
+	  echo -e "${gl_minglan}27.  ${color27}Dockge容器堆疊管理面板${gl_minglan}28.  ${color28}LibreSpeed測速工具"
+	  echo -e "${gl_minglan}29.  ${color29}searxng聚合搜尋站${gl_huang}★${gl_bai}                 ${gl_minglan}30.  ${color30}PhotoPrism私有相簿系統"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}31.  ${color31}StirlingPDF工具大全${gl_minglan}32.  ${color32}drawio免費的線上圖表軟體${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${color33}Sun-Panel導航面板${gl_minglan}34.  ${color34}Pingvin-Share文件分享平台"
+	  echo -e "${gl_minglan}35.  ${color35}極簡朋友圈${gl_minglan}36.  ${color36}LobeChatAI聊天聚合網站"
+	  echo -e "${gl_minglan}37.  ${color37}MyIP工具箱${gl_huang}★${gl_bai}                        ${gl_minglan}38.  ${color38}小雅alist全家桶"
+	  echo -e "${gl_minglan}39.  ${color39}Bililive直播錄影工具${gl_minglan}40.  ${color40}webssh網頁版SSH連線工具"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}41.  ${color41}耗子管理面板${gl_minglan}42.  ${color42}Nexterm遠端連線工具"
+	  echo -e "${gl_minglan}43.  ${color43}RustDesk遠端桌面(服務端)${gl_huang}★${gl_bai}          ${gl_minglan}44.  ${color44}RustDesk遠端桌面(中繼端)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}45.  ${color45}Docker加速站${gl_minglan}46.  ${color46}GitHub加速站${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}47.  ${color47}普羅米修斯監控${gl_minglan}48.  ${color48}普羅米修斯(主機監控)"
+	  echo -e "${gl_minglan}49.  ${color49}普羅米修斯(容器監控)${gl_minglan}50.  ${color50}補貨監控工具"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}51.  ${color51}PVE開小雞面板${gl_minglan}52.  ${color52}DPanel容器管理面板"
+	  echo -e "${gl_minglan}53.  ${color53}llama3聊天AI大模型${gl_minglan}54.  ${color54}AMH主機建站管理面板"
+	  echo -e "${gl_minglan}55.  ${color55}FRP內網穿透(服務端)${gl_huang}★${gl_bai}	         ${gl_minglan}56.  ${color56}FRP內網穿透(客戶端)${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}57.  ${color57}Deepseek聊天AI大模型${gl_minglan}58.  ${color58}Dify大模型知識庫${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}59.  ${color59}NewAPI大模型資產管理${gl_minglan}60.  ${color60}JumpServer開源堡壘機"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}61.  ${color61}線上翻譯伺服器${gl_minglan}62.  ${color62}RAGFlow大模型知識庫"
+	  echo -e "${gl_minglan}63.  ${color63}OpenWebUI自架AI平台${gl_huang}★${gl_bai}             ${gl_minglan}64.  ${color64}it-tools工具箱"
+	  echo -e "${gl_minglan}65.  ${color65}n8n自動化工作流程平台${gl_huang}★${gl_bai}               ${gl_minglan}66.  ${color66}yt-dlp影片下載工具"
+	  echo -e "${gl_minglan}67.  ${color67}ddns-go動態DNS管理工具${gl_huang}★${gl_bai}            ${gl_minglan}68.  ${color68}AllinSSL憑證管理平台"
+	  echo -e "${gl_minglan}69.  ${color69}SFTPGo檔案傳輸工具${gl_minglan}70.  ${color70}AstrBot聊天機器人框架"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}71.  ${color71}Navidrome私有音樂伺服器${gl_minglan}72.  ${color72}bitwarden密碼管理器${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}73.  ${color73}LibreTV私有影視${gl_minglan}74.  ${color74}MoonTV私有影視"
+	  echo -e "${gl_minglan}75.  ${color75}Melody音樂精靈${gl_minglan}76.  ${color76}線上DOS老遊戲"
+	  echo -e "${gl_minglan}77.  ${color77}迅雷離線下載工具${gl_minglan}78.  ${color78}PandaWiki智慧文件管理系統"
+	  echo -e "${gl_minglan}79.  ${color79}Beszel伺服器監控${gl_minglan}80.  ${color80}linkwarden書籤管理"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}81.  ${color81}JitsiMeet視訊會議${gl_minglan}82.  ${color82}gpt-load高性能AI透明代理"
+	  echo -e "${gl_minglan}83.  ${color83}komari伺服器監控工具${gl_minglan}84.  ${color84}Wallos個人財務管理工具"
+	  echo -e "${gl_minglan}85.  ${color85}immich圖片影片管理器${gl_minglan}86.  ${color86}jellyfin媒體管理系統"
+	  echo -e "${gl_minglan}87.  ${color87}SyncTV一起看片神器${gl_minglan}88.  ${color88}Owncast自架直播平台"
+	  echo -e "${gl_minglan}89.  ${color89}FileCodeBox檔案快遞${gl_minglan}90.  ${color90}matrix去中心化聊天協議"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}91.  ${color91}gitea私有程式碼倉庫${gl_minglan}92.  ${color92}FileBrowser文件管理器"
+	  echo -e "${gl_minglan}93.  ${color93}Dufs極簡靜態檔案伺服器${gl_minglan}94.  ${color94}Gopeed高速下載工具"
+	  echo -e "${gl_minglan}95.  ${color95}paperless文件管理平台${gl_minglan}96.  ${color96}2FAuth自架二步驟驗證器"
+	  echo -e "${gl_minglan}97.  ${color97}WireGuard組網(服務端)${gl_minglan}98.  ${color98}WireGuard組網(客戶端)"
+	  echo -e "${gl_minglan}99.  ${color99}DSM群暉虛擬機${gl_minglan}100. ${color100}Syncthing點對點檔案同步工具"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}101. ${color101}AI影片生成工具${gl_minglan}102. ${color102}VoceChat多人線上聊天系統"
+	  echo -e "${gl_minglan}103. ${color103}Umami網站統計工具${gl_minglan}104. ${color104}Stream四層代理轉送工具"
+	  echo -e "${gl_minglan}105. ${color105}思源筆記${gl_minglan}106. ${color106}Drawnix開源白板工具"
+	  echo -e "${gl_minglan}107. ${color107}PanSou網盤搜尋${gl_minglan}108. ${color108}LangBot聊天機器人"
+	  echo -e "${gl_minglan}109. ${color109}ZFile線上網路磁碟${gl_minglan}110. ${color110}Karakeep書籤管理"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}111. ${color111}多格式檔案轉換工具${gl_minglan}112. ${color112}Lucky大內網穿透工具"
+	  echo -e "${gl_minglan}113. ${color113}Firefox瀏覽器${gl_minglan}114. ${color114}OpenClaw機器人管理工具${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}115. ${color115}Hermes機器人管理工具${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}第三方應用程式列表"
+	  echo -e "${gl_minglan}想要讓你的應用程式出現在這裡？查看開發者指南:${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
 
 	  for f in "$HOME"/apps/*.conf; do
 		  [ -e "$f" ] || continue
@@ -15341,20 +15341,20 @@ while true; do
 		  # 這裡假設 appno.txt 中記錄的是 base_name (即檔名)
 		  if echo "$app_numbers" | grep -q "^$base_name$"; then
 			  # 如果已安裝：顯示 base_name - 描述 [已安裝] (綠色)
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - ${gl_lv}${app_text}[已安裝]${gl_bai}"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - ${gl_lv}${app_text}[已安裝]${gl_bai}"
 		  else
 			  # 如果未安裝：正常顯示
-			  echo -e "${gl_kjlan}$base_name${gl_bai} - $app_text"
+			  echo -e "${gl_minglan}$base_name${gl_bai} - $app_text"
 		  fi
 	  done
 
 
 
-	  echo -e "${gl_kjlan}-------------------------"
-	  echo -e "${gl_kjlan}b.   ${gl_bai}備份全部應用數據${gl_kjlan}r.   ${gl_bai}還原全部應用數據"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}-------------------------"
+	  echo -e "${gl_minglan}b.   ${gl_bai}備份全部應用數據${gl_minglan}r.   ${gl_bai}還原全部應用數據"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 	fi
 
@@ -19011,7 +19011,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	clear
 
 	  	local backup_filename="app_$(date +"%Y%m%d%H%M%S").tar.gz"
-	  	echo -e "${gl_kjlan}正在備份$backup_filename ...${gl_bai}"
+		echo -e "${gl_minglan}正在備份$backup_filename ...${gl_bai}"
 	  	cd / && tar czvf "$backup_filename" home
 
 	  	while true; do
@@ -19062,7 +19062,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 	  	fi
 
 	  	if [ -n "$filename" ]; then
-		  	  echo -e "${gl_kjlan}正在解壓縮$filename ...${gl_bai}"
+			echo -e "${gl_minglan}正在解壓縮$filename ...${gl_bai}"
 		  	  cd / && tar -xzf "$filename"
 			  echo "應用資料已還原，目前請手動進入指定應用程式選單，更新應用，即可還原應用程式。"
 	  	else
@@ -19108,29 +19108,29 @@ linux_work() {
 	  echo -e "系統將為你提供可以後台常駐運作的工作區，你可以用來執行長時間的任務"
 	  echo -e "即使你斷開SSH，工作區的任務也不會中斷，後台常駐任務。"
 	  echo -e "${gl_huang}提示:${gl_bai}進入工作區後再使用Ctrl+b再單獨按d，退出工作區！"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  echo "目前已存在的工作區列表"
-	  echo -e "${gl_kjlan}------------------------"
+	  echo -e "${gl_minglan}------------------------"
 	  tmux list-sessions
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}1號工作區"
-	  echo -e "${gl_kjlan}2.   ${gl_bai}2號工作區"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}3號工作區"
-	  echo -e "${gl_kjlan}4.   ${gl_bai}4號工作區"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}5號工作區"
-	  echo -e "${gl_kjlan}6.   ${gl_bai}6號工作區"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}7號工作區"
-	  echo -e "${gl_kjlan}8.   ${gl_bai}8號工作區"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}9號工作區"
-	  echo -e "${gl_kjlan}10.  ${gl_bai}10號工作區"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}SSH常駐模式${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}22.  ${gl_bai}創建/進入工作區"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}注入指令到後台工作區"
-	  echo -e "${gl_kjlan}24.  ${gl_bai}刪除指定工作區"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}1號工作區"
+	  echo -e "${gl_minglan}2.   ${gl_bai}2號工作區"
+	  echo -e "${gl_minglan}3.   ${gl_bai}3號工作區"
+	  echo -e "${gl_minglan}4.   ${gl_bai}4號工作區"
+	  echo -e "${gl_minglan}5.   ${gl_bai}5號工作區"
+	  echo -e "${gl_minglan}6.   ${gl_bai}6號工作區"
+	  echo -e "${gl_minglan}7.   ${gl_bai}7號工作區"
+	  echo -e "${gl_minglan}8.   ${gl_bai}8號工作區"
+	  echo -e "${gl_minglan}9.   ${gl_bai}9號工作區"
+	  echo -e "${gl_minglan}10.  ${gl_bai}10號工作區"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}SSH常駐模式${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}22.  ${gl_bai}創建/進入工作區"
+	  echo -e "${gl_minglan}23.  ${gl_bai}注入指令到後台工作區"
+	  echo -e "${gl_minglan}24.  ${gl_bai}刪除指定工作區"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -19752,39 +19752,39 @@ linux_Settings() {
 	while true; do
 	  clear
 	  echo -e "系統工具"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1.   ${gl_bai}設定腳本啟動快捷鍵${gl_kjlan}2.   ${gl_bai}修改登入密碼"
-	  echo -e "${gl_kjlan}3.   ${gl_bai}使用者密碼登入模式${gl_kjlan}4.   ${gl_bai}安裝Python指定版本"
-	  echo -e "${gl_kjlan}5.   ${gl_bai}開放所有連接埠${gl_kjlan}6.   ${gl_bai}修改SSH連接埠"
-	  echo -e "${gl_kjlan}7.   ${gl_bai}優化DNS位址${gl_kjlan}8.   ${gl_bai}一鍵重裝系統${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}9.   ${gl_bai}停用ROOT帳戶建立新帳戶${gl_kjlan}10.  ${gl_bai}切換優先ipv4/ipv6"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}11.  ${gl_bai}查看連接埠佔用狀態${gl_kjlan}12.  ${gl_bai}修改虛擬記憶體大小"
-	  echo -e "${gl_kjlan}13.  ${gl_bai}使用者管理${gl_kjlan}14.  ${gl_bai}使用者/密碼產生器"
-	  echo -e "${gl_kjlan}15.  ${gl_bai}系統時區調整${gl_kjlan}16.  ${gl_bai}設定BBR3加速"
-	  echo -e "${gl_kjlan}17.  ${gl_bai}防火牆高階管理器${gl_kjlan}18.  ${gl_bai}修改主機名"
-	  echo -e "${gl_kjlan}19.  ${gl_bai}切換系統更新來源${gl_kjlan}20.  ${gl_bai}定時任務管理"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}21.  ${gl_bai}本機host解析${gl_kjlan}22.  ${gl_bai}SSH防禦程序"
-	  echo -e "${gl_kjlan}23.  ${gl_bai}限流自動關機${gl_kjlan}24.  ${gl_bai}使用者密鑰登入模式"
-	  echo -e "${gl_kjlan}25.  ${gl_bai}TG-bot系統監控預警${gl_kjlan}26.  ${gl_bai}修復OpenSSH高風險漏洞"
-	  echo -e "${gl_kjlan}27.  ${gl_bai}紅帽系Linux核心升級${gl_kjlan}28.  ${gl_bai}Linux系統核心參數優化${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}29.  ${gl_bai}病毒掃描工具${gl_huang}★${gl_bai}                     ${gl_kjlan}30.  ${gl_bai}文件管理器"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}31.  ${gl_bai}切換系統語言${gl_kjlan}32.  ${gl_bai}命令列美化工具${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}33.  ${gl_bai}設定係統回收站${gl_kjlan}34.  ${gl_bai}系統備份與復原"
-	  echo -e "${gl_kjlan}35.  ${gl_bai}ssh遠端連線工具${gl_kjlan}36.  ${gl_bai}硬碟分割區管理工具"
-	  echo -e "${gl_kjlan}37.  ${gl_bai}命令列歷史記錄${gl_kjlan}38.  ${gl_bai}rsync遠端同步工具"
-	  echo -e "${gl_kjlan}39.  ${gl_bai}命令收藏夾${gl_huang}★${gl_bai}                       ${gl_kjlan}40.  ${gl_bai}網路卡管理工具"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}41.  ${gl_bai}系統日誌管理工具${gl_huang}★${gl_bai}                 ${gl_kjlan}42.  ${gl_bai}系統變數管理工具"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}61.  ${gl_bai}Project support                      ${gl_kjlan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}99.  ${gl_bai}重啟伺服器"
-	  echo -e "${gl_kjlan}101. ${gl_bai}${PROJECT_COMMAND}指令進階用法${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}解除安裝 ${PROJECT_NAME}"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0.   ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1.   ${gl_bai}設定腳本啟動快捷鍵${gl_minglan}2.   ${gl_bai}修改登入密碼"
+	  echo -e "${gl_minglan}3.   ${gl_bai}使用者密碼登入模式${gl_minglan}4.   ${gl_bai}安裝Python指定版本"
+	  echo -e "${gl_minglan}5.   ${gl_bai}開放所有連接埠${gl_minglan}6.   ${gl_bai}修改SSH連接埠"
+	  echo -e "${gl_minglan}7.   ${gl_bai}優化DNS位址${gl_minglan}8.   ${gl_bai}一鍵重裝系統${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}9.   ${gl_bai}停用ROOT帳戶建立新帳戶${gl_minglan}10.  ${gl_bai}切換優先ipv4/ipv6"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}11.  ${gl_bai}查看連接埠佔用狀態${gl_minglan}12.  ${gl_bai}修改虛擬記憶體大小"
+	  echo -e "${gl_minglan}13.  ${gl_bai}使用者管理${gl_minglan}14.  ${gl_bai}使用者/密碼產生器"
+	  echo -e "${gl_minglan}15.  ${gl_bai}系統時區調整${gl_minglan}16.  ${gl_bai}設定BBR3加速"
+	  echo -e "${gl_minglan}17.  ${gl_bai}防火牆高階管理器${gl_minglan}18.  ${gl_bai}修改主機名"
+	  echo -e "${gl_minglan}19.  ${gl_bai}切換系統更新來源${gl_minglan}20.  ${gl_bai}定時任務管理"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}21.  ${gl_bai}本機host解析${gl_minglan}22.  ${gl_bai}SSH防禦程序"
+	  echo -e "${gl_minglan}23.  ${gl_bai}限流自動關機${gl_minglan}24.  ${gl_bai}使用者密鑰登入模式"
+	  echo -e "${gl_minglan}25.  ${gl_bai}TG-bot系統監控預警${gl_minglan}26.  ${gl_bai}修復OpenSSH高風險漏洞"
+	  echo -e "${gl_minglan}27.  ${gl_bai}紅帽系Linux核心升級${gl_minglan}28.  ${gl_bai}Linux系統核心參數優化${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}29.  ${gl_bai}病毒掃描工具${gl_huang}★${gl_bai}                     ${gl_minglan}30.  ${gl_bai}文件管理器"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}31.  ${gl_bai}切換系統語言${gl_minglan}32.  ${gl_bai}命令列美化工具${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}33.  ${gl_bai}設定係統回收站${gl_minglan}34.  ${gl_bai}系統備份與復原"
+	  echo -e "${gl_minglan}35.  ${gl_bai}ssh遠端連線工具${gl_minglan}36.  ${gl_bai}硬碟分割區管理工具"
+	  echo -e "${gl_minglan}37.  ${gl_bai}命令列歷史記錄${gl_minglan}38.  ${gl_bai}rsync遠端同步工具"
+	  echo -e "${gl_minglan}39.  ${gl_bai}命令收藏夾${gl_huang}★${gl_bai}                       ${gl_minglan}40.  ${gl_bai}網路卡管理工具"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}41.  ${gl_bai}系統日誌管理工具${gl_huang}★${gl_bai}                 ${gl_minglan}42.  ${gl_bai}系統變數管理工具"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}61.  ${gl_bai}Project support                      ${gl_minglan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}99.  ${gl_bai}重啟伺服器"
+	  echo -e "${gl_minglan}101. ${gl_bai}${PROJECT_COMMAND}指令進階用法${gl_huang}★${gl_bai}                    ${gl_minglan}102. ${gl_bai}解除安裝 ${PROJECT_NAME}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0.   ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -20474,8 +20474,8 @@ EOF
 				echo "------------------------------------------------"
 				echo "目前流量使用情況，重啟伺服器流量計算會清除！"
 				output_status
-				echo -e "${gl_kjlan}總接收:${gl_bai}$rx"
-				echo -e "${gl_kjlan}總發送:${gl_bai}$tx"
+				echo -e "${gl_minglan}總接收:${gl_bai}$rx"
+				echo -e "${gl_minglan}總發送:${gl_bai}$tx"
 
 				# 檢查是否存在 Limiting_Shut_down.sh 文件
 				if [ -f ~/Limiting_Shut_down.sh ]; then
@@ -21043,18 +21043,18 @@ while true; do
 	  echo "伺服器叢集控制"
 	  cat ~/cluster/servers.py
 	  echo
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}伺服器清單管理${gl_bai}"
-	  echo -e "${gl_kjlan}1.  ${gl_bai}新增伺服器${gl_kjlan}2.  ${gl_bai}刪除伺服器${gl_kjlan}3.  ${gl_bai}編輯伺服器"
-	  echo -e "${gl_kjlan}4.  ${gl_bai}備份叢集${gl_kjlan}5.  ${gl_bai}還原叢集"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}批次執行任務${gl_bai}"
-	  echo -e "${gl_kjlan}11. ${gl_bai}Deployment guide (disabled)       ${gl_kjlan}12. ${gl_bai}Update system         ${gl_kjlan}13. ${gl_bai}Clean system"
-	  echo -e "${gl_kjlan}14. ${gl_bai}安裝docker${gl_kjlan}15. ${gl_bai}安裝BBR3${gl_kjlan}16. ${gl_bai}設定1G虛擬內存"
-	  echo -e "${gl_kjlan}17. ${gl_bai}設定時區到上海${gl_kjlan}18. ${gl_bai}開放所有連接埠${gl_kjlan}51. ${gl_bai}自訂指令"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
-	  echo -e "${gl_kjlan}0.  ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}伺服器清單管理${gl_bai}"
+	  echo -e "${gl_minglan}1.  ${gl_bai}新增伺服器${gl_minglan}2.  ${gl_bai}刪除伺服器${gl_minglan}3.  ${gl_bai}編輯伺服器"
+	  echo -e "${gl_minglan}4.  ${gl_bai}備份叢集${gl_minglan}5.  ${gl_bai}還原叢集"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}批次執行任務${gl_bai}"
+	  echo -e "${gl_minglan}11. ${gl_bai}Deployment guide (disabled)       ${gl_minglan}12. ${gl_bai}Update system         ${gl_minglan}13. ${gl_bai}Clean system"
+	  echo -e "${gl_minglan}14. ${gl_bai}安裝docker${gl_minglan}15. ${gl_bai}安裝BBR3${gl_minglan}16. ${gl_bai}設定1G虛擬內存"
+	  echo -e "${gl_minglan}17. ${gl_bai}設定時區到上海${gl_minglan}18. ${gl_bai}開放所有連接埠${gl_minglan}51. ${gl_bai}自訂指令"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}0.  ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -21152,12 +21152,12 @@ games_server_tools() {
 	while true; do
 	  clear
 	  echo -e "遊戲開服腳本合集"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}1. ${gl_bai}幻獸帕魯開服腳本"
-	  echo -e "${gl_kjlan}2. ${gl_bai}我的世界開服腳本"
-	  echo -e "${gl_kjlan}------------------------"
-	  echo -e "${gl_kjlan}0. ${gl_bai}返回主選單"
-	  echo -e "${gl_kjlan}------------------------${gl_bai}"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}1. ${gl_bai}幻獸帕魯開服腳本"
+	  echo -e "${gl_minglan}2. ${gl_bai}我的世界開服腳本"
+	  echo -e "${gl_minglan}------------------------"
+	  echo -e "${gl_minglan}0. ${gl_bai}返回主選單"
+	  echo -e "${gl_minglan}------------------------${gl_bai}"
 	  read -e -p "請輸入你的選擇:" sub_choice
 
 	  case $sub_choice in
@@ -21217,31 +21217,31 @@ project_update() {
 main_menu() {
 while true; do
 clear
-echo -e "${gl_kjlan}"
+echo -e "${gl_minglan}"
 echo -e "${PROJECT_NAME} v${PROJECT_VERSION}"
-echo -e "命令列輸入${gl_huang}${PROJECT_COMMAND}${gl_kjlan}可快速啟動腳本${gl_bai}"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}1.   ${gl_bai}系統資訊查詢"
-echo -e "${gl_kjlan}2.   ${gl_bai}系統更新"
-echo -e "${gl_kjlan}3.   ${gl_bai}系統清理"
-echo -e "${gl_kjlan}4.   ${gl_bai}基礎工具"
-echo -e "${gl_kjlan}5.   ${gl_bai}BBR管理"
-echo -e "${gl_kjlan}6.   ${gl_bai}Docker管理"
-echo -e "${gl_kjlan}7.   ${gl_bai}WARP管理"
-echo -e "${gl_kjlan}8.   ${gl_bai}測試腳本合集"
-echo -e "${gl_kjlan}9.   ${gl_bai}甲骨文雲腳本合集"
+echo -e "命令列輸入${gl_huang}${PROJECT_COMMAND}${gl_minglan}可快速啟動腳本${gl_bai}"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}1.   ${gl_bai}系統資訊查詢"
+echo -e "${gl_minglan}2.   ${gl_bai}系統更新"
+echo -e "${gl_minglan}3.   ${gl_bai}系統清理"
+echo -e "${gl_minglan}4.   ${gl_bai}基礎工具"
+echo -e "${gl_minglan}5.   ${gl_bai}BBR管理"
+echo -e "${gl_minglan}6.   ${gl_bai}Docker管理"
+echo -e "${gl_minglan}7.   ${gl_bai}WARP管理"
+echo -e "${gl_minglan}8.   ${gl_bai}測試腳本合集"
+echo -e "${gl_minglan}9.   ${gl_bai}甲骨文雲腳本合集"
 echo -e "${gl_huang}10.  ${gl_bai}LDNMP建站"
-echo -e "${gl_kjlan}11.  ${gl_bai}應用市場"
-echo -e "${gl_kjlan}12.  ${gl_bai}後台工作區"
-echo -e "${gl_kjlan}13.  ${gl_bai}系統工具"
-echo -e "${gl_kjlan}14.  ${gl_bai}伺服器叢集控制"
-echo -e "${gl_kjlan}15.  ${gl_bai}Project information"
-echo -e "${gl_kjlan}16.  ${gl_bai}遊戲開服腳本合集"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}00.  ${gl_bai}Project update (disabled)"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
-echo -e "${gl_kjlan}0.   ${gl_bai}退出腳本"
-echo -e "${gl_kjlan}------------------------${gl_bai}"
+echo -e "${gl_minglan}11.  ${gl_bai}應用市場"
+echo -e "${gl_minglan}12.  ${gl_bai}後台工作區"
+echo -e "${gl_minglan}13.  ${gl_bai}系統工具"
+echo -e "${gl_minglan}14.  ${gl_bai}伺服器叢集控制"
+echo -e "${gl_minglan}15.  ${gl_bai}Project information"
+echo -e "${gl_minglan}16.  ${gl_bai}遊戲開服腳本合集"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}00.  ${gl_bai}Project update (disabled)"
+echo -e "${gl_minglan}------------------------${gl_bai}"
+echo -e "${gl_minglan}0.   ${gl_bai}退出腳本"
+echo -e "${gl_minglan}------------------------${gl_bai}"
 read -e -p "請輸入你的選擇:" choice
 
 case $choice in
