@@ -12,7 +12,6 @@ License 2.0 個人化而來的 Linux 伺服器管理工具。
 ## 預設值
 
 - 主要命令：`m`
-- 相容命令：`k`
 - 遙測與使用統計：永久停用
 - 專案自我更新與自動更新：停用
 - 入口：`tw/ming.sh`
@@ -23,10 +22,9 @@ License 2.0 個人化而來的 Linux 伺服器管理工具。
 curl -fL --output ming.sh \
   https://raw.githubusercontent.com/JohnMing143/ming-sh/main/tw/ming.sh
 bash -n ming.sh
-shellcheck ming.sh
 less ming.sh
 bash ming.sh
 ```
 
-設定、相容策略、上游依賴與驗證方式請參閱主要 README 與
+設定、ming-sh 命名策略、上游依賴與驗證方式請參閱主要 README 與
 [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)。

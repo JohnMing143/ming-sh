@@ -47,7 +47,6 @@ enabling remote translation.
 | --- | --- | --- |
 | `ming.sh` | Primary monolithic implementation | Runs high-privilege system functions and installs command links at startup |
 | `cn/en/jp/kr/tw/ming.sh` | Localized implementations | Same risk profile as the root implementation |
-| `kejilion.sh` and localized copies | Legacy wrappers | Execute only an adjacent local `ming.sh`; do not download a replacement |
 | `config/project.conf` | Canonical identity, paths, policy, and upstream sources | Sourced as shell code; only trusted local edits should be used |
 | `mc.sh`, `palworld.sh`, `ldnmp.sh`, `hermes_manager.sh` | Standalone feature installers/managers | Perform system writes and execute external tools or installers |
 | `tests/` | Static extraction and smoke harnesses | Use temporary homes and command stubs; the Docker matrix remains an explicit exception |
@@ -66,7 +65,7 @@ enabling remote translation.
 | CMD-008 | High: firewall and network policy can be broadly cleared | `ming.sh:909`, `ming.sh:1190`, `ldnmp.sh:45`, and `auto_cert_renewal-1.sh:45` flush iptables; many menu functions add broad allow rules. | Services may become publicly reachable and existing protection can be lost. | Open. |
 | CMD-009 | High: world-writable permissions are applied recursively | Examples include `ming.sh:15540`, `ming.sh:17273`, `ming.sh:17984`, and `palworld.sh:304`. | Local users or compromised services can modify application data or executable content. | Open. |
 | CMD-010 | High: credentials are stored or displayed in plaintext | Cluster passwords are written to `~/cluster/servers.py`; `PandoraNext/config.json` ships `setup_password: webgptpasswd`; `PandoraNext/tokens.json` includes example password `12345`; several application definitions expose fixed initial passwords. | Secrets may leak through backups, process output, shell history, or permissive files. | Open. The token strings are examples, not verified live credentials. |
-| CMD-011 | High: startup performs persistent installation writes | `ming.sh:175-200` edits shell startup files, copies itself to the user directory and `/usr/local/bin/m`, and creates legacy links including `/usr/bin/k`. | Merely running the main entrypoint changes persistent host state. | Open and prominently documented; not executed during development. |
+| CMD-011 | High: startup performs persistent installation writes | `ming.sh:150-167` edits shell startup files and copies itself to the user directory and `/usr/local/bin/m`. | Merely running the main entrypoint changes persistent host state. | Open and prominently documented; not executed during development. |
 | CMD-012 | High: cron is rewritten in many feature paths | Representative writes occur at `ming.sh:895-896`, `ming.sh:1452-1453`, `ming.sh:7410`, `ming.sh:9646-9651`, `ming.sh:20458-20482`, and `ming.sh:20580-20589`. Some commands originate from interactive input. | Incorrect filters can delete unrelated jobs; arbitrary scheduled commands persist with the user's privileges. | Open. Project auto-update cron creation itself is removed. |
 | CMD-013 | High: dependencies are mutable and usually unpinned | Installers use `latest`, branch heads, short domains, mutable images, and remote application definitions. | A future upstream change can alter behavior without a repository change. | Open. Project-owned and upstream URLs are centralized, but not integrity-pinned. |
 | CMD-014 | High: command aliases can target arbitrary names under system bin directories | `ming.sh:19861-19887` applies a filename allowlist, rejects consecutive dots, and checks both destination paths before creating links. | A crafted or conflicting name could overwrite command paths or create unexpected links. | Resolved on 2026-07-14; existing commands not owned by this project are no longer overwritten. |
@@ -85,7 +84,7 @@ named upstream sources:
 - `UPSTREAM_DOCKER_*`: Docker Compose definitions.
 - `UPSTREAM_APPS_*`: executable third-party application definitions.
 - `UPSTREAM_WEBSITE_SOURCE_*`: site archives and templates.
-- `UPSTREAM_*_IMAGE`: `kjlion` container images needed for compatibility.
+- `UPSTREAM_*_IMAGE`: `kjlion` container images required by upstream-sourced features.
 - `UPSTREAM_PALWORLD_SETTINGS_URL`: a Palworld configuration file that is not
   present in this repository.
 
@@ -100,8 +99,8 @@ pinning risks remain covered by CMD-002, CMD-003, and CMD-013.
 
 The audit found code that writes to all of the following classes of locations:
 
-- Commands: `/usr/local/bin/m`, optional `/usr/bin` links, and legacy `k` paths.
-- User files: `~/ming.sh`, legacy links, shell startup files, application
+- Commands: `/usr/local/bin/m` and an optional project-configured link.
+- User files: `~/ming.sh`, shell startup files, application
   repositories, OpenClaw configuration, SSH data, and cluster credentials.
 - Application data: primarily `/home/docker`, `/home/web`, and `/home/game`.
 - System configuration: `/etc/ssh`, `/etc/sudoers.d`, `/etc/sysctl.d`,
@@ -113,14 +112,15 @@ The audit found code that writes to all of the following classes of locations:
 Centralizing these paths does not make the operations safe; it only makes the
 defaults discoverable and future migration reviewable.
 
-## Compatibility consequences
+## Naming and migration consequences
 
-- `m` is the primary command. `k` remains a compatibility link while
-  `KEEP_LEGACY_K="true"`.
-- Legacy filename wrappers require a neighboring `ming.sh`. Downloading a
-  wrapper alone no longer triggers a network fallback.
-- `KEEP_LEGACY_PATHS="true"` keeps existing optimizer filenames and markers so
-  previous system state remains discoverable.
+- `m` and `ming.sh` are the only default command and entrypoint names.
+- New installations use `99-ming-sh-*.conf` optimizer paths and the
+  `# ming-sh-optimize` marker.
+- Old-brand wrappers, command links, and system-path defaults are no longer
+  created by this repository.
+- Existing old-brand files, links, optimizer configuration, and cron entries
+  are not removed automatically; administrators must review them separately.
 - Persian and Russian implementations and documentation were removed. Calls to
   those paths now fail instead of silently running an outdated script.
 - Project self-update and scheduled auto-update are intentionally unavailable.
@@ -133,7 +133,6 @@ Safe, local checks used for this change:
 
 ```bash
 bash -n <changed shell files>
-shellcheck --shell=bash --severity=error <changed shell files>
 bash tests/tests_project_safety_defaults.sh
 bash tests/tests_command_construction_safety.sh
 bash tests/tests_openclaw_config_path_resolution_smoke.sh
@@ -145,6 +144,10 @@ bash cn/tests/openclaw/tests_openclaw_memory_menu_smoke.sh
 python3 -m py_compile translate.py en/to-en.py jp/to-jp.py kr/to-kr.py tw/to-tw.py
 git diff --check
 ```
+
+ShellCheck is not run on the large monolithic entrypoints because its current
+resource usage can exhaust the development environment. Validation uses Bash
+syntax checks, targeted static searches, regression tests, and diff review.
 
 The OpenClaw smoke tests use repository-local temporary directories and command
 stubs. In particular, the memory auto-setup harness now restricts `PATH` and

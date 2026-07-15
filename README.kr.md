@@ -13,7 +13,6 @@
 ## 기본값
 
 - 기본 명령: `m`
-- 호환 명령: `k`
 - 텔레메트리와 사용 통계: 항상 비활성화
 - 프로젝트 자체 업데이트와 자동 업데이트: 비활성화
 - 진입점: `kr/ming.sh`
@@ -24,10 +23,9 @@
 curl -fL --output ming.sh \
   https://raw.githubusercontent.com/JohnMing143/ming-sh/main/kr/ming.sh
 bash -n ming.sh
-shellcheck ming.sh
 less ming.sh
 bash ming.sh
 ```
 
-설정, 호환성, 업스트림 의존성 및 검증 방법은 기본 README와
+설정, ming-sh 명명 정책, 업스트림 의존성 및 검증 방법은 기본 README와
 [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)를 참조하십시오.

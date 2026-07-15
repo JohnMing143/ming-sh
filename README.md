@@ -17,7 +17,6 @@
 | --- | --- |
 | 项目名 | `ming.sh` |
 | 主命令 | `m` |
-| 兼容命令 | `k` |
 | 仓库 | `JohnMing143/ming-sh` |
 | 主入口 | `ming.sh` |
 | 安装路径 | `/usr/local/bin/m` |
@@ -27,7 +26,7 @@
 | GitHub 代理 | 留空，直接访问 |
 | 波斯语、俄语入口 | 已移除 |
 
-项目身份、仓库地址、安装路径、更新策略、兼容路径和上游依赖统一在
+项目身份、仓库地址、安装路径、更新策略、系统路径和上游依赖统一在
 [`config/project.conf`](config/project.conf) 中维护。独立下载的入口脚本包含相同的
 安全回退值，因此不依赖配置文件也不会重新启用项目自更新。项目源码不包含
 使用统计上报逻辑。
@@ -55,7 +54,6 @@
 curl -fL --output ming.sh \
   https://raw.githubusercontent.com/JohnMing143/ming-sh/main/ming.sh
 bash -n ming.sh
-shellcheck ming.sh
 less ming.sh
 bash ming.sh
 ```
@@ -70,16 +68,14 @@ kr/ming.sh
 tw/ming.sh
 ```
 
-首次运行会部署 `/usr/local/bin/m`。默认兼容策略还会保留 `k` 和旧文件路径，
-便于已有调用逐步迁移。新文档和新自动化应使用 `m`。
+首次运行只部署 `/usr/local/bin/m`，并使用 `/etc/sysctl.d/99-ming-sh-*.conf`
+及 `# ming-sh-optimize` 标记。新文档和自动化统一使用 `m`。
 
 ## 仓库结构
 
 ```text
 ming.sh                         主实现与稳定入口
-kejilion.sh                     仅转发到本地 ming.sh 的兼容入口
 cn|en|jp|kr|tw/ming.sh          保留的语言实现
-cn|en|jp|kr|tw/kejilion.sh      对应的兼容入口
 config/project.conf             项目与上游配置的权威来源
 tests/                          安全回归与 OpenClaw 冒烟测试
 SECURITY_AUDIT.md               高风险命令和安全边界审计
@@ -88,13 +84,13 @@ SECURITY_AUDIT.md               高风险命令和安全边界审计
 大型入口仍是单体 Bash 文件。后续模块化应保持一个稳定入口，并分别拆分配置、
 系统、网络、Docker、站点和应用功能，避免把品牌替换、行为修改和重构混在一起。
 
-## 兼容策略
+## 命名与迁移策略
 
-- `m` 是新的主命令；`k` 作为兼容链接保留。
-- `ming.sh` 是权威实现；旧文件名只在完整仓库或完整发行包中本地转发，不联网补齐。
-- `KEEP_LEGACY_PATHS="true"` 时继续使用既有内核调优文件名和标记，避免遗留配置失联。
-- 旧项目的在线安装地址和自动更新任务不会继续使用。已有机器上的旧 cron 任务需要
-  管理员自行审阅并删除。
+- `m` 是唯一默认命令，`ming.sh` 是唯一项目入口命名。
+- 新安装只创建 ming-sh 命名的脚本、命令、调优文件和标记。
+- 仓库不再提供旧品牌文件名包装器，也不会创建旧命令链接。
+- 已有机器上的旧品牌文件、链接、调优配置和 cron 任务不会被自动删除，需要
+  管理员自行审阅并清理。
 
 ## 上游依赖
 
@@ -110,7 +106,6 @@ Docker 镜像以及 Palworld 配置仍来自上游项目。所有这类地址和
 
 ```bash
 bash -n ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
-shellcheck ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
 bash tests/tests_project_safety_defaults.sh
 bash tests/tests_command_construction_safety.sh
 bash tests/tests_openclaw_config_path_resolution_smoke.sh
@@ -119,6 +114,9 @@ bash tests_openclaw_manager_smoke.sh
 for test_file in tests/openclaw/*.sh; do bash "$test_file"; done
 git diff --check
 ```
+
+当前大型单体入口不运行 ShellCheck；在完成模块化、解决其资源占用问题前，
+使用 `bash -n`、针对性静态检查和回归测试验证。
 
 OpenClaw 测试使用仓库内临时目录和 stub，详见
 [`tests/openclaw/README.md`](tests/openclaw/README.md)。会启动容器并可能拉取镜像的
