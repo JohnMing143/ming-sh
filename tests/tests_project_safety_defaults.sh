@@ -14,10 +14,8 @@ fail() {
 	[ "$PROJECT_NAME" = "ming.sh" ] || fail "unexpected project name"
 	[ "$PROJECT_COMMAND" = "m" ] || fail "unexpected primary command"
 	[ "$PROJECT_REPO" = "JohnMing143/ming-sh" ] || fail "unexpected repository"
-	[ "$ENABLE_TELEMETRY" = "false" ] || fail "telemetry must default to false"
 	[ "$ENABLE_SELF_UPDATE" = "false" ] || fail "self-update must default to false"
 	[ "$ENABLE_AUTO_UPDATE" = "false" ] || fail "automatic update must default to false"
-	[ -z "$TELEMETRY_ENDPOINT" ] || fail "telemetry endpoint must be empty"
 	[ -z "$PROJECT_UPDATE_URL" ] || fail "update URL must be empty"
 	[ "$KEEP_LEGACY_K" = "true" ] || fail "legacy k command must remain enabled"
 )
@@ -35,11 +33,13 @@ for script in "${implementations[@]}"; do
 	[ -f "$script" ] || fail "missing implementation: $script"
 	bash -n "$script"
 
-	stats_body=$(awk '/^send_stats\(\) \{/{found=1} found{print} found && /^}/{exit}' "$script")
-	printf '%s\n' "$stats_body" | grep -Fq 'return 0' || fail "send_stats is not a no-op: $script"
-	if printf '%s\n' "$stats_body" | grep -Eq 'curl|wget|urllib|http'; then
-		fail "send_stats contains a network operation: $script"
+	if grep -Eq 'send_stats|send_stat\(|ENABLE_(TELEMETRY|STATS)|TELEMETRY_ENDPOINT' "$script"; then
+		fail "removed project telemetry code returned: $script"
 	fi
+	if grep -Fq 'SYNAPSE_REPORT_STATS=yes' "$script"; then
+		fail "Matrix/Synapse statistics reporting is enabled: $script"
+	fi
+	grep -Fq 'SYNAPSE_REPORT_STATS=no' "$script" || fail "Matrix/Synapse reporting opt-out is missing: $script"
 
 	update_body=$(awk '/^project_update\(\) \{/{found=1} found{print} found && /^}/{exit}' "$script")
 	if printf '%s\n' "$update_body" | grep -Eq 'curl|wget|crontab|git (pull|fetch)'; then
@@ -47,7 +47,7 @@ for script in "${implementations[@]}"; do
 	fi
 done
 
-if grep -R -E 'api\.kejilion\.pro|SH_Update_task|ENABLE_STATS="true"' "${implementations[@]}"; then
+if grep -R -E 'api\.kejilion\.pro|SH_Update_task' "${implementations[@]}"; then
 	fail "deprecated telemetry or updater code remains"
 fi
 if grep -R -i -E '科技[[:space:]]*lion|tech(nology)?[[:space:]]*lion' "${implementations[@]}"; then

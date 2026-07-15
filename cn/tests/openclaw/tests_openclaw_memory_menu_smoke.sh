@@ -18,7 +18,6 @@ cat > "$WORKDIR/harness.sh" <<'EOF_INNER'
 #!/usr/bin/env bash
 set -euo pipefail
 break_end() { return 0; }
-send_stats() { return 0; }
 gh_proxy="https://"
 stat() {
   if [ "$(uname -s)" = "Darwin" ] && [ "${1:-}" = "-c" ] && [ "${2:-}" = "%y" ]; then

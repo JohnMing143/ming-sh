@@ -17,7 +17,6 @@ cat > "$WORKDIR/harness.sh" <<'EOF_INNER'
 #!/usr/bin/env bash
 set -euo pipefail
 break_end() { return 0; }
-send_stats() { return 0; }
 stat() {
   if [ "$(uname -s)" = "Darwin" ] && [ "${1:-}" = "-c" ] && [ "${2:-}" = "%y" ]; then
     printf '%s\n' '2026-01-01 00:00:00.000000000 +0000'

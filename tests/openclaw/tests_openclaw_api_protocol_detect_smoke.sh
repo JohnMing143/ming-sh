@@ -18,7 +18,6 @@ cat > "$WORKDIR/harness.sh" <<'EOF_INNER'
 #!/usr/bin/env bash
 set -euo pipefail
 break_end() { return 0; }
-send_stats() { return 0; }
 start_gateway() { return 0; }
 install() { return 0; }
 openclaw_get_config_file() { printf '%s\n' "$HOME/.openclaw/openclaw.json"; }

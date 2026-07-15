@@ -34,7 +34,7 @@ def translate_text(text):
 
 def translate_line_preserving_variables(line):
     """
-    Translate only Chinese parts in echo/read/send_stats commands, excluding shell variables
+    Translate only Chinese parts in echo/read commands, excluding shell variables
     """
     # Match double or single quoted strings
     def repl(match):
@@ -76,7 +76,7 @@ def translate_file(input_file, output_file):
                 else:
                     f_out.write(line)
 
-            elif any(cmd in stripped for cmd in ['echo', 'read', 'send_stats']) and is_chinese(stripped):
+            elif any(cmd in stripped for cmd in ['echo', 'read']) and is_chinese(stripped):
                 translated_line = translate_line_preserving_variables(line)
                 f_out.write(translated_line)
 

@@ -38,7 +38,6 @@ cat > "$WORKDIR/harness.sh" <<'EOF'
 set -euo pipefail
 install() { return 0; }
 break_end() { :; }
-send_stats() { :; }
 openclaw_get_config_file() { printf '%s\n' "$HOME/.openclaw/openclaw.json"; }
 gh_proxy=""
 : "${OPENCLAW_TEST_WEB_CONF_DIR:?}"

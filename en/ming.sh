@@ -55,7 +55,6 @@ else
 fi
 ENABLE_SELF_UPDATE="${ENABLE_SELF_UPDATE:-false}"
 ENABLE_AUTO_UPDATE="${ENABLE_AUTO_UPDATE:-false}"
-ENABLE_TELEMETRY="${ENABLE_TELEMETRY:-false}"
 PROJECT_UPDATE_URL="${PROJECT_UPDATE_URL:-}"
 PROJECT_UPDATE_LOG_URL="${PROJECT_UPDATE_LOG_URL:-}"
 PROJECT_WEBSITE_URL="${PROJECT_WEBSITE_URL:-}"
@@ -119,7 +118,6 @@ gl_kjlan='\033[96m'
 
 canshu="default"
 permission_granted="false"
-ENABLE_STATS="false"
 
 
 quanju_canshu() {
@@ -173,12 +171,6 @@ CheckFirstRun_true() {
 
 
 
-# Telemetry is permanently disabled. Calls are retained as local no-ops so
-# feature control flow and translated call sites keep their existing behavior.
-send_stats() {
-	return 0
-}
-
 for shell_rc in "$HOME/.bashrc" "$HOME/.profile" "$HOME/.bash_profile"; do
 	sed -i "/^alias ${PROJECT_COMMAND}=/d" "$shell_rc" > /dev/null 2>&1
 	if [ "$KEEP_LEGACY_K" = "true" ]; then
@@ -227,11 +219,9 @@ UserLicenseAgreement() {
 
 
 	if [ "$user_input" = "y" ] || [ "$user_input" = "Y" ]; then
-		send_stats "License agreement"
 		sed -i 's/^permission_granted="false"/permission_granted="true"/' "$PROJECT_HOME_PATH"
 		sed -i 's/^permission_granted="false"/permission_granted="true"/' "$PROJECT_INSTALL_PATH"
 	else
-		send_stats "permission denied"
 		clear
 		exit
 	fi
@@ -331,7 +321,6 @@ check_disk_space() {
 		echo "Current available space: $((available_space_mb/1024))G"
 		echo "Minimum required space:${required_gb}G"
 		echo "The installation cannot continue. Please clear the disk space and try again."
-		send_stats "Not enough disk space"
 		break_end
 		return_to_main_menu
 	fi
@@ -574,7 +563,6 @@ install_docker() {
 docker_ps() {
 while true; do
 	clear
-	send_stats "Docker container management"
 	echo "Docker container list"
 	docker ps -a --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Ports}}"
 	echo ""
@@ -597,7 +585,6 @@ while true; do
 	read -e -p "Please enter your choice:" sub_choice
 	case $sub_choice in
 		1)
-			send_stats "Create a new container"
 			read -e -p "Please enter the create command:" dockername
 			local -a docker_command=()
 			read -r -a docker_command <<< "$dockername"
@@ -610,35 +597,28 @@ while true; do
 			fi
 			;;
 		2)
-			send_stats "Start the specified container"
 			read -e -p "Please enter the container name (please separate multiple container names with spaces):" dockername
 			docker start $dockername
 			;;
 		3)
-			send_stats "Stop specified container"
 			read -e -p "Please enter the container name (please separate multiple container names with spaces):" dockername
 			docker stop $dockername
 			;;
 		4)
-			send_stats "Delete the specified container"
 			read -e -p "Please enter the container name (please separate multiple container names with spaces):" dockername
 			docker rm -f $dockername
 			;;
 		5)
-			send_stats "Restart the specified container"
 			read -e -p "Please enter the container name (please separate multiple container names with spaces):" dockername
 			docker restart $dockername
 			;;
 		6)
-			send_stats "Start all containers"
 			docker start $(docker ps -a -q)
 			;;
 		7)
-			send_stats "Stop all containers"
 			docker stop $(docker ps -q)
 			;;
 		8)
-			send_stats "Delete all containers"
 			read -e -p "$(echo -e "${gl_hong}注意: ${gl_bai}确定删除所有容器吗？(Y/N): ")" choice
 			case "$choice" in
 			  [Yy])
@@ -652,23 +632,19 @@ while true; do
 			esac
 			;;
 		9)
-			send_stats "Restart all containers"
 			docker restart $(docker ps -q)
 			;;
 		11)
-			send_stats "Enter the container"
 			read -e -p "Please enter the container name:" dockername
 			docker exec -it $dockername /bin/sh
 			break_end
 			;;
 		12)
-			send_stats "View container logs"
 			read -e -p "Please enter the container name:" dockername
 			docker logs $dockername
 			break_end
 			;;
 		13)
-			send_stats "View container network"
 			echo ""
 			container_ids=$(docker ps -q)
 			echo "------------------------------------------------------------"
@@ -686,13 +662,11 @@ while true; do
 			break_end
 			;;
 		14)
-			send_stats "View container occupancy"
 			docker stats --no-stream
 			break_end
 			;;
 
 		15)
-			send_stats "Allow container port access"
 			read -e -p "Please enter the container name:" docker_name
 			ip_address
 			clear_container_rules "$docker_name" "$ipv4_address"
@@ -702,7 +676,6 @@ while true; do
 			;;
 
 		16)
-			send_stats "Block container port access"
 			read -e -p "Please enter the container name:" docker_name
 			ip_address
 			block_container_port "$docker_name" "$ipv4_address"
@@ -722,7 +695,6 @@ done
 docker_image() {
 while true; do
 	clear
-	send_stats "Docker image management"
 	echo "Docker image list"
 	docker image ls
 	echo ""
@@ -736,7 +708,6 @@ while true; do
 	read -e -p "Please enter your choice:" sub_choice
 	case $sub_choice in
 		1)
-			send_stats "Pull image"
 			read -e -p "Please enter the image name (please separate multiple image names with spaces):" imagenames
 			for name in $imagenames; do
 				echo -e "${gl_kjlan}Obtaining image:$name${gl_bai}"
@@ -744,7 +715,6 @@ while true; do
 			done
 			;;
 		2)
-			send_stats "Update image"
 			read -e -p "Please enter the image name (please separate multiple image names with spaces):" imagenames
 			for name in $imagenames; do
 				echo -e "${gl_kjlan}Updating image:$name${gl_bai}"
@@ -752,14 +722,12 @@ while true; do
 			done
 			;;
 		3)
-			send_stats "Delete image"
 			read -e -p "Please enter the image name (please separate multiple image names with spaces):" imagenames
 			for name in $imagenames; do
 				docker rmi -f $name
 			done
 			;;
 		4)
-			send_stats "Delete all images"
 			read -e -p "$(echo -e "${gl_hong}注意: ${gl_bai}确定删除所有镜像吗？(Y/N): ")" choice
 			case "$choice" in
 			  [Yy])
@@ -975,7 +943,6 @@ open_port() {
 	done
 
 	save_iptables_rules
-	send_stats "Port opened"
 }
 
 
@@ -1013,7 +980,6 @@ close_port() {
 	iptables -I FORWARD 1 -i lo -j ACCEPT
 
 	save_iptables_rules
-	send_stats "Port closed"
 }
 
 
@@ -1038,7 +1004,6 @@ allow_ip() {
 	done
 
 	save_iptables_rules
-	send_stats "Released IP"
 }
 
 block_ip() {
@@ -1062,7 +1027,6 @@ block_ip() {
 	done
 
 	save_iptables_rules
-	send_stats "IP blocked"
 }
 
 
@@ -1082,7 +1046,6 @@ enable_ddos_defense() {
 	iptables -A INPUT -p udp -m limit --limit 3000/s -j ACCEPT
 	iptables -A INPUT -p udp -j DROP
 
-	send_stats "Turn on DDoS defense"
 }
 
 # Turn off DDoS defense
@@ -1097,7 +1060,6 @@ disable_ddos_defense() {
 	iptables -D INPUT -p udp -m limit --limit 3000/s -j ACCEPT 2>/dev/null
 	iptables -D INPUT -p udp -j DROP 2>/dev/null
 
-	send_stats "Turn off DDoS defense"
 }
 
 
@@ -1192,7 +1154,6 @@ iptables_panel() {
   while true; do
 		  clear
 		  echo "Advanced firewall management"
-		  send_stats "Advanced firewall management"
 		  echo "------------------------"
 		  iptables -L INPUT
 		  echo ""
@@ -1218,12 +1179,10 @@ iptables_panel() {
 			  1)
 				  read -e -p "Please enter the open port number:" o_port
 				  open_port $o_port
-				  send_stats "Open specified port"
 				  ;;
 			  2)
 				  read -e -p "Please enter the closed port number:" c_port
 				  close_port $c_port
-				  send_stats "Close specified port"
 				  ;;
 			  3)
 				  # Open all ports
@@ -1239,7 +1198,6 @@ iptables_panel() {
 				  iptables -A FORWARD -i lo -j ACCEPT
 				  iptables -A INPUT -p tcp --dport $current_port -j ACCEPT
 				  iptables-save > /etc/iptables/rules.v4
-				  send_stats "Open all ports"
 				  ;;
 			  4)
 				  # Close all ports
@@ -1255,7 +1213,6 @@ iptables_panel() {
 				  iptables -A FORWARD -i lo -j ACCEPT
 				  iptables -A INPUT -p tcp --dport $current_port -j ACCEPT
 				  iptables-save > /etc/iptables/rules.v4
-				  send_stats "Close all ports"
 				  ;;
 
 			  5)
@@ -1274,21 +1231,18 @@ iptables_panel() {
 				  iptables -D INPUT -s $d_ip -j ACCEPT 2>/dev/null
 				  iptables -D INPUT -s $d_ip -j DROP 2>/dev/null
 				  iptables-save > /etc/iptables/rules.v4
-				  send_stats "Clear specified IP"
 				  ;;
 			  11)
 				  # Allow PING
 				  iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
 				  iptables -A OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT
 				  iptables-save > /etc/iptables/rules.v4
-				  send_stats "Allow PING"
 				  ;;
 			  12)
 				  # Disable PING
 				  iptables -D INPUT -p icmp --icmp-type echo-request -j ACCEPT 2>/dev/null
 				  iptables -D OUTPUT -p icmp --icmp-type echo-reply -j ACCEPT 2>/dev/null
 				  iptables-save > /etc/iptables/rules.v4
-				  send_stats "Disable PING"
 				  ;;
 			  13)
 				  enable_ddos_defense
@@ -1300,18 +1254,15 @@ iptables_panel() {
 			  15)
 				  read -e -p "Please enter the blocked country code (multiple country codes can be separated by spaces, such as CN US JP):" country_code
 				  manage_country_rules block $country_code
-				  send_stats "allow countries$country_codeIP"
 				  ;;
 			  16)
 				  read -e -p "Please enter the allowed country codes (multiple country codes can be separated by spaces, such as CN US JP):" country_code
 				  manage_country_rules allow $country_code
-				  send_stats "block country$country_codeIP"
 				  ;;
 
 			  17)
 				  read -e -p "Please enter the cleared country code (multiple country codes can be separated by spaces, such as CN US JP):" country_code
 				  manage_country_rules unblock $country_code
-				  send_stats "clear country$country_codeIP"
 				  ;;
 
 			  *)
@@ -1487,7 +1438,6 @@ prefer_ipv4() {
 grep -q '^precedence ::ffff:0:0/96  100' /etc/gai.conf 2>/dev/null \
 	|| echo 'precedence ::ffff:0:0/96  100' >> /etc/gai.conf
 echo "Switched to IPv4 priority"
-send_stats "Switched to IPv4 priority"
 }
 
 
@@ -1640,9 +1590,8 @@ certs_status() {
 
 	local file_path="/etc/letsencrypt/live/$yuming/fullchain.pem"
 	if [ -f "$file_path" ]; then
-		send_stats "Domain name certificate application successful"
+		:
 	else
-		send_stats "Domain name certificate application failed"
 		echo -e "${gl_hong}Notice:${gl_bai}Certificate application failed, please check the following possible reasons and try again:"
 		echo -e "1. Domain name is spelled incorrectly ➠ Please check whether the domain name is entered correctly"
 		echo -e "2. DNS resolution problem ➠ Confirm that the domain name has been correctly resolved to the server IP"
@@ -1656,7 +1605,6 @@ certs_status() {
 		read -e -p "Please enter your choice:" sub_choice
 		case $sub_choice in
 	  	  1)
-	  	  	send_stats "Reapply"
 		  	echo "Please try deploying again$webname"
 		  	add_yuming
 		  	install_ssltls
@@ -1664,7 +1612,6 @@ certs_status() {
 
 	  		  ;;
 	  	  2)
-	  	  	send_stats "Import existing certificate"
 
 			# Define file path
 			local cert_file="/home/web/certs/${yuming}_cert.pem"
@@ -1720,7 +1667,6 @@ certs_status() {
 
 repeat_add_yuming() {
 if [ -e /home/web/conf.d/$yuming.conf ]; then
-  send_stats "Domain name reuse"
   web_del "${yuming}" > /dev/null 2>&1
 fi
 
@@ -1809,7 +1755,6 @@ nginx_upgrade() {
   docker exec nginx chown -R nginx:nginx /var/cache/nginx/fastcgi
   docker restart $ldnmp_pods > /dev/null 2>&1
 
-  send_stats "renew$ldnmp_pods"
   echo "renew${ldnmp_pods}Finish"
 
 }
@@ -1833,7 +1778,6 @@ phpmyadmin_upgrade() {
   echo "username:$dbuse"
   echo "password:$dbusepasswd"
   echo
-  send_stats "start up$ldnmp_pods"
 }
 
 
@@ -1879,7 +1823,6 @@ cf_purge_cache() {
 
 
 web_cache() {
-  send_stats "Clear site cache"
   cf_purge_cache
   cd /home/web && docker compose restart
 }
@@ -1888,7 +1831,6 @@ web_cache() {
 
 web_del() {
 
-	send_stats "Delete site data"
 	yuming_list="${1:-}"
 	if [ -z "$yuming_list" ]; then
 		read -e -p "To delete site data, please enter your domain name (separate multiple domain names with spaces):" yuming_list
@@ -2212,7 +2154,6 @@ nginx_gzip() {
 
 
 web_security() {
-	  send_stats "LDNMP environment defense"
 	  while true; do
 		check_f2b_status
 		check_waf_status
@@ -2317,7 +2258,6 @@ web_security() {
 					  ;;
 
 				  21)
-					  send_stats "cloudflare mode"
 					  echo "Go to my profile in the upper right corner of the cf backend, select the API token on the left, and get the Global API Key"
 					  echo "https://dash.cloudflare.com/login"
 					  read -e -p "Enter CF’s account number:" cfuser
@@ -2340,7 +2280,6 @@ web_security() {
 					  ;;
 
 				  22)
-					  send_stats "High load enables 5 seconds shield"
 					  echo -e "${gl_huang}The website automatically detects every 5 minutes. When it detects high load, it will automatically open the shield, and when it detects low load, it will automatically close the shield for 5 seconds.${gl_bai}"
 					  echo "--------------"
 					  echo "Get CF parameters:"
@@ -2377,13 +2316,11 @@ web_security() {
 				  31)
 					  nginx_waf on
 					  echo "Site WAF is enabled"
-					  send_stats "Site WAF is enabled"
 					  ;;
 
 				  32)
 				  	  nginx_waf off
 					  echo "Site WAF is down"
-					  send_stats "Site WAF is down"
 					  ;;
 
 				  33)
@@ -2455,7 +2392,6 @@ web_optimization() {
 		  	  check_ldnmp_mode
 			  check_nginx_compression
 			  clear
-			  send_stats "Optimize LDNMP environment"
 			  echo -e "Optimize LDNMP environment${gl_lv}${mode_info}${gzip_status}${br_status}${zstd_status}${gl_bai}"
 			  echo "------------------------"
 			  echo "1. Standard mode 2. High performance mode (2H4G or above recommended)"
@@ -2469,7 +2405,6 @@ web_optimization() {
 			  read -e -p "Please enter your choice:" sub_choice
 			  case $sub_choice in
 				  1)
-				  send_stats "site standards mode"
 
 				  local cpu_cores=$(nproc)
 				  local connections=$((1024 * ${cpu_cores}))
@@ -2510,7 +2445,6 @@ web_optimization() {
 
 					  ;;
 				  2)
-				  send_stats "Site high performance mode"
 
 				  # nginx tuning
 				  local cpu_cores=$(nproc)
@@ -2549,27 +2483,21 @@ web_optimization() {
 
 					  ;;
 				  3)
-				  send_stats "nginx_gzip on"
 				  nginx_gzip on
 					  ;;
 				  4)
-				  send_stats "nginx_gzip off"
 				  nginx_gzip off
 					  ;;
 				  5)
-				  send_stats "nginx_br on"
 				  nginx_br on
 					  ;;
 				  6)
-				  send_stats "nginx_br off"
 				  nginx_br off
 					  ;;
 				  7)
-				  send_stats "nginx_zstd on"
 				  nginx_zstd on
 					  ;;
 				  8)
-				  send_stats "nginx_zstd off"
 				  nginx_zstd off
 					  ;;
 				  *)
@@ -2963,7 +2891,6 @@ grep -qxF "${app_id}" /home/docker/appno.txt || echo "${app_id}" >> /home/docker
 
 
 docker_app() {
-send_stats "${docker_name}manage"
 
 while true; do
 	clear
@@ -3001,7 +2928,6 @@ while true; do
 
 				if ss -tuln | grep -q ":$app_port "; then
 					echo -e "${gl_hong}mistake:${gl_bai}port$app_portAlready occupied, please change a port"
-					send_stats "Application port is occupied"
 				else
 					local docker_port=$app_port
 					break
@@ -3021,7 +2947,6 @@ while true; do
 			echo ""
 			$docker_use
 			$docker_passwd
-			send_stats "Install$docker_name"
 			;;
 		2)
 			docker rm -f "$docker_name"
@@ -3036,7 +2961,6 @@ while true; do
 			echo ""
 			$docker_use
 			$docker_passwd
-			send_stats "renew$docker_name"
 			;;
 		3)
 			docker rm -f "$docker_name"
@@ -3046,12 +2970,10 @@ while true; do
 
 			sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
 			echo "App uninstalled"
-			send_stats "uninstall$docker_name"
 			;;
 
 		5)
 			echo "${docker_name}Domain name access settings"
-			send_stats "${docker_name}Domain name access settings"
 			add_yuming
 			ldnmp_Proxy ${yuming} 127.0.0.1 ${docker_port}
 			block_container_port "$docker_name" "$ipv4_address"
@@ -3063,12 +2985,10 @@ while true; do
 			;;
 
 		7)
-			send_stats "Allow IP access${docker_name}"
 			clear_container_rules "$docker_name" "$ipv4_address"
 			;;
 
 		8)
-			send_stats "Block IP access${docker_name}"
 			block_container_port "$docker_name" "$ipv4_address"
 			;;
 
@@ -3086,7 +3006,6 @@ done
 
 
 docker_app_plus() {
-	send_stats "$app_name"
 	while true; do
 		clear
 		check_docker_app
@@ -3125,7 +3044,6 @@ docker_app_plus() {
 
 					if ss -tuln | grep -q ":$app_port "; then
 						echo -e "${gl_hong}mistake:${gl_bai}port$app_portAlready occupied, please change a port"
-						send_stats "Application port is occupied"
 					else
 						local docker_port=$app_port
 						break
@@ -3138,13 +3056,11 @@ docker_app_plus() {
 				echo "$docker_port" > "/home/docker/${docker_name}_port.conf"
 
 				add_app_id
-				send_stats "$app_nameInstall"
 				;;
 
 			2)
 				docker_app_update
 				add_app_id
-				send_stats "$app_namerenew"
 				;;
 
 			3)
@@ -3152,12 +3068,10 @@ docker_app_plus() {
 				rm -f /home/docker/${docker_name}_port.conf
 
 				sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
-				send_stats "$app_nameuninstall"
 				;;
 
 			5)
 				echo "${docker_name}Domain name access settings"
-				send_stats "${docker_name}Domain name access settings"
 				add_yuming
 				ldnmp_Proxy ${yuming} 127.0.0.1 ${docker_port}
 				local docker_check_name="${docker_app_service:-$docker_name}"
@@ -3169,11 +3083,9 @@ docker_app_plus() {
 				web_del
 				;;
 			7)
-				send_stats "Allow IP access${docker_name}"
 				clear_container_rules "$docker_name" "$ipv4_address"
 				;;
 			8)
-				send_stats "Block IP access${docker_name}"
 				local docker_check_name="${docker_app_service:-$docker_name}"
 				block_container_port "$docker_check_name" "$ipv4_address"
 				;;
@@ -3454,7 +3366,6 @@ ldnmp_install_status_one() {
 
    if docker inspect "php" &>/dev/null; then
 	clear
-	send_stats "Unable to install LDNMP environment again"
 	echo -e "${gl_huang}hint:${gl_bai}The website building environment has been installed. No need to install again!"
 	break_end
 	linux_ldnmp
@@ -3465,7 +3376,6 @@ ldnmp_install_status_one() {
 
 ldnmp_install_all() {
 cd ~
-send_stats "Install LDNMP environment"
 root_use
 clear
 echo -e "${gl_huang}The LDNMP environment is not installed. Start installing the LDNMP environment...${gl_bai}"
@@ -3481,7 +3391,6 @@ install_ldnmp
 
 nginx_install_all() {
 cd ~
-send_stats "Install nginx environment"
 root_use
 clear
 echo -e "${gl_huang}nginx is not installed, start installing nginx environment...${gl_bai}"
@@ -3505,7 +3414,6 @@ echo ""
 ldnmp_install_status() {
 
 	if ! docker inspect "php" &>/dev/null; then
-		send_stats "Please install the LDNMP environment first"
 		ldnmp_install_all
 	fi
 
@@ -3515,7 +3423,6 @@ ldnmp_install_status() {
 nginx_install_status() {
 
 	if ! docker inspect "nginx" &>/dev/null; then
-		send_stats "Please install nginx environment first"
 		nginx_install_all
 	fi
 
@@ -3558,7 +3465,6 @@ ldnmp_wp() {
   # wordpress
   webname="WordPress"
   yuming="${1:-}"
-  send_stats "Install$webname"
   echo "Start deployment$webname"
   if [ -z "$yuming" ]; then
 	add_yuming
@@ -3606,7 +3512,6 @@ ldnmp_Proxy() {
 	reverseproxy="${2:-}"
 	port="${3:-}"
 
-	send_stats "Install$webname"
 	echo "Start deployment$webname"
 	if [ -z "$yuming" ]; then
 		add_yuming
@@ -3659,7 +3564,6 @@ ldnmp_Proxy_backend() {
 	clear
 	webname="Reverse proxy-load balancing"
 
-	send_stats "Install$webname"
 	echo "Start deployment$webname"
 	if [ -z "$yuming" ]; then
 		add_yuming
@@ -3751,7 +3655,6 @@ list_stream_services() {
 
 
 stream_panel() {
-	send_stats "Stream four-layer proxy"
 	local app_id="104"
 	local docker_name="nginx"
 
@@ -3778,20 +3681,17 @@ stream_panel() {
 			1)
 				nginx_install_status
 				add_app_id
-				send_stats "Install Stream four-layer agent"
 				;;
 			2)
 				update_docker_compose_with_db_creds
 				nginx_upgrade
 				add_app_id
-				send_stats "Update Stream four-layer proxy"
 				;;
 			3)
 				read -e -p "Are you sure you want to delete the nginx container? This may affect website functionality! (y/N):" confirm
 				if [[ "$confirm" =~ ^[Yy]$ ]]; then
 					docker rm -f nginx
 					sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
-					send_stats "Update Stream four-layer proxy"
 					echo "nginx container has been deleted."
 				else
 					echo "The operation has been cancelled."
@@ -3802,22 +3702,17 @@ stream_panel() {
 			4)
 				ldnmp_Proxy_backend_stream
 				add_app_id
-				send_stats "Add layer 4 proxy"
 				;;
 			5)
-				send_stats "Edit forwarding configuration"
 				read -e -p "Please enter the service name you want to edit:" stream_name
 				install nano
 				nano /home/web/stream.d/$stream_name.conf
 				docker restart nginx
-				send_stats "Modify layer 4 proxy"
 				;;
 			6)
-				send_stats "Delete forwarding configuration"
 				read -e -p "Please enter the service name you want to delete:" stream_name
 				rm /home/web/stream.d/$stream_name.conf > /dev/null 2>&1
 				docker restart nginx
-				send_stats "Delete layer 4 proxy"
 				;;
 			*)
 				break
@@ -3833,7 +3728,6 @@ ldnmp_Proxy_backend_stream() {
 	clear
 	webname="Stream four-layer proxy-load balancing"
 
-	send_stats "Install$webname"
 	echo "Start deployment$webname"
 
 	# Get agent name
@@ -3920,7 +3814,6 @@ ldnmp_web_status() {
 		local db_output="${gl_lv}${db_count}${gl_bai}"
 
 		clear
-		send_stats "LDNMP site management"
 		echo "LDNMP environment"
 		echo "------------------------"
 		ldnmp_v
@@ -3984,7 +3877,6 @@ ldnmp_web_status() {
 		read -e -p "Please enter your choice:" sub_choice
 		case $sub_choice in
 			1)
-				send_stats "Apply for a domain name certificate"
 				read -e -p "Please enter your domain name:" yuming
 				install_certbot
 				docker run --rm -v /etc/letsencrypt/:/etc/letsencrypt certbot/certbot delete --cert-name "$yuming" -n 2>/dev/null
@@ -3994,7 +3886,6 @@ ldnmp_web_status() {
 				;;
 
 			2)
-				send_stats "Clone site domain name"
 				read -e -p "Please enter the old domain name:" oddyuming
 				read -e -p "Please enter new domain name:" yuming
 				install_certbot
@@ -4034,7 +3925,6 @@ ldnmp_web_status() {
 				web_cache
 				;;
 			4)
-				send_stats "Create associated sites"
 				echo -e "Associate a new domain name with the existing site for access"
 				read -e -p "Please enter an existing domain name:" oddyuming
 				read -e -p "Please enter new domain name:" yuming
@@ -4051,24 +3941,20 @@ ldnmp_web_status() {
 
 				;;
 			5)
-				send_stats "View access log"
 				tail -n 200 /home/web/log/nginx/access.log
 				break_end
 				;;
 			6)
-				send_stats "View error log"
 				tail -n 200 /home/web/log/nginx/error.log
 				break_end
 				;;
 			7)
-				send_stats "Edit global configuration"
 				install nano
 				nano /home/web/nginx.conf
 				docker exec nginx nginx -s reload
 				;;
 
 			8)
-				send_stats "Edit site configuration"
 				read -e -p "To edit site configuration, please enter the domain name you want to edit:" yuming
 				install nano
 				nano /home/web/conf.d/$yuming.conf
@@ -4079,7 +3965,6 @@ ldnmp_web_status() {
 				break_end
 				;;
 			10)
-				send_stats "View site data"
 				install goaccess
 				goaccess --log-format=COMBINED /home/web/log/nginx/access.log
 				;;
@@ -4110,7 +3995,6 @@ fi
 
 
 install_panel() {
-send_stats "${panelname}manage"
 while true; do
 	clear
 	check_panel_app
@@ -4133,20 +4017,17 @@ while true; do
 			panel_app_install
 
 			add_app_id
-			send_stats "${panelname}Install"
 			;;
 		2)
 			panel_app_manage
 
 			add_app_id
-			send_stats "${panelname}control"
 
 			;;
 		3)
 			panel_app_uninstall
 
 			sed -i "/\b${app_id}\b/d" /home/docker/appno.txt
-			send_stats "${panelname}uninstall"
 			;;
 		*)
 			break
@@ -4190,7 +4071,6 @@ donlond_frp() {
 
 generate_frps_config() {
 
-	send_stats "Install frp server"
 	# Generate random ports and credentials
 	local bind_port=8055
 	local dashboard_port=8056
@@ -4232,7 +4112,6 @@ EOF
 
 
 configure_frpc() {
-	send_stats "Install frp client"
 	read -e -p "Please enter the external network docking IP:" server_addr
 	read -e -p "Please enter the external network docking token:" token
 	echo
@@ -4254,7 +4133,6 @@ EOF
 }
 
 add_forwarding_service() {
-	send_stats "Add frp intranet service"
 	# Prompts user for service name and forwarding information
 	read -e -p "Please enter service name:" service_name
 	read -e -p "Please enter the forwarding type (tcp/udp) [Enter to default to tcp]:" service_type
@@ -4286,7 +4164,6 @@ EOF
 
 
 delete_forwarding_service() {
-	send_stats "Delete frp intranet service"
 	# Prompt the user to enter the name of the service that needs to be deleted
 	read -e -p "Please enter the service name to be deleted:" service_name
 	# Use sed to delete the service and its related configuration
@@ -4443,7 +4320,6 @@ frps_main_ports() {
 
 
 frps_panel() {
-	send_stats "FRP server"
 	local app_id="55"
 	local docker_name="frps"
 	local docker_port=8056
@@ -4502,7 +4378,6 @@ frps_panel() {
 				;;
 			5)
 				echo "Reverse intranet penetration service into domain name access"
-				send_stats "FRP external domain name access"
 				add_yuming
 				read -e -p "Please enter your intranet penetration service port:" frps_port
 				ldnmp_Proxy ${yuming} 127.0.0.1 ${frps_port}
@@ -4514,20 +4389,17 @@ frps_panel() {
 				;;
 
 			7)
-				send_stats "Allow IP access"
 				read -e -p "Please enter the port that needs to be released:" frps_port
 				clear_host_port_rules "$frps_port" "$ipv4_address"
 				;;
 
 			8)
-				send_stats "Block IP access"
 				echo "If you have reversed domain name access, you can use this function to block IP+port access, which is safer."
 				read -e -p "Please enter the port to be blocked:" frps_port
 				block_host_port "$frps_port" "$ipv4_address"
 				;;
 
 			00)
-				send_stats "Refresh FRP service status"
 				echo "FRP service status has been refreshed"
 				;;
 
@@ -4541,7 +4413,6 @@ frps_panel() {
 
 
 frpc_panel() {
-	send_stats "FRP client"
 	local app_id="56"
 	local docker_name="frpc"
 	local docker_port=8055
@@ -4641,7 +4512,6 @@ yt_menu_pro() {
 		fi
 
 		clear
-		send_stats "yt-dlp download tool"
 		echo -e "yt-dlp $YTDLP_STATUS"
 		echo -e "yt-dlp is a powerful video download tool that supports thousands of sites such as YouTube, Bilibili, Twitter, etc."
 		echo -e "Official website address:${gh_https_url}github.com/yt-dlp/yt-dlp"
@@ -4660,7 +4530,6 @@ yt_menu_pro() {
 
 		case $choice in
 			1)
-				send_stats "Installing yt-dlp..."
 				echo "Installing yt-dlp..."
 				install ffmpeg
 				curl -L ${gh_https_url}github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
@@ -4670,7 +4539,6 @@ yt_menu_pro() {
 				echo "The installation is complete. Press any key to continue..."
 				read ;;
 			2)
-				send_stats "Updating yt-dlp..."
 				echo "Updating yt-dlp..."
 				yt-dlp -U
 
@@ -4678,7 +4546,6 @@ yt_menu_pro() {
 				echo "Update completed. Press any key to continue..."
 				read ;;
 			3)
-				send_stats "Uninstalling yt-dlp..."
 				echo "Uninstalling yt-dlp..."
 				rm -f /usr/local/bin/yt-dlp
 
@@ -4686,7 +4553,6 @@ yt_menu_pro() {
 				echo "Uninstallation completed. Press any key to continue..."
 				read ;;
 			5)
-				send_stats "Single video download"
 				read -e -p "Please enter video link:" url
 				yt-dlp -P "$VIDEO_DIR" -f "bv*+ba/b" --merge-output-format mp4 \
 					--write-subs --sub-langs all \
@@ -4696,7 +4562,6 @@ yt_menu_pro() {
 					--no-overwrites --no-post-overwrites "$url"
 				read -e -p "Download completed, press any key to continue..." ;;
 			6)
-				send_stats "Batch video download"
 				install nano
 				if [ ! -f "$URL_FILE" ]; then
 				  echo -e "# Enter multiple video link addresses\n# https://www.bilibili.com/bangumi/play/ep733316?spm_id_from=333.337.0.0&from_spmid=666.25.episode.0" > "$URL_FILE"
@@ -4712,7 +4577,6 @@ yt_menu_pro() {
 					--no-overwrites --no-post-overwrites
 				read -e -p "Batch download completed, press any key to continue..." ;;
 			7)
-				send_stats "Custom video download"
 				read -e -p "Please enter the complete yt-dlp parameters (excluding yt-dlp):" custom
 				yt-dlp -P "$VIDEO_DIR" $custom \
 					--write-subs --sub-langs all \
@@ -4722,7 +4586,6 @@ yt_menu_pro() {
 					--no-overwrites --no-post-overwrites
 				read -e -p "Execution completed, press any key to continue..." ;;
 			8)
-				send_stats "MP3 download"
 				read -e -p "Please enter video link:" url
 				yt-dlp -P "$VIDEO_DIR" -x --audio-format mp3 \
 					--write-subs --sub-langs all \
@@ -4733,7 +4596,6 @@ yt_menu_pro() {
 				read -e -p "Audio download complete, press any key to continue..." ;;
 
 			9)
-				send_stats "Delete video"
 				read -e -p "Please enter the name of the deleted video:" rmdir
 				rm -rf "$VIDEO_DIR/$rmdir"
 				;;
@@ -4929,7 +4791,6 @@ chattr +i /etc/resolv.conf
 
 set_dns_ui() {
 root_use
-send_stats "Optimize DNS"
 while true; do
 	clear
 	echo "Optimize DNS address"
@@ -4956,7 +4817,6 @@ while true; do
 		local dns1_ipv6="2606:4700:4700::1111"
 		local dns2_ipv6="2001:4860:4860::8888"
 		set_dns
-		send_stats "Foreign DNS optimization"
 		;;
 	  2)
 		local dns1_ipv4="223.5.5.5"
@@ -4964,14 +4824,12 @@ while true; do
 		local dns1_ipv6="2400:3200::1"
 		local dns2_ipv6="2400:da00::6666"
 		set_dns
-		send_stats "Domestic DNS optimization"
 		;;
 	  3)
 		install nano
 		chattr -i /etc/resolv.conf
 		nano /etc/resolv.conf
 		chattr +i /etc/resolv.conf
-		send_stats "Manually edit DNS configuration"
 		;;
 	  *)
 		break
@@ -5229,7 +5087,6 @@ fetch_github_ssh_keys() {
 
 sshkey_panel() {
   root_use
-  send_stats "User key login"
   while true; do
 	  clear
 	  local REAL_STATUS=$(grep -i "^PubkeyAuthentication" /etc/ssh/sshd_config | tr '[:upper:]' '[:lower:]')
@@ -5251,36 +5108,30 @@ sshkey_panel() {
 	  read -e -p "Please enter your choice:" host_dns
 	  case $host_dns in
 		  1)
-	  		send_stats "Generate new key"
 	  		add_sshkey
 			break_end
 			  ;;
 		  2)
-			send_stats "Import existing public key"
 			import_sshkey
 			break_end
 			  ;;
 		  3)
-			send_stats "Import GitHub remote public key"
 			fetch_github_ssh_keys
 			break_end
 			  ;;
 		  4)
-			send_stats "Import URL remote public key"
 			read -e -p "Please enter your remote public key URL:" keys_url
 			fetch_remote_ssh_keys "${keys_url}"
 			break_end
 			  ;;
 
 		  5)
-			send_stats "Edit public key file"
 			install nano
 			nano ${HOME}/.ssh/authorized_keys
 			break_end
 			  ;;
 
 		  6)
-			send_stats "View local key"
 			echo "------------------------"
 			echo "Public key information"
 			cat ${HOME}/.ssh/authorized_keys
@@ -5307,7 +5158,6 @@ sshkey_panel() {
 add_sshpasswd() {
 
 	root_use
-	send_stats "Set password login mode"
 	echo "Set password login mode"
 
 	local target_user="$1"
@@ -5370,7 +5220,6 @@ clear
 
 
 dd_xitong() {
-		send_stats "Reinstall the system"
 		dd_xitong_MollyLau() {
 			wget --no-check-certificate -qO InstallNET.sh "${gh_proxy}raw.githubusercontent.com/leitbogioro/Tools/master/Linux_reinstall/InstallNET.sh" && chmod a+x InstallNET.sh
 
@@ -5448,7 +5297,6 @@ dd_xitong() {
 
 
 			  1)
-				send_stats "Reinstall debian 13"
 				dd_xitong_3
 				bash reinstall.sh debian 13
 				reboot
@@ -5456,49 +5304,42 @@ dd_xitong() {
 				;;
 
 			  2)
-				send_stats "Reinstall debian 12"
 				dd_xitong_3
 				bash reinstall.sh debian 12
 				reboot
 				exit
 				;;
 			  3)
-				send_stats "Reinstall debian 11"
 				dd_xitong_3
 				bash reinstall.sh debian 11
 				reboot
 				exit
 				;;
 			  4)
-				send_stats "Reinstall debian 10"
 				dd_xitong_3
 				bash reinstall.sh debian 10
 				reboot
 				exit
 				;;
 			  11)
-				send_stats "Reinstall ubuntu 26.04"
 				dd_xitong_3
 				bash reinstall.sh ubuntu 26.04
 				reboot
 				exit
 				;;
 			  12)
-				send_stats "Reinstall ubuntu 24.04"
 				dd_xitong_3
 				bash reinstall.sh ubuntu 24.04
 				reboot
 				exit
 				;;
 			  13)
-				send_stats "Reinstall ubuntu 22.04"
 				dd_xitong_3
 				bash reinstall.sh ubuntu 22.04
 				reboot
 				exit
 				;;
 			  14)
-				send_stats "Reinstall ubuntu 20.04"
 				dd_xitong_3
 				bash reinstall.sh ubuntu 20.04
 				reboot
@@ -5506,7 +5347,6 @@ dd_xitong() {
 				;;
 
 			  21)
-				send_stats "Reinstall rockylinux10"
 				dd_xitong_3
 				bash reinstall.sh rocky
 				reboot
@@ -5514,7 +5354,6 @@ dd_xitong() {
 				;;
 
 			  22)
-				send_stats "Reinstall rockylinux9"
 				dd_xitong_3
 				bash reinstall.sh rocky 9
 				reboot
@@ -5522,7 +5361,6 @@ dd_xitong() {
 				;;
 
 			  23)
-				send_stats "Reinstall alma10"
 				dd_xitong_3
 				bash reinstall.sh almalinux
 				reboot
@@ -5530,7 +5368,6 @@ dd_xitong() {
 				;;
 
 			  24)
-				send_stats "Reinstall alma9"
 				dd_xitong_3
 				bash reinstall.sh almalinux 9
 				reboot
@@ -5538,7 +5375,6 @@ dd_xitong() {
 				;;
 
 			  25)
-				send_stats "Reinstall oracle10"
 				dd_xitong_3
 				bash reinstall.sh oracle
 				reboot
@@ -5546,7 +5382,6 @@ dd_xitong() {
 				;;
 
 			  26)
-				send_stats "Reinstall oracle9"
 				dd_xitong_3
 				bash reinstall.sh oracle 9
 				reboot
@@ -5554,7 +5389,6 @@ dd_xitong() {
 				;;
 
 			  27)
-				send_stats "Reinstall fedora44"
 				dd_xitong_3
 				bash reinstall.sh fedora 44
 				reboot
@@ -5562,7 +5396,6 @@ dd_xitong() {
 				;;
 
 			  28)
-				send_stats "Reinstall fedora43"
 				dd_xitong_3
 				bash reinstall.sh fedora 43
 				reboot
@@ -5570,7 +5403,6 @@ dd_xitong() {
 				;;
 
 			  29)
-				send_stats "Reinstall centos10"
 				dd_xitong_3
 				bash reinstall.sh centos 10
 				reboot
@@ -5578,7 +5410,6 @@ dd_xitong() {
 				;;
 
 			  30)
-				send_stats "Reinstall centos9"
 				dd_xitong_3
 				bash reinstall.sh centos 9
 				reboot
@@ -5586,7 +5417,6 @@ dd_xitong() {
 				;;
 
 			  31)
-				send_stats "Reinstall alpine"
 				dd_xitong_1
 				bash InstallNET.sh -alpine
 				reboot
@@ -5594,7 +5424,6 @@ dd_xitong() {
 				;;
 
 			  32)
-				send_stats "Reinstall arch"
 				dd_xitong_3
 				bash reinstall.sh arch
 				reboot
@@ -5602,7 +5431,6 @@ dd_xitong() {
 				;;
 
 			  33)
-				send_stats "Reinstall kali"
 				dd_xitong_3
 				bash reinstall.sh kali
 				reboot
@@ -5610,7 +5438,6 @@ dd_xitong() {
 				;;
 
 			  34)
-				send_stats "Reinstall openeuler"
 				dd_xitong_3
 				bash reinstall.sh openeuler
 				reboot
@@ -5618,7 +5445,6 @@ dd_xitong() {
 				;;
 
 			  35)
-				send_stats "Reinstall opensuse"
 				dd_xitong_3
 				bash reinstall.sh opensuse
 				reboot
@@ -5626,7 +5452,6 @@ dd_xitong() {
 				;;
 
 			  36)
-				send_stats "Reinstall Feiniu"
 				dd_xitong_3
 				bash reinstall.sh fnos
 				reboot
@@ -5634,7 +5459,6 @@ dd_xitong() {
 				;;
 
 			  41)
-				send_stats "Reinstall windows 11"
 				dd_xitong_2
 				bash InstallNET.sh -windows 11 -lang "cn"
 				reboot
@@ -5643,14 +5467,12 @@ dd_xitong() {
 
 			  42)
 				dd_xitong_2
-				send_stats "Reinstall Windows 10"
 				bash InstallNET.sh -windows 10 -lang "cn"
 				reboot
 				exit
 				;;
 
 			  43)
-				send_stats "Reinstall windows7"
 				dd_xitong_4
 				bash reinstall.sh windows --iso="https://archive.org/download/en_windows_7_professional_with_sp1_x64_dvd_u_676939_201906/en_windows_7_professional_with_sp1_x64_dvd_u_676939.iso" --image-name='windows 7 professional'
 				reboot
@@ -5658,7 +5480,6 @@ dd_xitong() {
 				;;
 
 			  44)
-				send_stats "Reinstall windows server 25"
 				dd_xitong_2
 				bash InstallNET.sh -windows 2025 -lang "cn"
 				reboot
@@ -5666,7 +5487,6 @@ dd_xitong() {
 				;;
 
 			  45)
-				send_stats "Reinstall windows server 22"
 				dd_xitong_2
 				bash InstallNET.sh -windows 2022 -lang "cn"
 				reboot
@@ -5674,7 +5494,6 @@ dd_xitong() {
 				;;
 
 			  46)
-				send_stats "Reinstall windows server 19"
 				dd_xitong_2
 				bash InstallNET.sh -windows 2019 -lang "cn"
 				reboot
@@ -5682,7 +5501,6 @@ dd_xitong() {
 				;;
 
 			  47)
-				send_stats "Reinstall windows11 ARM"
 				dd_xitong_4
 				bash reinstall.sh dd --img https://r2.hotdog.eu.org/win11-arm-with-pagefile-15g.xz
 				reboot
@@ -5699,7 +5517,6 @@ dd_xitong() {
 
 bbrv3() {
 		  root_use
-		  send_stats "bbrv3 management"
 
 		  xanmod_add_repo() {
 				local keyring="/usr/share/keyrings/xanmod-archive-keyring.gpg"
@@ -5958,7 +5775,6 @@ elrepo_install() {
 
 elrepo() {
 		  root_use
-		  send_stats "Red Hat Kernel Management"
 		  if uname -r | grep -q 'elrepo'; then
 			while true; do
 				  clear
@@ -5980,7 +5796,6 @@ elrepo() {
 						dnf remove -y elrepo-release
 						rpm -qa | grep elrepo | grep kernel | xargs rpm -e --nodeps
 						elrepo_install
-						send_stats "Update Red Hat Kernel"
 						server_reboot
 
 						  ;;
@@ -5988,7 +5803,6 @@ elrepo() {
 						dnf remove -y elrepo-release
 						rpm -qa | grep elrepo | grep kernel | xargs rpm -e --nodeps
 						echo "The elrepo kernel has been uninstalled. Take effect after restart"
-						send_stats "Uninstall Red Hat Kernel"
 						server_reboot
 
 						  ;;
@@ -6013,7 +5827,6 @@ elrepo() {
 			[Yy])
 			  check_swap
 			  elrepo_install
-			  send_stats "Upgrade Red Hat kernel"
 			  server_reboot
 			  ;;
 			[Nn])
@@ -6084,7 +5897,6 @@ clamav_scan() {
 
 clamav() {
 		  root_use
-		  send_stats "Virus scan management"
 		  while true; do
 				clear
 				echo "clamav virus scanning tool"
@@ -6100,7 +5912,6 @@ clamav() {
 				read -e -p "Please enter your choice:" sub_choice
 				case $sub_choice in
 					1)
-					  send_stats "Full scan"
 					  install_docker
 					  docker volume create clam_db > /dev/null 2>&1
 					  clamav_freshclam
@@ -6109,7 +5920,6 @@ clamav() {
 
 						;;
 					2)
-					  send_stats "Important directory scan"
 					  install_docker
 					  docker volume create clam_db > /dev/null 2>&1
 					  clamav_freshclam
@@ -6117,7 +5927,6 @@ clamav() {
 					  break_end
 						;;
 					3)
-					  send_stats "Custom directory scan"
 					  read -e -p "Please enter the directories to scan, separated by spaces (for example: /etc /var /usr /home /root):" directories
 					  install_docker
 					  clamav_freshclam
@@ -6482,7 +6291,6 @@ Kernel_optimize() {
 	root_use
 	while true; do
 	  clear
-	  send_stats "Linux kernel tuning management"
 	  local current_mode=$(grep "^# Mode:" "$ACTIVE_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# mode: //' | awk -F'|' '{print $1}' | xargs)
 	  [ -z "$current_mode" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode="Automatic tuning mode"
 	  echo "Linux system kernel parameter optimization"
@@ -6513,45 +6321,38 @@ Kernel_optimize() {
 			  clear
 			  local tiaoyou_moshi="High performance optimization mode"
 			  optimize_high_performance
-			  send_stats "High performance mode optimization"
 			  ;;
 		  2)
 			  cd ~
 			  clear
 			  optimize_balanced
-			  send_stats "Balanced mode optimization"
 			  ;;
 		  3)
 			  cd ~
 			  clear
 			  optimize_web_server
-			  send_stats "Website optimization model"
 			  ;;
 		  4)
 			  cd ~
 			  clear
 			  _kernel_optimize_core "Live broadcast optimization mode" "stream"
-			  send_stats "Live streaming optimization"
 			  ;;
 		  5)
 			  cd ~
 			  clear
 			  _kernel_optimize_core "Game server optimization mode" "game"
-			  send_stats "Game server optimization"
 			  ;;
 		  6)
 			  cd ~
 			  clear
 			  restore_defaults
 			  curl -sS ${PROJECT_DOWNLOAD_BASE}/network-optimize.sh -o /tmp/network-optimize.sh && source /tmp/network-optimize.sh && restore_network_defaults
-			  send_stats "Restore default settings"
 			  ;;
 
 		  7)
 			  cd ~
 			  clear
 			  curl -sS ${PROJECT_DOWNLOAD_BASE}/network-optimize.sh | bash
-			  send_stats "Kernel automatic tuning"
 			  ;;
 
 		  *)
@@ -6610,7 +6411,6 @@ update_locale() {
 
 linux_language() {
 root_use
-send_stats "Switch system language"
 while true; do
   clear
   echo "Current system language:$LANG"
@@ -6624,15 +6424,12 @@ while true; do
   case $choice in
 	  1)
 		  update_locale "en_US.UTF-8" "en_US.UTF-8"
-		  send_stats "switch to english"
 		  ;;
 	  2)
 		  update_locale "zh_CN.UTF-8" "zh_CN.UTF-8"
-		  send_stats "Switch to Simplified Chinese"
 		  ;;
 	  3)
 		  update_locale "zh_TW.UTF-8" "zh_TW.UTF-8"
-		  send_stats "Switch to Traditional Chinese"
 		  ;;
 	  *)
 		  break
@@ -6665,7 +6462,6 @@ break_end
 
 shell_bianse() {
   root_use
-  send_stats "Command line beautification tool"
   while true; do
 	clear
 	echo "Command line beautification tool"
@@ -6725,7 +6521,6 @@ shell_bianse() {
 
 linux_trash() {
   root_use
-  send_stats "System Recycle Bin"
 
   local bashrc_profile="/root/.bashrc"
   local TRASH_DIR="$HOME/.local/share/Trash/files"
@@ -6793,13 +6588,11 @@ linux_trash() {
 }
 
 linux_fav() {
-send_stats "Command Favorites"
 bash <(curl -l -s ${gh_proxy}raw.githubusercontent.com/byJoey/cmdbox/refs/heads/main/install.sh)
 }
 
 # Create backup
 create_backup() {
-	send_stats "Create backup"
 	local TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 
 	# Prompt user for backup directory
@@ -6857,7 +6650,6 @@ create_backup() {
 
 # Restore backup
 restore_backup() {
-	send_stats "Restore backup"
 	# Select the backup to restore
 	read -e -p "Please enter the backup file name to be restored:" BACKUP_NAME
 
@@ -6886,7 +6678,6 @@ list_backups() {
 
 # Delete backup
 delete_backup() {
-	send_stats "Delete backup"
 
 	read -e -p "Please enter the backup file name to be deleted:" BACKUP_NAME
 
@@ -6913,7 +6704,6 @@ linux_backup() {
 	mkdir -p "$BACKUP_DIR"
 	while true; do
 		clear
-		send_stats "System backup function"
 		echo "System backup function"
 		echo "------------------------"
 		list_backups
@@ -7110,7 +6900,6 @@ list_connections() {
 
 # Add new connection
 add_connection() {
-	send_stats "Add new connection"
 	echo "Example of creating a new connection:"
 	echo "- Connection name: my_server"
 	echo "- IP address: 192.168.1.100"
@@ -7132,7 +6921,6 @@ add_connection() {
 
 # Delete connection
 delete_connection() {
-	send_stats "Delete connection"
 	read -e -p "Please enter the connection number to be deleted:" num
 
 	local connection=$(sed -n "${num}p" "$CONFIG_FILE")
@@ -7154,7 +6942,6 @@ delete_connection() {
 
 # Use connection
 use_connection() {
-	send_stats "Use connection"
 	read -e -p "Please enter the connection number to use:" num
 
 	local connection=$(sed -n "${num}p" "$CONFIG_FILE")
@@ -7196,7 +6983,6 @@ use_connection() {
 
 
 ssh_manager() {
-	send_stats "ssh remote connection tool"
 
 	CONFIG_FILE="$HOME/.ssh_connections"
 	KEY_DIR="$HOME/.ssh/ssh_manager_keys"
@@ -7252,7 +7038,6 @@ list_partitions() {
 
 # Persistently mounted partition
 mount_partition() {
-	send_stats "Mount partition"
 	read -e -p "Please enter the name of the partition to be mounted (e.g. sda1):" PARTITION
 
 	DEVICE="/dev/$PARTITION"
@@ -7311,7 +7096,6 @@ mount_partition() {
 
 # Unmount partition
 unmount_partition() {
-	send_stats "Unmount partition"
 	read -e -p "Please enter the name of the partition to be unmounted (e.g. sda1):" PARTITION
 
 	# Check whether the partition is mounted
@@ -7340,7 +7124,6 @@ list_mounted_partitions() {
 
 # Format partition
 format_partition() {
-	send_stats "Format partition"
 	read -e -p "Please enter the name of the partition to be formatted (e.g. sda1):" PARTITION
 
 	# Check if the partition exists
@@ -7391,7 +7174,6 @@ format_partition() {
 
 # Check partition status
 check_partition() {
-	send_stats "Check partition status"
 	read -e -p "Please enter the partition name to check (for example sda1):" PARTITION
 
 	# Check if the partition exists
@@ -7407,7 +7189,6 @@ check_partition() {
 
 # Main menu
 disk_manager() {
-	send_stats "Hard disk management function"
 	while true; do
 		clear
 		echo "Hard disk partition management"
@@ -7446,7 +7227,6 @@ list_tasks() {
 
 # Add new task
 add_task() {
-	send_stats "Add new sync task"
 	echo "Example of creating a new sync task:"
 	echo "- Task name: backup_www"
 	echo "- Local directory: /var/www"
@@ -7495,7 +7275,6 @@ add_task() {
 
 # Delete task
 delete_task() {
-	send_stats "Delete sync task"
 	read -e -p "Please enter the task number to be deleted:" num
 
 	local task=$(sed -n "${num}p" "$CONFIG_FILE")
@@ -7517,7 +7296,6 @@ delete_task() {
 
 
 run_task() {
-	send_stats "Perform synchronization tasks"
 
 	CONFIG_FILE="$HOME/.rsync_tasks"
 	CRON_FILE="$HOME/.rsync_cron"
@@ -7598,7 +7376,6 @@ run_task() {
 
 # Create a scheduled task
 schedule_task() {
-	send_stats "Add synchronization scheduled tasks"
 
 	read -e -p "Please enter the task number to be synchronized regularly:" num
 	if ! [[ "$num" =~ ^[0-9]+$ ]]; then
@@ -7644,7 +7421,6 @@ view_tasks() {
 
 # Delete scheduled tasks
 delete_task_schedule() {
-	send_stats "Delete synchronization scheduled tasks"
 	read -e -p "Please enter the task number to be deleted:" num
 	if ! [[ "$num" =~ ^[0-9]+$ ]]; then
 		echo "Error: Please enter a valid task number!"
@@ -7705,7 +7481,6 @@ linux_info() {
 
 	clear
 	echo -e "${gl_kjlan}Querying system information...${gl_bai}"
-	send_stats "System information query"
 
 	ip_address
 
@@ -7805,7 +7580,6 @@ linux_tools() {
 
   while true; do
 	  clear
-	  # send_stats "Basic Tools"
 	  echo -e "basic tools"
 
 	  tools=(
@@ -7891,7 +7665,6 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  curl --help
-			  send_stats "Install curl"
 			  ;;
 		  2)
 			  clear
@@ -7899,7 +7672,6 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  wget --help
-			  send_stats "Install wget"
 			  ;;
 			3)
 			  clear
@@ -7907,7 +7679,6 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  sudo --help
-			  send_stats "install sudo"
 			  ;;
 			4)
 			  clear
@@ -7915,21 +7686,18 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  socat -h
-			  send_stats "Install socat"
 			  ;;
 			5)
 			  clear
 			  install htop
 			  clear
 			  htop
-			  send_stats "Install htop"
 			  ;;
 			6)
 			  clear
 			  install iftop
 			  clear
 			  iftop
-			  send_stats "Install iftop"
 			  ;;
 			7)
 			  clear
@@ -7937,7 +7705,6 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  unzip
-			  send_stats "installunzip"
 			  ;;
 			8)
 			  clear
@@ -7945,7 +7712,6 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  tar --help
-			  send_stats "Install tar"
 			  ;;
 			9)
 			  clear
@@ -7953,7 +7719,6 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  tmux --help
-			  send_stats "Install tmux"
 			  ;;
 			10)
 			  clear
@@ -7961,7 +7726,6 @@ linux_tools() {
 			  clear
 			  echo "The tool has been installed and is used as follows:"
 			  ffmpeg --help
-			  send_stats "Install ffmpeg"
 			  ;;
 
 			11)
@@ -7969,7 +7733,6 @@ linux_tools() {
 			  install btop
 			  clear
 			  btop
-			  send_stats "Install btop"
 			  ;;
 			12)
 			  clear
@@ -7978,7 +7741,6 @@ linux_tools() {
 			  clear
 			  ranger
 			  cd ~
-			  send_stats "Install ranger"
 			  ;;
 			13)
 			  clear
@@ -7987,7 +7749,6 @@ linux_tools() {
 			  clear
 			  ncdu
 			  cd ~
-			  send_stats "Install ncdu"
 			  ;;
 			14)
 			  clear
@@ -7996,7 +7757,6 @@ linux_tools() {
 			  clear
 			  fzf
 			  cd ~
-			  send_stats "Install fzf"
 			  ;;
 			15)
 			  clear
@@ -8005,7 +7765,6 @@ linux_tools() {
 			  clear
 			  vim -h
 			  cd ~
-			  send_stats "Install vim"
 			  ;;
 			16)
 			  clear
@@ -8014,7 +7773,6 @@ linux_tools() {
 			  clear
 			  nano -h
 			  cd ~
-			  send_stats "Install nano"
 			  ;;
 
 
@@ -8025,7 +7783,6 @@ linux_tools() {
 			  clear
 			  git --help
 			  cd ~
-			  send_stats "Install git"
 			  ;;
 
 			18)
@@ -8035,7 +7792,6 @@ linux_tools() {
 			  source ~/.bashrc
 			  source ~/.profile
 			  opencode
-			  send_stats "Install opencode"
 			  ;;
 
 
@@ -8044,28 +7800,24 @@ linux_tools() {
 			  install cmatrix
 			  clear
 			  cmatrix
-			  send_stats "Install cmatrix"
 			  ;;
 			22)
 			  clear
 			  install sl
 			  clear
 			  sl
-			  send_stats "Install sl"
 			  ;;
 			26)
 			  clear
 			  install bastet
 			  clear
 			  bastet
-			  send_stats "Install bastet"
 			  ;;
 			27)
 			  clear
 			  install nsnake
 			  clear
 			  nsnake
-			  send_stats "Install nsnake"
 			  ;;
 
 			28)
@@ -8073,25 +7825,21 @@ linux_tools() {
 			  install ninvaders
 			  clear
 			  ninvaders
-			  send_stats "Install ninvaders"
 			  ;;
 
 		  31)
 			  clear
-			  send_stats "Install all"
 			  install curl wget sudo socat htop iftop unzip tar tmux ffmpeg btop ranger ncdu fzf cmatrix sl bastet nsnake ninvaders vim nano git
 			  ;;
 
 		  32)
 			  clear
-			  send_stats "Install all (excluding games and screensavers)"
 			  install curl wget sudo socat htop iftop unzip tar tmux ffmpeg btop ranger ncdu fzf vim nano git
 			  ;;
 
 
 		  33)
 			  clear
-			  send_stats "Uninstall all"
 			  remove htop iftop tmux ffmpeg btop ranger ncdu fzf cmatrix sl bastet nsnake ninvaders vim nano git
 			  opencode uninstall
 			  rm -rf ~/.opencode
@@ -8101,13 +7849,11 @@ linux_tools() {
 			  clear
 			  read -e -p "Please enter the installed tool name (wget curl sudo htop):" installname
 			  install $installname
-			  send_stats "Install specified software"
 			  ;;
 		  42)
 			  clear
 			  read -e -p "Please enter the uninstalled tool name (htop ufw tmux cmatrix):" removename
 			  remove $removename
-			  send_stats "Uninstall specified software"
 			  ;;
 
 		  0)
@@ -8129,7 +7875,6 @@ linux_tools() {
 
 linux_bbr() {
 	clear
-	send_stats "bbr management"
 	if [ -f "/etc/alpine-release" ]; then
 		while true; do
 			  clear
@@ -8149,7 +7894,6 @@ linux_bbr() {
 			  case $sub_choice in
 				  1)
 					bbr_on
-					send_stats "alpine opens bbr3"
 					  ;;
 				  2)
 					sed -i '/net.ipv4.tcp_congestion_control=/d' /etc/sysctl.conf
@@ -8195,7 +7939,6 @@ docker_ssh_migration() {
 	# backup
 	# ----------------------------
 	backup_docker() {
-		send_stats "Docker backup"
 
 		echo -e "${gl_kjlan}Backing up Docker containers...${gl_bai}"
 		docker ps --format '{{.Names}}'
@@ -8315,7 +8058,6 @@ docker_ssh_migration() {
 	# ----------------------------
 	restore_docker() {
 
-		send_stats "Docker restore"
 		read -e -p  "Please enter the backup directory to be restored:" BACKUP_DIR
 		[[ ! -d "$BACKUP_DIR" ]] && { echo -e "${gl_hong}The backup directory does not exist${gl_bai}"; return; }
 
@@ -8434,7 +8176,6 @@ docker_ssh_migration() {
 	# migrate
 	# ----------------------------
 	migrate_docker() {
-		send_stats "Docker migration"
 		install jq
 		read -e -p  "Please enter the backup directory to be migrated:" BACKUP_DIR
 		[[ ! -d "$BACKUP_DIR" ]] && { echo -e "${gl_hong}The backup directory does not exist${gl_bai}"; return; }
@@ -8458,7 +8199,6 @@ docker_ssh_migration() {
 	# Delete backup
 	# ----------------------------
 	delete_backup() {
-		send_stats "Docker backup file deletion"
 		read -e -p  "Please enter the backup directory to be deleted:" BACKUP_DIR
 		[[ ! -d "$BACKUP_DIR" ]] && { echo -e "${gl_hong}The backup directory does not exist${gl_bai}"; return; }
 		rm -rf "$BACKUP_DIR"
@@ -8469,7 +8209,6 @@ docker_ssh_migration() {
 	# Main menu
 	# ----------------------------
 	main_menu() {
-		send_stats "Docker backup migration restore"
 		while true; do
 			clear
 			echo "------------------------"
@@ -8509,7 +8248,6 @@ linux_docker() {
 
 	while true; do
 	  clear
-	  # send_stats "docker management"
 	  echo -e "Docker management"
 	  docker_tato
 	  echo -e "${gl_kjlan}------------------------"
@@ -8540,7 +8278,6 @@ linux_docker() {
 	  case $sub_choice in
 		  1)
 			clear
-			send_stats "Install docker environment"
 			install_add_docker
 
 			  ;;
@@ -8551,7 +8288,6 @@ linux_docker() {
 			  local network_count=$(docker network ls -q 2>/dev/null | wc -l)
 			  local volume_count=$(docker volume ls -q 2>/dev/null | wc -l)
 
-			  send_stats "docker global status"
 			  echo "Docker version"
 			  docker -v
 			  docker compose version
@@ -8581,7 +8317,6 @@ linux_docker() {
 		  5)
 			  while true; do
 				  clear
-				  send_stats "Docker network management"
 				  echo "Docker network list"
 				  echo "------------------------------------------------------------"
 				  docker network ls
@@ -8619,12 +8354,10 @@ linux_docker() {
 
 				  case $sub_choice in
 					  1)
-						  send_stats "Create network"
 						  read -e -p "Set new network name:" dockernetwork
 						  docker network create $dockernetwork
 						  ;;
 					  2)
-						  send_stats "Join the network"
 						  read -e -p "Add network name:" dockernetwork
 						  read -e -p "Which containers join the network (please separate multiple container names with spaces):" dockernames
 
@@ -8633,7 +8366,6 @@ linux_docker() {
 						  done
 						  ;;
 					  3)
-						  send_stats "Join the network"
 						  read -e -p "Exit network name:" dockernetwork
 						  read -e -p "Those containers exit the network (please separate multiple container names with spaces):" dockernames
 
@@ -8644,7 +8376,6 @@ linux_docker() {
 						  ;;
 
 					  4)
-						  send_stats "delete network"
 						  read -e -p "Please enter the network name to be deleted:" dockernetwork
 						  docker network rm $dockernetwork
 						  ;;
@@ -8659,7 +8390,6 @@ linux_docker() {
 		  6)
 			  while true; do
 				  clear
-				  send_stats "Docker volume management"
 				  echo "Docker volume list"
 				  docker volume ls
 				  echo ""
@@ -8675,7 +8405,6 @@ linux_docker() {
 
 				  case $sub_choice in
 					  1)
-						  send_stats "Create new volume"
 						  read -e -p "Set new volume name:" dockerjuan
 						  docker volume create $dockerjuan
 
@@ -8690,7 +8419,6 @@ linux_docker() {
 						  ;;
 
 					   3)
-						  send_stats "Delete all volumes"
 						  read -e -p "$(echo -e "${gl_hong}注意: ${gl_bai}确定删除所有未使用的卷吗？(Y/N): ")" choice
 						  case "$choice" in
 							[Yy])
@@ -8712,7 +8440,6 @@ linux_docker() {
 			  ;;
 		  7)
 			  clear
-			  send_stats "Docker cleanup"
 			  read -e -p "$(echo -e "${gl_huang}提示: ${gl_bai}将清理无用的镜像容器网络，包括停止的容器，确定清理吗？(Y/N): ")" choice
 			  case "$choice" in
 				[Yy])
@@ -8727,7 +8454,6 @@ linux_docker() {
 			  ;;
 		  8)
 			  clear
-			  send_stats "Docker source"
 			  bash <(curl -sSL https://linuxmirrors.cn/docker.sh)
 			  ;;
 
@@ -8743,13 +8469,11 @@ linux_docker() {
 
 		  11)
 			  clear
-			  send_stats "Docker v6 on"
 			  docker_ipv6_on
 			  ;;
 
 		  12)
 			  clear
-			  send_stats "Docker v6 Close"
 			  docker_ipv6_off
 			  ;;
 
@@ -8760,7 +8484,6 @@ linux_docker() {
 
 		  20)
 			  clear
-			  send_stats "Docker uninstall"
 			  read -e -p "$(echo -e "${gl_hong}注意: ${gl_bai}确定卸载docker环境吗？(Y/N): ")" choice
 			  case "$choice" in
 				[Yy])
@@ -8798,7 +8521,6 @@ linux_test() {
 
 	while true; do
 	  clear
-	  # send_stats "Test script collection"
 	  echo -e "Test script collection"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}IP and unlock status detection"
@@ -8837,52 +8559,43 @@ linux_test() {
 	  case $sub_choice in
 		  1)
 			  clear
-			  send_stats "ChatGPT unlock status detection"
 			  bash <(curl -Ls https://cdn.jsdelivr.net/gh/missuo/OpenAI-Checker/openai.sh)
 			  ;;
 		  2)
 			  clear
-			  send_stats "Region streaming media unlock test"
 			  bash <(curl -L -s check.unlock.media)
 			  ;;
 		  3)
 			  clear
-			  send_stats "yeahwu streaming media unlock detection"
 			  install wget
 			  wget -qO- ${gh_proxy}github.com/yeahwu/check/raw/main/check.sh | bash
 			  ;;
 		  4)
 			  clear
-			  send_stats "xykt_IP quality check script"
 			  bash <(curl -Ls IP.Check.Place)
 			  ;;
 
 
 		  11)
 			  clear
-			  send_stats "besttrace triple network backhaul delay routing test"
 			  install wget
 			  wget -qO- git.io/besttrace | bash
 			  ;;
 		  12)
 			  clear
-			  send_stats "mtr_trace triple network backhaul line test"
 			  curl ${gh_proxy}raw.githubusercontent.com/zhucaidan/mtr_trace/main/mtr_trace.sh | bash
 			  ;;
 		  13)
 			  clear
-			  send_stats "Superspeed triple network speed test"
 			  bash <(curl -Lso- https://git.io/superspeed_uxh)
 			  ;;
 		  14)
 			  clear
-			  send_stats "nxtrace fast backhaul test script"
 			  curl nxtrace.org/nt |bash
 			  nexttrace --fast-trace --tcp
 			  ;;
 		  15)
 			  clear
-			  send_stats "nxtrace specifies IP backhaul test script"
 			  echo "Reference IP list"
 			  echo "------------------------"
 			  echo "Beijing Telecom: 219.141.136.12"
@@ -8909,54 +8622,45 @@ linux_test() {
 
 		  16)
 			  clear
-			  send_stats "ludashi2020 three network line test"
 			  curl ${gh_proxy}raw.githubusercontent.com/ludashi2020/backtrace/main/install.sh -sSf | sh
 			  ;;
 
 		  17)
 			  clear
-			  send_stats "i-abc multifunctional speed test script"
 			  bash <(curl -sL ${gh_proxy}raw.githubusercontent.com/i-abc/Speedtest/main/speedtest.sh)
 			  ;;
 
 		  18)
 			  clear
-			  send_stats "Network quality test script"
 			  bash <(curl -sL Net.Check.Place)
 			  ;;
 
 		  19)
 			  clear
-			  send_stats "TcpQuality TCP retransmission detection script"
 			  bash <(curl -sL https://raw.githubusercontent.com/ibsgss/TcpQuality/main/runTcpQuality.sh)
 			  ;;
 
 		  21)
 			  clear
-			  send_stats "yabs performance test"
 			  check_swap
 			  curl -sL yabs.sh | bash -s -- -i -5
 			  ;;
 		  22)
 			  clear
-			  send_stats "icu/gb5 CPU performance test script"
 			  check_swap
 			  bash <(curl -sL bash.icu/gb5)
 			  ;;
 
 		  31)
 			  clear
-			  send_stats "bench performance test"
 			  curl -Lso- bench.sh | bash
 			  ;;
 		  32)
-			  send_stats "spiritysdx fusion monster review"
 			  clear
 			  curl -L ${gh_proxy}github.com/spiritLHLS/ecs/raw/main/ecs.sh -o ecs.sh && chmod +x ecs.sh && bash ecs.sh
 			  ;;
 
 		  33)
-			  send_stats "nodequality fusion monster evaluation"
 			  clear
 			  bash <(curl -sL https://run.NodeQuality.com)
 			  ;;
@@ -8984,7 +8688,6 @@ linux_Oracle() {
 
 	 while true; do
 	  clear
-	  send_stats "Oracle Cloud Script Collection"
 	  echo -e "Oracle Cloud Script Collection"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}1.   ${gl_bai}Install idle machine active script"
@@ -9036,7 +8739,6 @@ linux_Oracle() {
 					  -e MEM_UTIL="$mem_util" \
 					  -e SPEEDTEST_INTERVAL="$speedtest_interval" \
 					  fogforest/lookbusy
-				  send_stats "Oracle Cloud Installation Active Script"
 
 				  ;;
 				[Nn])
@@ -9051,7 +8753,6 @@ linux_Oracle() {
 			  clear
 			  docker rm -f lookbusy
 			  docker rmi fogforest/lookbusy
-			  send_stats "Oracle Cloud Uninstall Active Script"
 			  ;;
 
 		  3)
@@ -9084,7 +8785,6 @@ linux_Oracle() {
 			  read -e -p "Please enter your password after reinstallation:" vpspasswd
 			  install wget
 			  bash <(wget --no-check-certificate -qO- "${gh_proxy}raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh") $xitong -v 64 -p $vpspasswd -port 22
-			  send_stats "Oracle Cloud reinstall system script"
 			  ;;
 			[Nn])
 			  echo "Canceled"
@@ -9097,7 +8797,6 @@ linux_Oracle() {
 
 		  4)
 			  clear
-			  send_stats "Detective R startup script"
 			  bash <(wget -qO- ${gh_proxy}github.com/Yohann0617/oci-helper/releases/latest/download/sh_oci-helper_install.sh)
 			  ;;
 		  5)
@@ -9108,7 +8807,6 @@ linux_Oracle() {
 			  clear
 			  bash <(curl -L -s jhb.ovh/jb/v6.sh)
 			  echo "This function is provided by jhb, thank him!"
-			  send_stats "ipv6 repair"
 			  ;;
 		  0)
 			  return_to_main_menu
@@ -9188,7 +8886,6 @@ linux_ldnmp() {
   while true; do
 
 	clear
-	# send_stats "LDNMP website building"
 	echo -e "${gl_huang}LDNMP website building"
 	ldnmp_tato
 	echo -e "${gl_huang}------------------------"
@@ -9228,7 +8925,6 @@ linux_ldnmp() {
 	  clear
 	  # Discuz Forum
 	  webname="Discuz Forum"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9273,7 +8969,6 @@ linux_ldnmp() {
 	  clear
 	  # Kedao cloud desktop
 	  webname="Kedao cloud desktop"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9312,7 +9007,6 @@ linux_ldnmp() {
 	  clear
 	  # AppleCMS
 	  webname="AppleCMS"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9360,7 +9054,6 @@ linux_ldnmp() {
 	  clear
 	  # One-legged number card
 	  webname="One-legged number card"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9414,7 +9107,6 @@ linux_ldnmp() {
 	  clear
 	  # flarum forum
 	  webname="flarum forum"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9475,7 +9167,6 @@ linux_ldnmp() {
 	  clear
 	  # typecho
 	  webname="typecho"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9519,7 +9210,6 @@ linux_ldnmp() {
 	  clear
 	  # LinkStack
 	  webname="LinkStack"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9559,7 +9249,6 @@ linux_ldnmp() {
 	  20)
 	  clear
 	  webname="PHP dynamic site"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9696,7 +9385,6 @@ linux_ldnmp() {
 	  22)
 	  clear
 	  webname="site redirect"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  read -e -p "Please enter the redirect domain name:" reverseproxy
@@ -9738,7 +9426,6 @@ linux_ldnmp() {
 	  24)
 	  clear
 	  webname="Reverse proxy-domain name"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  echo -e "Domain name format:${gl_huang}google.com${gl_bai}"
@@ -9766,7 +9453,6 @@ linux_ldnmp() {
 	  25)
 	  clear
 	  webname="Bitwarden"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 
@@ -9786,7 +9472,6 @@ linux_ldnmp() {
 	  26)
 	  clear
 	  webname="halo"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 
@@ -9800,7 +9485,6 @@ linux_ldnmp() {
 	  27)
 	  clear
 	  webname="AI painting prompt word generator"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  nginx_install_status
@@ -9841,7 +9525,6 @@ linux_ldnmp() {
 	  30)
 	  clear
 	  webname="static site"
-	  send_stats "Install$webname"
 	  echo "Start deployment$webname"
 	  add_yuming
 	  repeat_add_yuming
@@ -9905,7 +9588,6 @@ linux_ldnmp() {
 
 	32)
 	  clear
-	  send_stats "LDNMP environment backup"
 
 	  local backup_filename="web_$(date +"%Y%m%d%H%M%S").tar.gz"
 	  echo -e "${gl_kjlan}Backing up$backup_filename ...${gl_bai}"
@@ -9943,7 +9625,6 @@ linux_ldnmp() {
 
 	33)
 	  clear
-	  send_stats "Scheduled remote backup"
 	  read -e -p "Enter the remote server IP:" useip
 	  read -e -p "Enter the remote server password:" usepasswd
 
@@ -9980,7 +9661,6 @@ linux_ldnmp() {
 
 	34)
 	  root_use
-	  send_stats "LDNMP environment restoration"
 	  echo "Available site backups"
 	  echo "-------------------------"
 	  ls -lt /home/*.gz | awk '{print $NF}'
@@ -10028,7 +9708,6 @@ linux_ldnmp() {
 	  root_use
 	  while true; do
 		  clear
-		  send_stats "Update LDNMP environment"
 		  echo "Update LDNMP environment"
 		  echo "------------------------"
 		  ldnmp_v
@@ -10078,7 +9757,6 @@ linux_ldnmp() {
 			  docker compose up -d --force-recreate $ldnmp_pods
 			  docker restart $ldnmp_pods
 			  cp /home/web/docker-compose1.yml /home/web/docker-compose.yml
-			  send_stats "renew$ldnmp_pods"
 			  echo "renew${ldnmp_pods}Finish"
 
 				  ;;
@@ -10117,7 +9795,6 @@ linux_ldnmp() {
 
 			  docker restart $ldnmp_pods > /dev/null 2>&1
 			  cp /home/web/docker-compose1.yml /home/web/docker-compose.yml
-			  send_stats "renew$ldnmp_pods"
 			  echo "renew${ldnmp_pods}Finish"
 
 				  ;;
@@ -10128,7 +9805,6 @@ linux_ldnmp() {
 			  docker images --filter=reference="$ldnmp_pods*" -q | xargs docker rmi > /dev/null 2>&1
 			  docker compose up -d --force-recreate $ldnmp_pods
 			  docker restart $ldnmp_pods > /dev/null 2>&1
-			  send_stats "renew$ldnmp_pods"
 			  echo "renew${ldnmp_pods}Finish"
 
 				  ;;
@@ -10136,7 +9812,6 @@ linux_ldnmp() {
 				read -e -p "$(echo -e "${gl_huang}提示: ${gl_bai}长时间不更新环境的用户，请慎重更新LDNMP环境，会有数据库更新失败的风险。确定更新LDNMP环境吗？(Y/N): ")" choice
 				case "$choice" in
 				  [Yy])
-					send_stats "Complete update of LDNMP environment"
 					cd /home/web/
 					docker compose down --rmi all
 
@@ -10161,7 +9836,6 @@ linux_ldnmp() {
 
 	38)
 		root_use
-		send_stats "Uninstall the LDNMP environment"
 		read -e -p "$(echo -e "${gl_hong}强烈建议：${gl_bai}先备份全部网站数据，再卸载LDNMP环境。确定删除所有网站数据吗？(Y/N): ")" choice
 		case "$choice" in
 		  [Yy])
@@ -10201,7 +9875,6 @@ linux_ldnmp() {
 moltbot_menu() {
 	local app_id="114"
 
-	send_stats "clawdbot/moltbot management"
 
 	check_openclaw_update() {
 		if ! command -v npm >/dev/null 2>&1; then
@@ -10328,10 +10001,6 @@ import time
 import urllib.request
 
 path = sys.argv[1]
-
-def send_stat(_action):
-    """Compatibility no-op: telemetry is permanently disabled."""
-    return
 
 with open(path, 'r', encoding='utf-8') as f:
     obj = json.load(f)
@@ -10517,14 +10186,11 @@ for name, provider in list(providers.items()):
     data, err, attempts = fetch_remote_models_with_retry(name, base_url, api_key, retries=3)
     if err is not None:
         summary.append(f'⚠️ {name}: /models detection failed, retried {attempts} times ({type(err).__name__}: {err})')
-        send_stat('OpenClaw API confirmed intervention')
         if prompt_delete_provider(name):
             deleted = delete_provider_and_refs(name)
             if deleted:
-                send_stat('OpenClaw API deletion failed Provider-Confirm')
                 summary.append(f'✅ {name}: The user has confirmed to delete the provider and all related model references')
         else:
-            send_stat('OpenClaw API deletion failed Provider-rejected')
             summary.append(f'ℹ️ {name}: The user has not confirmed the deletion and retains the existing provider configuration.')
         continue
 
@@ -10644,7 +10310,6 @@ PY
 
 	install_moltbot() {
 		echo "Start installing OpenClaw..."
-		send_stats "Start installing OpenClaw..."
 		install git jq
 
 		install_node_and_tools
@@ -10668,14 +10333,12 @@ PY
 
 	start_bot() {
 		echo "Starting OpenClaw..."
-		send_stats "Starting OpenClaw..."
 		start_gateway
 		break_end
 	}
 
 	stop_bot() {
 		echo "Stop OpenClaw..."
-		send_stats "Stop OpenClaw..."
 		tmux kill-session -t gateway > /dev/null 2>&1
 		openclaw gateway stop
 		break_end
@@ -10683,7 +10346,6 @@ PY
 
 	view_logs() {
 		echo "View the OpenClaw status log"
-		send_stats "View OpenClaw logs"
 		openclaw status
 		openclaw gateway status
 		openclaw logs
@@ -10870,7 +10532,6 @@ EOF
 	}
 
 	add-openclaw-provider-interactive() {
-		send_stats "OpenClaw API added"
 		echo "=== Interactively add OpenClaw Provider (full model) ==="
 
 		# 1. Provider name
@@ -10978,7 +10639,6 @@ EOF
 
 openclaw_api_manage_list() {
 	local config_file="${HOME}/.openclaw/openclaw.json"
-	send_stats "OpenClaw API List"
 
 	while IFS=$'\t' read -r rec_type idx name base_url model_count api_type latency_txt latency_level; do
 		case "$rec_type" in
@@ -11095,7 +10755,6 @@ PY
 }
 sync-openclaw-provider-interactive() {
 	local config_file="${HOME}/.openclaw/openclaw.json"
-	send_stats "OpenClaw API synchronization by Provider"
 
 	if [ ! -f "$config_file" ]; then
 		echo "❌ Configuration file not found:$config_file"
@@ -11348,7 +11007,6 @@ openclaw_detect_api_protocol_by_provider() {
 
 fix-openclaw-provider-protocol-interactive() {
 	local config_file="${HOME}/.openclaw/openclaw.json"
-	send_stats "OpenClaw API protocol switching"
 
 	if [ ! -f "$config_file" ]; then
 		echo "❌ Configuration file not found:$config_file"
@@ -11434,7 +11092,6 @@ PY
 	delete-openclaw-provider-interactive() {
 		local config_file
 		config_file=$(openclaw_get_config_file)
-		send_stats "OpenClaw API delete entry"
 
 		if [ ! -f "$config_file" ]; then
 			echo "❌ Configuration file not found:$config_file"
@@ -11444,7 +11101,6 @@ PY
 
 		read -erp "Please enter the API name (provider) to be deleted:" provider_name
 		if [ -z "$provider_name" ]; then
-			send_stats "OpenClaw API Delete Cancel"
 			echo "❌ provider name cannot be empty"
 			break_end
 			return 1
@@ -11562,7 +11218,6 @@ PY
 		local rc=$?
 		case "$rc" in
 			0)
-				send_stats "OpenClaw API deletion confirmation"
 				echo "✅Deletion completed"
 				start_gateway
 				;;
@@ -11570,7 +11225,6 @@ PY
 				echo "❌ Deletion failed: provider does not exist"
 				;;
 			3)
-				send_stats "OpenClaw API Delete Cancel"
 				echo "❌ Deletion failed: no replacement model available, original configuration has been maintained"
 				;;
 			*)
@@ -11582,7 +11236,6 @@ PY
 	}
 
 	openclaw_api_providers_showcase() {
-		send_stats "OpenClaw API Vendor Recommendations"
 
 		clear
 		echo ""
@@ -11642,7 +11295,6 @@ PY
 	}
 
 	openclaw_api_manage_menu() {
-		send_stats "OpenClaw API entrance"
 		while true; do
 			clear
 			echo "======================================="
@@ -11722,7 +11374,6 @@ REPO
 
 
 	change_model() {
-		send_stats "Change model"
 
 		local orange="#FF8C00"
 
@@ -12279,7 +11930,6 @@ PYTHON_EOF
 
 
 		install_plugin() {
-		send_stats "Plug-in management"
 		while true; do
 			clear
 			echo "========================================"
@@ -12409,7 +12059,6 @@ PYTHON_EOF
 
 
 	install_skill() {
-		send_stats "Skill management"
 		while true; do
 			clear
 			echo "========================================"
@@ -12750,7 +12399,6 @@ openclaw_json_get_bool() {
 	}
 
 	change_tg_bot_code() {
-		send_stats "Robot docking"
 		while true; do
 			clear
 			echo "========================================"
@@ -12962,7 +12610,6 @@ PY
 	}
 
 	openclaw_memory_backup_export() {
-		send_stats "OpenClaw memory full backup"
 		local backup_root=$(openclaw_backup_root)
 		local ts=$(date +%Y%m%d-%H%M%S)
 		local out_file="$backup_root/openclaw-memory-full-${ts}.tar.gz"
@@ -12994,7 +12641,6 @@ for item in workspaces:
 	}
 
 	openclaw_memory_backup_import() {
-		send_stats "OpenClaw memory full restoration"
 		local archive_path=$(openclaw_read_import_path "Restore the full amount of memory (supports multi-agent)")
 		[ -z "$archive_path" ] && { echo "❌ No path entered"; break_end; return 1; }
 		local tmp_unpack=$(mktemp -d) || return 1
@@ -13018,7 +12664,6 @@ if os.path.isdir(agents_root):
 
 
 	openclaw_project_backup_export() {
-		send_stats "OpenClaw project backup"
 		local config_file
 		config_file=$(openclaw_get_config_file)
 		local openclaw_root
@@ -13080,7 +12725,6 @@ if os.path.isdir(agents_root):
 	}
 
 	openclaw_project_backup_import() {
-		send_stats "OpenClaw project restore"
 		local config_file
 		config_file=$(openclaw_get_config_file)
 		local openclaw_root
@@ -13241,7 +12885,6 @@ if os.path.isdir(agents_root):
 	}
 
 	openclaw_backup_delete_file() {
-		send_stats "OpenClaw delete backup files"
 		local backup_root backup_root_real user_input target_file target_path target_type
 		backup_root=$(openclaw_backup_root)
 
@@ -14374,7 +14017,6 @@ EOF
 	}
 
 	openclaw_memory_menu() {
-		send_stats "OpenClaw memory management"
 		while true; do
 			clear
 			echo "======================================="
@@ -14753,7 +14395,6 @@ except Exception:
 	}
 
 	openclaw_permission_apply_standard() {
-		send_stats "OpenClaw Permissions - Standard Security Mode"
 		openclaw_permission_require_openclaw || return 1
 
 		echo "Configuring application layer policy..."
@@ -14772,7 +14413,6 @@ except Exception:
 	}
 
 	openclaw_permission_apply_developer() {
-		send_stats "OpenClaw Permissions - Development Enhanced Mode"
 		openclaw_permission_require_openclaw || return 1
 
 		echo "Configuring application layer policy..."
@@ -14790,7 +14430,6 @@ except Exception:
 	}
 
 	openclaw_permission_apply_full() {
-		send_stats "OpenClaw Permissions - Fully Open Mode"
 		openclaw_permission_require_openclaw || return 1
 
 		echo "Configuring application layer policy..."
@@ -14809,7 +14448,6 @@ except Exception:
 	}
 
 	openclaw_permission_restore_official_defaults() {
-		send_stats "OpenClaw permissions-restore official default"
 		openclaw_permission_require_openclaw || return 1
 
 		echo "Clean application layer force coverage..."
@@ -14907,7 +14545,6 @@ except Exception as e:
 	}
 
 	openclaw_permission_menu() {
-		send_stats "OpenClaw permission management"
 		while true; do
 			clear
 			echo "======================================="
@@ -15176,7 +14813,6 @@ else:
 	}
 
 	openclaw_multiagent_list_agents() {
-		send_stats "OpenClaw Multi-Agent - List Agents"
 		python3 -c 'import json,sys; agents=json.loads(sys.argv[1] or "[]");
 if not agents: print("No Agent has been configured yet."); raise SystemExit(0)
 for idx,item in enumerate(agents,1):
@@ -15184,7 +14820,6 @@ for idx,item in enumerate(agents,1):
 	}
 
 	openclaw_multiagent_add_agent() {
-		send_stats "OpenClaw multi-agent-new Agent"
 		openclaw_multiagent_require_openclaw || return 1
 		local agent_id workspace confirm
 		read -e -p "Please enter new Agent ID:" agent_id
@@ -15211,7 +14846,6 @@ for idx,item in enumerate(agents,1):
 	}
 
 	openclaw_multiagent_delete_agent() {
-		send_stats "OpenClaw multi-agent-delete agent"
 		openclaw_multiagent_require_openclaw || return 1
 		local agent_id confirm
 		read -e -p "Please enter the Agent ID to delete:" agent_id
@@ -15228,7 +14862,6 @@ for idx,item in enumerate(agents,1):
 	}
 
 	openclaw_multiagent_list_bindings() {
-		send_stats "OpenClaw multi-agent - view routing bindings"
 		python3 -c '
 import json,sys
 bindings=json.loads(sys.argv[1] or "[]")
@@ -15242,7 +14875,6 @@ for idx,item in enumerate(bindings,1):
 	}
 
 	openclaw_multiagent_add_binding() {
-		send_stats "OpenClaw multi-agent-new routing binding"
 		openclaw_multiagent_require_openclaw || return 1
 		local agent_id bind_value confirm
 		read -e -p "Please enter the agent ID:" agent_id
@@ -15260,7 +14892,6 @@ for idx,item in enumerate(bindings,1):
 	}
 
 	openclaw_multiagent_remove_binding() {
-		send_stats "OpenClaw multi-agent - remove routing binding"
 		openclaw_multiagent_require_openclaw || return 1
 		local agent_id bind_value confirm
 		read -e -p "Please enter the agent ID:" agent_id
@@ -15279,7 +14910,6 @@ for idx,item in enumerate(bindings,1):
 
 
 	openclaw_multiagent_show_sessions() {
-		send_stats "OpenClaw Multi-Agent - Session Overview"
 		python3 -c '
 import json,sys
 sess_obj=json.loads(sys.argv[1] or "{}")
@@ -15309,7 +14939,6 @@ for item in sessions[:10]:
 	}
 
 	openclaw_multiagent_health_check() {
-		send_stats "OpenClaw Multi-Agent-Health Check"
 		openclaw_multiagent_require_openclaw || return 1
 		local config_file
 		config_file=$(openclaw_multiagent_config_file)
@@ -15372,7 +15001,6 @@ print("✅Multi-agent health check completed")
 	}
 
 	openclaw_multiagent_menu() {
-		send_stats "OpenClaw multi-agent management"
 		while true; do
 			clear
 			echo "======================================="
@@ -15411,7 +15039,6 @@ print("✅Multi-agent health check completed")
 
 openclaw_backup_restore_menu() {
 
-		send_stats "OpenClaw backup and restore"
 		while true; do
 			clear
 			echo "======================================="
@@ -15446,7 +15073,6 @@ openclaw_backup_restore_menu() {
 
 	update_moltbot() {
 		echo "更新 OpenClaw..."
-		send_stats "Update OpenClaw..."
 		install_node_and_tools
 		git config --global url."${gh_proxy}github.com/".insteadOf ssh://git@github.com/
 		git config --global url."${gh_proxy}github.com/".insteadOf git@github.com:
@@ -15462,7 +15088,6 @@ openclaw_backup_restore_menu() {
 
 	uninstall_moltbot() {
 		echo "Uninstall OpenClaw..."
-		send_stats "Uninstall OpenClaw..."
 		openclaw uninstall
 		npm uninstall -g openclaw
 		crontab -l 2>/dev/null | grep -v "s gateway" | crontab -
@@ -15475,7 +15100,6 @@ openclaw_backup_restore_menu() {
 	}
 
 	nano_openclaw_json() {
-		send_stats "Edit the OpenClaw configuration file"
 		install nano
 		nano "$(openclaw_get_config_file)"
 		start_gateway
@@ -15586,7 +15210,6 @@ openclaw_backup_restore_menu() {
 	# Main menu
 	openclaw_webui_menu() {
 
-		send_stats "WebUI access and settings"
 		while true; do
 			clear
 			openclaw_show_webui_addr
@@ -15635,16 +15258,16 @@ openclaw_backup_restore_menu() {
 			8) install_plugin ;;
 			9) install_skill ;;
 			10) nano_openclaw_json ;;
-			11) send_stats "Initial configuration wizard"
+			11)
 				openclaw onboard --install-daemon
 				break_end
 				;;
-			12) send_stats "Health detection and repair"
+			12)
 				openclaw doctor --fix
 				break_end
 				;;
 			13) openclaw_webui_menu ;;
-			14) send_stats "TUI command line conversation"
+			14)
 				openclaw tui
 				break_end
 			 	;;
@@ -15981,7 +15604,6 @@ while true; do
 		  ;;
 	  7|nezha)
 		clear
-		send_stats "Build Nezha"
 
 		local app_id="7"
 		local docker_name="nezha-dashboard"
@@ -16060,7 +15682,6 @@ while true; do
 		  ;;
 
 	  9|mail)
-		send_stats "Build a post office"
 		clear
 		install telnet
 		local app_id="9"
@@ -16471,7 +16092,6 @@ while true; do
 		  ;;
 
 	  19|safeline)
-		send_stats "Build a thunder pool"
 
 		local app_id="19"
 		local docker_name=safeline-mgt
@@ -16987,7 +16607,6 @@ while true; do
 		  ;;
 
 	  38|xiaoya)
-		send_stats "Xiaoya family bucket"
 		clear
 		install_docker
 		check_disk_space 1
@@ -17299,7 +16918,6 @@ while true; do
 
 	  51|pve)
 		clear
-		send_stats "PVE open chick"
 		check_disk_space 1
 		curl -L ${gh_proxy}raw.githubusercontent.com/oneclickvirt/pve/main/scripts/install_pve.sh -o install_pve.sh && chmod +x install_pve.sh && bash install_pve.sh
 		  ;;
@@ -18493,7 +18111,7 @@ while true; do
 				docker run --rm \
 				  -v /home/docker/matrix/data:/data \
 				  -e SYNAPSE_SERVER_NAME=${yuming} \
-				  -e SYNAPSE_REPORT_STATS=yes \
+				  -e SYNAPSE_REPORT_STATS=no \
 				  --name matrix \
 				  matrixdotorg/synapse:latest generate
 			fi
@@ -19453,7 +19071,6 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 
 	  b)
 	  	clear
-	  	send_stats "All application backup"
 
 	  	local backup_filename="app_$(date +"%Y%m%d%H%M%S").tar.gz"
 	  	echo -e "${gl_kjlan}Backing up$backup_filename ...${gl_bai}"
@@ -19490,7 +19107,6 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 
 	  r)
 	  	root_use
-	  	send_stats "Restore all apps"
 	  	echo "Available application backups"
 	  	echo "-------------------------"
 	  	ls -lt /app*.gz | awk '{print $NF}'
@@ -19550,7 +19166,6 @@ linux_work() {
 
 	while true; do
 	  clear
-	  send_stats "Backend workspace"
 	  echo -e "Backend workspace"
 	  echo -e "The system will provide you with a workspace that can run permanently in the background, which you can use to perform long-term tasks."
 	  echo -e "Even if you disconnect SSH, the tasks in the workspace will not be interrupted, and the background tasks will persist."
@@ -19586,7 +19201,6 @@ linux_work() {
 			  clear
 			  install tmux
 			  local SESSION_NAME="work1"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 
 			  ;;
@@ -19594,63 +19208,54 @@ linux_work() {
 			  clear
 			  install tmux
 			  local SESSION_NAME="work2"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  3)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work3"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  4)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work4"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  5)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work5"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  6)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work6"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  7)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work7"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  8)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work8"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  9)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work9"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 		  10)
 			  clear
 			  install tmux
 			  local SESSION_NAME="work10"
-			  send_stats "Start workspace$SESSION_NAME"
 			  tmux_run
 			  ;;
 
@@ -19662,7 +19267,6 @@ linux_work() {
 			  else
 				  local tmux_sshd_status="${gl_hui}closure${gl_bai}"
 			  fi
-			  send_stats "SSH resident mode"
 			  echo -e "SSH resident mode${tmux_sshd_status}"
 			  echo "After opening the SSH connection, it will directly enter the resident mode and return directly to the previous working state."
 			  echo "------------------------"
@@ -19675,7 +19279,6 @@ linux_work() {
 				1)
 			  	  install tmux
 			  	  local SESSION_NAME="sshd"
-			  	  send_stats "Start workspace$SESSION_NAME"
 				  grep -q "tmux attach-session -t sshd" ~/.bashrc || echo -e "\n# Automatically enter tmux session\nif [[ -z \"\$TMUX\" ]]; then\n    tmux attach-session -t sshd || tmux new-session -s sshd\nfi" >> ~/.bashrc
 				  source ~/.bashrc
 			  	  tmux_run
@@ -19694,20 +19297,17 @@ linux_work() {
 		  22)
 			  read -e -p "Please enter the name of the workspace you created or entered, such as 1001 kj001 work1:" SESSION_NAME
 			  tmux_run
-			  send_stats "Custom workspace"
 			  ;;
 
 
 		  23)
 			  read -e -p "Please enter the command you want to execute in the background, for example uptime:" tmuxd
 			  tmux_run_d
-			  send_stats "Inject commands into the background workspace"
 			  ;;
 
 		  24)
 			  read -e -p "Please enter the name of the workspace you want to delete:" gongzuoqu_name
 			  tmux kill-window -t $gongzuoqu_name
-			  send_stats "Delete workspace"
 			  ;;
 
 		  0)
@@ -19788,7 +19388,6 @@ switch_mirror() {
 
 fail2ban_panel() {
 		  root_use
-		  send_stats "ssh defense"
 		  while true; do
 
 				check_f2b_status
@@ -19827,12 +19426,10 @@ fail2ban_panel() {
 						break
 						;;
 					4)
-						send_stats "SSH defense basic parameter configuration"
 						f2b_basic_config
 						break_end
 						;;
 					5)
-						send_stats "SSH Defense Edit Configuration File"
 						f2b_edit_config
 						break_end
 						;;
@@ -19856,7 +19453,6 @@ fail2ban_panel() {
 
 net_menu() {
 
-	send_stats "Network card management tool"
 	show_nics() {
 		echo "================ Current network card information ================"
 		printf "%-18s %-12s %-20s %-26s\n" "Network card name" "state" "IP address" "MAC address"
@@ -19887,7 +19483,6 @@ net_menu() {
 
 		case $choice in
 			1)
-				send_stats "Enable network card"
 				read -erp "Please enter the name of the network card to be enabled:" nic
 				if ip link show "$nic" &>/dev/null; then
 					ip link set "$nic" up && echo "✔ Network card$nicEnabled"
@@ -19897,7 +19492,6 @@ net_menu() {
 				read -erp "Press Enter to continue..."
 				;;
 			2)
-				send_stats "Disable network card"
 				read -erp "Please enter the name of the network card to be disabled:" nic
 				if ip link show "$nic" &>/dev/null; then
 					ip link set "$nic" down && echo "✔ Network card$nicDisabled"
@@ -19907,7 +19501,6 @@ net_menu() {
 				read -erp "Press Enter to continue..."
 				;;
 			3)
-				send_stats "View network card details"
 				read -erp "Please enter the name of the network card you want to view:" nic
 				if ip link show "$nic" &>/dev/null; then
 					echo "========== $nicDetails =========="
@@ -19919,7 +19512,6 @@ net_menu() {
 				read -erp "Press Enter to continue..."
 				;;
 			4)
-				send_stats "Refresh network card information"
 				continue
 				;;
 			*)
@@ -19932,7 +19524,6 @@ net_menu() {
 
 
 log_menu() {
-	send_stats "System log management tool"
 
 	show_log_overview() {
 		echo "============= System log overview ============="
@@ -19963,14 +19554,12 @@ log_menu() {
 
 		case $choice in
 			1)
-				send_stats "View recent logs"
 				read -erp "How many recent log lines have you viewed? [Default 100]:" lines
 				lines=${lines:-100}
 				journalctl -n "$lines" --no-pager
 				read -erp "Press Enter to continue..."
 				;;
 			2)
-				send_stats "View specified service logs"
 				read -erp "Please enter the service name (such as sshd, nginx):" svc
 				if systemctl list-unit-files | grep -q "^$svc"; then
 					journalctl -u "$svc" -n 100 --no-pager
@@ -19980,7 +19569,6 @@ log_menu() {
 				read -erp "Press Enter to continue..."
 				;;
 			3)
-				send_stats "View login/security logs"
 				echo "====== Recent login log ======"
 				last -n 10
 				echo
@@ -19995,7 +19583,6 @@ log_menu() {
 				read -erp "Press Enter to continue..."
 				;;
 			4)
-				send_stats "Real-time tracking log"
 				echo "1) System log"
 				echo "2) Specify service log"
 				read -erp "Select tracking type:" t
@@ -20009,7 +19596,6 @@ log_menu() {
 				fi
 				;;
 			5)
-				send_stats "Clean up old journal logs"
 				echo "⚠️ Clean the journal (safe way)"
 				echo "1) Keep the last 7 days"
 				echo "2) Keep the last 3 days"
@@ -20038,11 +19624,9 @@ env_menu() {
 	BASHRC="$HOME/.bashrc"
 	PROFILE="$HOME/.profile"
 
-	send_stats "System variable management tool"
 
 	show_env_vars() {
 		clear
-		send_stats "Environment variables currently in effect"
 		echo "========== Currently in effect environment variables (excerpt) =========="
 		printf "%-20s %s\n" "variable name" "value"
 		echo "-----------------------------------------------"
@@ -20086,7 +19670,6 @@ env_menu() {
 
 	view_file() {
 		local file="$1"
-		send_stats "View variable file$file"
 		clear
 		if [ -f "$file" ]; then
 			echo "========== View files:$file =========="
@@ -20100,14 +19683,12 @@ env_menu() {
 
 	edit_file() {
 		local file="$1"
-		send_stats "Edit variable file$file"
 		install nano
 		nano "$file"
 	}
 
 	source_files() {
 		echo "Reloading environment variables..."
-		send_stats "Reloading environment variables"
 		source "$BASHRC"
 		source "$PROFILE"
 		echo "✔ Environment variables have been reloaded"
@@ -20181,11 +19762,9 @@ create_user_with_sshkey() {
 
 	case "$sshkey_vl" in
 		http://*|https://*)
-			send_stats "Import SSH public key from URL"
 			fetch_remote_ssh_keys "$sshkey_vl" "/home/$new_username"
 			;;
 		ssh-rsa*|ssh-ed25519*|ssh-ecdsa*)
-			send_stats "Directly import the public key"
 			import_sshkey "$sshkey_vl" "/home/$new_username"
 			;;
 		*)
@@ -20234,7 +19813,6 @@ linux_Settings() {
 
 	while true; do
 	  clear
-	  # send_stats "System Tools"
 	  echo -e "system tools"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}1.   ${gl_bai}Set script startup shortcut key${gl_kjlan}2.   ${gl_bai}Change login password"
@@ -20264,7 +19842,7 @@ linux_Settings() {
 	  echo -e "${gl_kjlan}41.  ${gl_bai}System log management tool${gl_huang}★${gl_bai}                 ${gl_kjlan}42.  ${gl_bai}System variable management tool"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}61.  ${gl_bai}Project support                      ${gl_kjlan}66.  ${gl_bai}System tuning ${gl_huang}★${gl_bai}"
-	  echo -e "${gl_kjlan}99.  ${gl_bai}Restart the server${gl_kjlan}100. ${gl_bai}Privacy and security"
+	  echo -e "${gl_kjlan}99.  ${gl_bai}Restart the server"
 	  echo -e "${gl_kjlan}101. ${gl_bai}Advanced usage of ${PROJECT_COMMAND} command${gl_huang}★${gl_bai}                    ${gl_kjlan}102. ${gl_bai}Uninstall ${PROJECT_NAME}"
 	  echo -e "${gl_kjlan}------------------------"
 	  echo -e "${gl_kjlan}0.   ${gl_bai}Return to main menu"
@@ -20307,7 +19885,6 @@ linux_Settings() {
 				  fi
 				  ln -sf "$PROJECT_INSTALL_PATH" "/usr/bin/$kuaijiejian" > /dev/null 2>&1
 				  echo "Shortcut keys have been set"
-				  send_stats "Script shortcut key has been set"
 				  break_end
 				  linux_Settings
 			  done
@@ -20315,7 +19892,6 @@ linux_Settings() {
 
 		  2)
 			  clear
-			  send_stats "Set your login password"
 			  echo "Set your login password"
 			  passwd
 			  ;;
@@ -20326,7 +19902,6 @@ linux_Settings() {
 
 		  4)
 			root_use
-			send_stats "py version management"
 			echo "python version management"
 			echo "Video introduction: https://www.bilibili.com/video/BV1Pm42157cK?t=0.1"
 			echo "---------------------------------------"
@@ -20341,7 +19916,6 @@ linux_Settings() {
 
 
 			if [[ "$py_new_v" == "0" ]]; then
-				send_stats "Script PY management"
 				break_end
 				linux_Settings
 			fi
@@ -20404,13 +19978,11 @@ EOF
 
 			local VERSION=$(python -V 2>&1 | awk '{print $2}')
 			echo -e "Current python version number:${gl_huang}$VERSION${gl_bai}"
-			send_stats "Script PY version switching"
 
 			  ;;
 
 		  5)
 			  root_use
-			  send_stats "open port"
 			  iptables_open
 			  remove iptables-persistent ufw firewalld iptables-services > /dev/null 2>&1
 			  echo "All ports are open"
@@ -20418,7 +19990,6 @@ EOF
 			  ;;
 		  6)
 			root_use
-			send_stats "Modify SSH port"
 
 			while true; do
 				clear
@@ -20439,19 +20010,15 @@ EOF
 				# Determine whether the port number is within the valid range
 				if [[ $new_port =~ ^[0-9]+$ ]]; then  # 检查输入是否为数字
 					if [[ $new_port -ge 1 && $new_port -le 65535 ]]; then
-						send_stats "SSH port has been modified"
 						new_ssh_port $new_port
 					elif [[ $new_port -eq 0 ]]; then
-						send_stats "Exit SSH port modification"
 						break
 					else
 						echo "The port number is invalid. Please enter a number between 1 and 65535."
-						send_stats "Invalid SSH port entered"
 						break_end
 					fi
 				else
 					echo "Invalid input, please enter a number."
-					send_stats "Invalid SSH port entered"
 					break_end
 				fi
 			done
@@ -20470,7 +20037,6 @@ EOF
 			  ;;
 		  9)
 			root_use
-			send_stats "Disable root for new users"
 			read -e -p "Please enter a new username (enter 0 to exit):" new_username
 			if [ "$new_username" == "0" ]; then
 				break_end
@@ -20489,7 +20055,6 @@ EOF
 
 		  10)
 			root_use
-			send_stats "Set v4/v6 priority"
 			while true; do
 				clear
 				echo "Set v4/v6 priority"
@@ -20517,14 +20082,12 @@ EOF
 					2)
 						rm -f /etc/gai.conf
 						echo "Switched to IPv6 first"
-						send_stats "Switched to IPv6 first"
 						;;
 
 					3)
 						clear
 						bash <(curl -L -s jhb.ovh/jb/v6.sh)
 						echo "This function is provided by jhb, thank him!"
-						send_stats "ipv6 repair"
 						;;
 
 					*)
@@ -20542,7 +20105,6 @@ EOF
 
 		  12)
 			root_use
-			send_stats "Set up virtual memory"
 			while true; do
 				clear
 				echo "Set up virtual memory"
@@ -20560,17 +20122,14 @@ EOF
 
 				case "$choice" in
 				  1)
-					send_stats "1G virtual memory has been set"
 					add_swap 1024
 
 					;;
 				  2)
-					send_stats "2G virtual memory has been set"
 					add_swap 2048
 
 					;;
 				  3)
-					send_stats "4G virtual memory has been set up"
 					add_swap 4096
 
 					;;
@@ -20578,7 +20137,6 @@ EOF
 				  4)
 					read -e -p "Please enter the virtual memory size (unit M):" new_swap
 					add_swap "$new_swap"
-					send_stats "Custom virtual memory set"
 					;;
 
 				  *)
@@ -20591,7 +20149,6 @@ EOF
 		  13)
 			  while true; do
 				root_use
-				send_stats "User management"
 				echo "User list"
 				echo "----------------------------------------------------------------------------"
 				printf "%-24s %-34s %-20s %-10s\n" "username" "User permissions" "User group" "sudo permissions"
@@ -20665,7 +20222,6 @@ EOF
 
 		  14)
 			clear
-			send_stats "User information generator"
 			echo "random username"
 			echo "------------------------"
 			for i in {1..5}; do
@@ -20716,7 +20272,6 @@ EOF
 
 		  15)
 			root_use
-			send_stats "Change time zone"
 			while true; do
 				clear
 				echo "System time information"
@@ -20798,7 +20353,6 @@ EOF
 
 		  18)
 		  root_use
-		  send_stats "Modify hostname"
 
 		  while true; do
 			  clear
@@ -20831,7 +20385,6 @@ EOF
 				  fi
 
 				  echo "The hostname has been changed to:$new_hostname"
-				  send_stats "Hostname changed"
 				  sleep 1
 			  else
 				  echo "Exited without changing hostname."
@@ -20842,7 +20395,6 @@ EOF
 
 		  19)
 		  root_use
-		  send_stats "Change system update source"
 		  clear
 		  echo "Select update source region"
 		  echo "Access LinuxMirrors to switch system update sources"
@@ -20855,19 +20407,15 @@ EOF
 
 		  case $choice in
 			  1)
-				  send_stats "Mainland China default source"
 				  bash <(curl -sSL https://linuxmirrors.cn/main.sh)
 				  ;;
 			  2)
-				  send_stats "Mainland China Education Source"
 				  bash <(curl -sSL https://linuxmirrors.cn/main.sh) --edu
 				  ;;
 			  3)
-				  send_stats "Overseas sources"
 				  bash <(curl -sSL https://linuxmirrors.cn/main.sh) --abroad
 				  ;;
 			  4)
-				  send_stats "Intelligent switching of update sources"
 				  switch_mirror false false
 				  ;;
 
@@ -20880,7 +20428,6 @@ EOF
 			  ;;
 
 		  20)
-		  send_stats "Scheduled task management"
 			  while true; do
 				  clear
 				  check_crontab_installed
@@ -20926,16 +20473,13 @@ EOF
 								  break  # 跳出
 								  ;;
 						  esac
-						  send_stats "Add a scheduled task"
 						  ;;
 					  2)
 						  read -e -p "Please enter the keyword of the task to be deleted:" kquest
 						  crontab -l | grep -v "$kquest" | crontab -
-						  send_stats "Delete scheduled tasks"
 						  ;;
 					  3)
 						  crontab -e
-						  send_stats "Edit scheduled tasks"
 						  ;;
 					  *)
 						  break  # 跳出循环，退出菜单
@@ -20947,7 +20491,6 @@ EOF
 
 		  21)
 			  root_use
-			  send_stats "Local host resolution"
 			  while true; do
 				  clear
 				  echo "Native host resolution list"
@@ -20966,13 +20509,11 @@ EOF
 					  1)
 						  read -e -p "Please enter a new parsing record format: 110.25.5.33 example.com:" addhost
 						  echo "$addhost" >> /etc/hosts
-						  send_stats "Local host resolution is added"
 
 						  ;;
 					  2)
 						  read -e -p "Please enter the keywords of the parsed content that need to be deleted:" delhost
 						  sed -i "/$delhost/d" /etc/hosts
-						  send_stats "Local host resolution and deletion"
 						  ;;
 					  *)
 						  break  # 跳出循环，退出菜单
@@ -20988,7 +20529,6 @@ EOF
 
 		  23)
 			root_use
-			send_stats "Current limiting shutdown function"
 			while true; do
 				clear
 				echo "Current limiting shutdown function"
@@ -21042,7 +20582,6 @@ EOF
 					crontab -l | grep -v 'reboot' | crontab -
 					(crontab -l ; echo "0 1 $cz_day * * reboot") | crontab - > /dev/null 2>&1
 					echo "Current limiting shutdown has been set"
-					send_stats "Current limiting shutdown has been set"
 					;;
 				  2)
 					check_crontab_installed
@@ -21065,7 +20604,6 @@ EOF
 
 		  25)
 			  root_use
-			  send_stats "Telegraph warning"
 			  echo "TG-bot monitoring and early warning function"
 			  echo "Video introduction: https://youtu.be/vLL-eb3Z_TY"
 			  echo "------------------------------------------------"
@@ -21076,7 +20614,6 @@ EOF
 
 			  case "$choice" in
 				[Yy])
-				  send_stats "Telegram warning enabled"
 				  cd ~
 				  install nano tmux bc jq
 				  check_crontab_installed
@@ -21123,7 +20660,6 @@ EOF
 
 		  26)
 			  root_use
-			  send_stats "Fix high-risk SSH vulnerabilities"
 			  cd ~
 			  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/upgrade_openssh9.8p1.sh
 			  chmod +x ~/upgrade_openssh9.8p1.sh
@@ -21167,7 +20703,6 @@ EOF
 			  ;;
 		  37)
 			  clear
-			  send_stats "Command line history"
 			  get_history_file() {
 				  for file in "$HOME"/.bash_history "$HOME"/.ash_history "$HOME"/.zsh_history "$HOME"/.local/share/fish/fish_history; do
 					  [ -f "$file" ] && { echo "$file"; return; }
@@ -21212,7 +20747,6 @@ EOF
 		  66)
 
 			  root_use
-			  send_stats "One-stop tuning"
 			  echo "One-stop system tuning"
 			  echo "------------------------------------------------"
 			  echo "The following content will be operated and optimized"
@@ -21234,7 +20768,6 @@ EOF
 			  case "$choice" in
 				[Yy])
 				  clear
-				  send_stats "One-stop tuning starts"
 				  echo "------------------------------------------------"
 				  switch_mirror false false
 				  linux_update
@@ -21298,15 +20831,7 @@ EOF
 
 		  99)
 			  clear
-			  send_stats "Restart the system"
 			  server_reboot
-			  ;;
-		  100)
-			  clear
-			  echo "Privacy & Security / 隐私与安全"
-			  echo "Telemetry and usage statistics are permanently disabled in ${PROJECT_NAME}."
-			  echo "send_stats is a local no-op and no telemetry endpoint is configured."
-			  break_end
 			  ;;
 
 		  101)
@@ -21316,7 +20841,6 @@ EOF
 
 		  102)
 			  clear
-			  send_stats "Uninstall ${PROJECT_NAME}"
 			  echo "Uninstall ${PROJECT_NAME}"
 			  echo "------------------------------------------------"
 			  echo "${PROJECT_NAME} will be completely uninstalled without affecting your other functions."
@@ -21371,7 +20895,6 @@ EOF
 
 linux_file() {
 	root_use
-	send_stats "file manager"
 	while true; do
 		clear
 		echo "file manager"
@@ -21398,92 +20921,76 @@ linux_file() {
 			1)  # 进入目录
 				read -e -p "Please enter the directory name:" dirname
 				cd "$dirname" 2>/dev/null || echo "Unable to enter directory"
-				send_stats "Enter directory"
 				;;
 			2)  # 创建目录
 				read -e -p "Please enter the directory name to be created:" dirname
 				mkdir -p "$dirname" && echo "Directory created" || echo "Creation failed"
-				send_stats "Create directory"
 				;;
 			3)  # 修改目录权限
 				read -e -p "Please enter the directory name:" dirname
 				read -e -p "Please enter permissions (e.g. 755):" perm
 				chmod "$perm" "$dirname" && echo "Permissions have been modified" || echo "Modification failed"
-				send_stats "Modify directory permissions"
 				;;
 			4)  # 重命名目录
 				read -e -p "Please enter the current directory name:" current_name
 				read -e -p "Please enter a new directory name:" new_name
 				mv "$current_name" "$new_name" && echo "Directory has been renamed" || echo "Rename failed"
-				send_stats "Rename directory"
 				;;
 			5)  # 删除目录
 				read -e -p "Please enter the directory name to be deleted:" dirname
 				rm -rf "$dirname" && echo "Directory deleted" || echo "Delete failed"
-				send_stats "delete directory"
 				;;
 			6)  # 返回上一级选单目录
 				cd ..
-				send_stats "Return to the previous menu directory"
 				;;
 			11) # 创建文件
 				read -e -p "Please enter the file name to be created:" filename
 				touch "$filename" && echo "File created" || echo "Creation failed"
-				send_stats "Create file"
 				;;
 			12) # 编辑文件
 				read -e -p "Please enter the file name to be edited:" filename
 				install nano
 				nano "$filename"
-				send_stats "Edit file"
 				;;
 			13) # 修改文件权限
 				read -e -p "Please enter a file name:" filename
 				read -e -p "Please enter permissions (e.g. 755):" perm
 				chmod "$perm" "$filename" && echo "Permissions have been modified" || echo "Modification failed"
-				send_stats "Modify file permissions"
 				;;
 			14) # 重命名文件
 				read -e -p "Please enter the current file name:" current_name
 				read -e -p "Please enter a new file name:" new_name
 				mv "$current_name" "$new_name" && echo "File has been renamed" || echo "Rename failed"
-				send_stats "Rename file"
 				;;
 			15) # 删除文件
 				read -e -p "Please enter the file name to be deleted:" filename
 				rm -f "$filename" && echo "File deleted" || echo "Delete failed"
-				send_stats "Delete files"
 				;;
 			21) # 压缩文件/目录
 				read -e -p "Please enter the file/directory name to be compressed:" name
 				install tar
 				tar -czvf "$name.tar.gz" "$name" && echo "Compressed to$name.tar.gz" || echo "Compression failed"
-				send_stats "Compressed files/directories"
 				;;
 			22) # 解压文件/目录
 				read -e -p "Please enter the file name to be extracted (.tar.gz):" filename
 				install tar
 				tar -xzvf "$filename" && echo "Unzipped$filename" || echo "Decompression failed"
-				send_stats "Unzip files/directories"
 				;;
 
 			23) # 移动文件或目录
 				read -e -p "Please enter the file or directory path to be moved:" src_path
 				if [ ! -e "$src_path" ]; then
 					echo "Error: File or directory does not exist."
-					send_stats "Failed to move file or directory: File or directory does not exist"
 					continue
 				fi
 
 				read -e -p "Please enter the destination path (including new file or directory name):" dest_path
 				if [ -z "$dest_path" ]; then
 					echo "Error: Please enter destination path."
-					send_stats "Failed to move file or directory: Destination path not specified"
 					continue
 				fi
 
 				mv "$src_path" "$dest_path" && echo "File or directory moved to$dest_path" || echo "Failed to move file or directory"
-				send_stats "Move a file or directory"
 				;;
 
 
@@ -21491,20 +20998,17 @@ linux_file() {
 				read -e -p "Please enter the file or directory path to copy:" src_path
 				if [ ! -e "$src_path" ]; then
 					echo "Error: File or directory does not exist."
-					send_stats "Failed to copy file or directory: File or directory does not exist"
 					continue
 				fi
 
 				read -e -p "Please enter the destination path (including new file or directory name):" dest_path
 				if [ -z "$dest_path" ]; then
 					echo "Error: Please enter destination path."
-					send_stats "Copying file or directory failed: Destination path not specified"
 					continue
 				fi
 
 				# Use the -r option to copy directories recursively
 				cp -r "$src_path" "$dest_path" && echo "File or directory copied to$dest_path" || echo "Failed to copy file or directory"
-				send_stats "Copy a file or directory"
 				;;
 
 
@@ -21512,7 +21016,6 @@ linux_file() {
 				read -e -p "Please enter the file path to be transferred:" file_to_transfer
 				if [ ! -f "$file_to_transfer" ]; then
 					echo "Error: File does not exist."
-					send_stats "Failed to transfer file: file does not exist"
 					continue
 				fi
 
@@ -21535,10 +21038,8 @@ EOF
 
 				if [ $? -eq 0 ]; then
 					echo "The file has been transferred to the remote server home directory."
-					send_stats "File transfer successful"
 				else
 					echo "File transfer failed."
-					send_stats "File transfer failed"
 				fi
 
 				break_end
@@ -21547,12 +21048,10 @@ EOF
 
 
 			0)  # 返回上一级选单
-				send_stats "Return to the previous menu"
 				break
 				;;
 			*)  # 处理无效输入
 				echo "Invalid selection, please re-enter"
-				send_stats "Invalid selection"
 				;;
 		esac
 	done
@@ -21603,7 +21102,6 @@ fi
 
 while true; do
 	  clear
-	  send_stats "Cluster control center"
 	  echo "Server cluster control"
 	  cat ~/cluster/servers.py
 	  echo
@@ -21623,7 +21121,6 @@ while true; do
 
 	  case $sub_choice in
 		  1)
-			  send_stats "Add cluster server"
 			  read -e -p "Server name:" server_name
 			  read -e -p "Server IP:" server_ip
 			  read -e -p "Server port (22):" server_port
@@ -21636,26 +21133,22 @@ while true; do
 
 			  ;;
 		  2)
-			  send_stats "Delete cluster server"
 			  read -e -p "Please enter the keywords to be deleted:" rmserver
 			  sed -i "/$rmserver/d" ~/cluster/servers.py
 			  ;;
 		  3)
-			  send_stats "Edit cluster server"
 			  install nano
 			  nano ~/cluster/servers.py
 			  ;;
 
 		  4)
 			  clear
-			  send_stats "Backup cluster"
 			  echo -e "please change${gl_huang}/root/cluster/servers.py${gl_bai}Download the file and complete the backup!"
 			  break_end
 			  ;;
 
 		  5)
 			  clear
-			  send_stats "Restore cluster"
 			  echo "Please upload your servers.py and press any key to start uploading!"
 			  echo -e "Please upload your${gl_huang}servers.py${gl_bai}file to${gl_huang}/root/cluster/${gl_bai}Restore completed!"
 			  break_end
@@ -21689,7 +21182,6 @@ while true; do
 			  ;;
 
 		  51)
-			  send_stats "Custom execution command"
 			  read -e -p "Please enter the command for batch execution:" mingling
 			  run_commands_on_servers "${mingling}"
 			  ;;
@@ -21712,7 +21204,6 @@ project_info() {
 	echo "Repository: $PROJECT_REPO_URL"
 	echo "License: $UPSTREAM_LICENSE"
 	echo "Derived from: $UPSTREAM_REPO_URL"
-	echo "Telemetry: disabled"
 	echo "Self-update: disabled"
 	[ -n "$PROJECT_WEBSITE_URL" ] && echo "Website: $PROJECT_WEBSITE_URL"
 	[ -n "$PROJECT_SUPPORT_URL" ] && echo "Support: $PROJECT_SUPPORT_URL"
@@ -21733,11 +21224,11 @@ games_server_tools() {
 
 	  case $sub_choice in
 
-		  1) send_stats "Eudemons Parlu server opening script" ; cd ~
+		  1) cd ~
 			 curl -sS -O ${PROJECT_DOWNLOAD_BASE}/palworld.sh ; chmod +x palworld.sh ; ./palworld.sh
 			 exit
 			 ;;
-		  2) send_stats "Minecraft server opening script" ; cd ~
+		  2) cd ~
 			 curl -sS -O ${PROJECT_DOWNLOAD_BASE}/mc.sh ; chmod +x mc.sh ; ./mc.sh
 			 exit
 			 ;;
@@ -21817,12 +21308,12 @@ read -e -p "Please enter your choice:" choice
 
 case $choice in
   1) linux_info ;;
-  2) clear ; send_stats "System update" ; linux_update ;;
-  3) clear ; send_stats "System cleanup" ; linux_clean ;;
+  2) clear ; linux_update ;;
+  3) clear ; linux_clean ;;
   4) linux_tools ;;
   5) linux_bbr ;;
   6) linux_docker ;;
-  7) clear ; send_stats "warp management" ; install wget
+  7) clear ; install wget
 	wget -N https://gitlab.com/fscarmen/warp/-/raw/main/menu.sh ; bash menu.sh [option] [lisence/url/token]
 	;;
   8) linux_test ;;
@@ -21844,7 +21335,6 @@ done
 
 
 command_help() {
-send_stats "${PROJECT_COMMAND} command reference use case"
 echo "-------------------"
 echo "Video introduction: https://www.bilibili.com/video/BV1ib421E7it?t=0.1"
 echo "The following is a reference use case for the ${PROJECT_COMMAND} command:"
@@ -21908,12 +21398,10 @@ else
 	case $1 in
 		install|add|安装)
 			shift
-			send_stats "Install software"
 			install "$@"
 			;;
 		remove|del|uninstall|卸载)
 			shift
-			send_stats "Uninstall software"
 			remove "$@"
 			;;
 		update|更新)
@@ -21947,7 +21435,6 @@ else
 
 		rsync_run)
 			shift
-			send_stats "Scheduled rsync synchronization"
 			run_task "$@"
 			;;
 
@@ -21985,13 +21472,11 @@ else
 
 		swap)
 			shift
-			send_stats "Quickly set up virtual memory"
 			add_swap "$@"
 			;;
 
 		time|时区)
 			shift
-			send_stats "Quickly set time zone"
 			set_timedate "$@"
 			;;
 
@@ -22039,42 +21524,34 @@ else
 
 		status|状态)
 			shift
-			send_stats "Check software status"
 			status "$@"
 			;;
 		start|启动)
 			shift
-			send_stats "Software startup"
 			start "$@"
 			;;
 		stop|停止)
 			shift
-			send_stats "software pause"
 			stop "$@"
 			;;
 		restart|重启)
 			shift
-			send_stats "Software restart"
 			restart "$@"
 			;;
 
 		enable|autostart|开机启动)
 			shift
-			send_stats "Software starts automatically when booting"
 			enable "$@"
 			;;
 
 		ssl)
 			shift
 			if [ "$1" = "ps" ]; then
-				send_stats "View certificate status"
 				ssl_ps
 			elif [ -z "$1" ]; then
 				add_ssl
-				send_stats "Apply for a certificate quickly"
 			elif [ -n "$1" ]; then
 				add_ssl "$1"
-				send_stats "Apply for a certificate quickly"
 			else
 				command_help
 			fi
@@ -22084,15 +21561,12 @@ else
 			shift
 			case $1 in
 				install|安装)
-					send_stats "Quickly install docker"
 					install_docker
 					;;
 				ps|容器)
-					send_stats "Quick container management"
 					docker_ps
 					;;
 				img|镜像)
-					send_stats "Quick image management"
 					docker_image
 					;;
 				*)
@@ -22119,7 +21593,6 @@ else
 
 		app)
 			shift
-			send_stats "Apply$*"
 			linux_panel "$@"
 			;;
 
@@ -22142,20 +21615,16 @@ else
 			case "$1" in
 				"" )
 					# sshkey → interactive menu
-					send_stats "SSHKey interactive menu"
 					sshkey_panel
 					;;
 				github )
 					shift
-					send_stats "Import SSH public key from GitHub"
 					fetch_github_ssh_keys "$1"
 					;;
 				http://*|https://* )
-					send_stats "Import SSH public key from URL"
 					fetch_remote_ssh_keys "$1"
 					;;
 				ssh-rsa*|ssh-ed25519*|ssh-ecdsa* )
-					send_stats "Directly import the public key"
 					import_sshkey "$1"
 					;;
 				* )
