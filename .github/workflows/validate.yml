@@ -1,0 +1,39 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Safe validation only: syntax checks, static safety regressions, and stubbed
+# smoke tests. The Docker matrix and anything touching real services, package
+# managers, or privileged paths stay excluded, matching SECURITY_AUDIT.md.
+jobs:
+  safe-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bash syntax checks
+        run: bash -n ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
+
+      - name: Python syntax checks
+        run: python3 -m py_compile translate.py en/to-en.py jp/to-jp.py kr/to-kr.py tw/to-tw.py
+
+      - name: Safety regression tests
+        run: |
+          for test_file in tests/tests_*.sh; do
+            echo "== $test_file"
+            bash "$test_file"
+          done
+
+      - name: OpenClaw smoke tests
+        run: |
+          bash tests_openclaw_manager_smoke.sh
+          for test_file in tests/openclaw/tests_*.sh cn/tests/openclaw/tests_*.sh; do
+            echo "== $test_file"
+            bash "$test_file"
+          done
