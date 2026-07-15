@@ -81,6 +81,15 @@ tests/                          安全回归与 OpenClaw 冒烟测试
 SECURITY_AUDIT.md               高风险命令和安全边界审计
 ```
 
+部分模板存在同名变体，属于不同场景而非冗余副本：
+
+| 文件对 | 区别 |
+| --- | --- |
+| `www.conf` / `www-1.conf` | PHP-FPM 池配置；无后缀为高性能模式，`-1` 为标准（低资源）模式 |
+| `custom_mysql_config.cnf` / `custom_mysql_config-1.cnf` | MySQL 配置；无后缀为高性能模式，`-1` 为标准模式 |
+| `auto_cert_renewal.sh` / `auto_cert_renewal-1.sh` | 证书续签；无后缀用于本项目 `/home/web/certs` 布局，`-1` 用于 certbot `/etc/letsencrypt/live` 布局 |
+| `Limiting_Shut_down.sh` / `Limiting_Shut_down1.sh` | 流量关机脚本；主入口部署 `Limiting_Shut_down1.sh`，无后缀为旧版实现 |
+
 大型入口仍是单体 Bash 文件。后续模块化应保持一个稳定入口，并分别拆分配置、
 系统、网络、Docker、站点和应用功能，避免把品牌替换、行为修改和重构混在一起。
 
