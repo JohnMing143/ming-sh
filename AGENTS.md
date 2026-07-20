@@ -31,6 +31,31 @@ kejilion/sh under the Apache License 2.0.
 - Run available checks after each change.
 - Prefer `bash -n` and ShellCheck where applicable.
 
+## Repository layout
+
+```text
+ming.sh                         Canonical implementation and stable entrypoint
+cn|en|jp|kr|tw/ming.sh          Localized implementations
+config/project.conf             Canonical source for project and upstream settings
+tests/                          Safety regressions and OpenClaw smoke tests
+SECURITY_AUDIT.md               High-risk command and trust-boundary audit
+```
+
+`cn/ming.sh` must stay byte-identical to the root entrypoint except for the
+`canshu="CN"` variant marker; regenerate it from `ming.sh` instead of editing
+it directly (`tests/tests_variant_sync.sh` enforces this). The translated
+variants must receive every functional change applied to the root script.
+
+Some templates exist as same-name variants for different scenarios, not as
+redundant copies:
+
+| File pair | Difference |
+| --- | --- |
+| `www.conf` / `www-1.conf` | PHP-FPM pool config; no suffix is the high-performance profile, `-1` is the standard (low-resource) profile |
+| `custom_mysql_config.cnf` / `custom_mysql_config-1.cnf` | MySQL config; no suffix is the high-performance profile, `-1` is the standard profile |
+| `auto_cert_renewal.sh` / `auto_cert_renewal-1.sh` | Certificate renewal; no suffix targets this project's `/home/web/certs` layout, `-1` targets the certbot `/etc/letsencrypt/live` layout |
+| `Limiting_Shut_down.sh` / `Limiting_Shut_down1.sh` | Traffic-based shutdown; the main entrypoint deploys `Limiting_Shut_down1.sh`, the unsuffixed file is the legacy implementation |
+
 ## Architecture direction
 
 - Gradually split the large shell script into modules.

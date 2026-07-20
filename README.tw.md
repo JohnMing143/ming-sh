@@ -45,7 +45,8 @@ m
 或修改系統的操作，均只在你主動選擇對應選單項目時才會發生。
 
 系統調校相關功能使用 `/etc/sysctl.d/99-ming-sh-*.conf` 設定檔和
-`# ming-sh-optimize` 標記，便於識別和清理。
+`# ming-sh-optimize` 標記；網路自動調校模式使用
+`/etc/sysctl.d/99-network-optimize.conf`，便於識別和清理。
 
 ## 隱私與安全預設值
 

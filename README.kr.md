@@ -48,7 +48,9 @@ m
 해당 메뉴 항목을 직접 선택했을 때만 수행됩니다.
 
 시스템 튜닝 관련 기능은 `/etc/sysctl.d/99-ming-sh-*.conf` 설정 파일과
-`# ming-sh-optimize` 마커를 사용하므로 식별과 정리가 쉽습니다.
+`# ming-sh-optimize` 마커를 사용하고, 네트워크 자동 튜닝 모드는
+`/etc/sysctl.d/99-network-optimize.conf`를 사용하므로 식별과 정리가
+쉽습니다.
 
 ## 개인정보 보호와 보안 기본값
 
