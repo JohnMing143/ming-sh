@@ -27,6 +27,19 @@ jobs:
       - name: Python syntax checks
         run: python3 -m py_compile translate.py lib/inline.py tests/normalize_shell_skeleton.py
 
+      - name: ShellCheck (helpers, tests, library)
+        run: |
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y shellcheck
+          fi
+          # The monolithic entrypoints are excluded: ShellCheck's memory use on
+          # a 21k-line generated file can exhaust the runner (see SECURITY_AUDIT.md).
+          # Error severity is the initial gate; tightening it is future work.
+          mapfile -t shell_files < <(git ls-files '*.sh' \
+            | grep -vE '^(ming\.sh|(cn|en|jp|kr|tw)/ming\.sh)$')
+          printf '== %s\n' "${shell_files[@]}"
+          shellcheck --severity=error "${shell_files[@]}"
+
       - name: Safety regression tests
         run: |
           for test_file in tests/tests_*.sh; do

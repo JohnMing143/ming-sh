@@ -159,8 +159,10 @@ git diff --check
 ```
 
 ShellCheck is not run on the large monolithic entrypoints because its current
-resource usage can exhaust the development environment. It is run on changed
-smaller shell files and tests. Main-entrypoint validation uses Bash syntax
+resource usage can exhaust the development environment. The CI workflow runs
+ShellCheck at error severity on every other tracked shell file (helpers, the
+shared library, and tests), excluding only the six entrypoints; tightening the
+severity gate is future work. Main-entrypoint validation uses Bash syntax
 checks, targeted static searches, regression tests, and diff review.
 
 The OpenClaw smoke tests use repository-local temporary directories and command

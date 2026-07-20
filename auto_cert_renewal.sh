@@ -1,3 +1,4 @@
+#!/bin/sh
 # 定义证书存储目录
 certs_directory="/home/web/certs/"
 days_before_expiry=15  # 设置在证书到期前几天触发续签

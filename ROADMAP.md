@@ -90,8 +90,11 @@ hand-edited or regeneration was skipped.
    removes the config and reloads system defaults instead of re-applying a
    prior optimization backup. The entrypoints detect and clean both paths;
    `tests/tests_network_optimize_paths.sh` guards it.
-6. **ShellCheck in CI** for helpers and tests (the monolithic entrypoints
-   stay excluded for the resource reasons documented in the audit).
+6. **ShellCheck in CI — done 2026-07-19.** The workflow runs ShellCheck at
+   error severity on every tracked shell file except the six entrypoints
+   (excluded for the documented resource reasons). Tightening the severity
+   gate toward warning level, after triaging the legacy helpers in a
+   ShellCheck-capable environment, is future work.
 7. **Documentation language policy, stated in AGENTS.md:** user-facing
    READMEs in zh/tw/ja/kr maintained together; developer docs (AGENTS,
    SECURITY_AUDIT, ROADMAP) in English only. Resolve the current mismatch:
