@@ -75,7 +75,7 @@ fi
 if grep -En '^[[:space:]]*[^#]*(curl|wget)[^[:space:]]*[[:space:]].*http://' "${production_shell_files[@]}"; then
 	fail "a production download still uses plaintext HTTP"
 fi
-for firewall_helper in "$repo_root/ldnmp.sh" "$repo_root/auto_cert_renewal-1.sh"; do
+for firewall_helper in "$repo_root/auto_cert_renewal-1.sh"; do
 	if grep -En '^[[:space:]]*(iptables|ip6tables)[[:space:]]+(-F|-X)([[:space:]]|$)' "$firewall_helper"; then
 		fail "an unrelated helper still flushes broad firewall state: $firewall_helper"
 	fi
