@@ -39,6 +39,7 @@ while IFS= read -r tracked_file; do
 
 		# Tests
 		tests/tests_*.sh|tests/openclaw/tests_*.sh|tests/openclaw/README.md) ;;
+		tests/normalize_shell_skeleton.py) ;;
 		cn/tests/openclaw/tests_*.sh) ;;
 		tests_openclaw_manager_smoke.sh|run_openclaw_manager_matrix.sh) ;;
 
