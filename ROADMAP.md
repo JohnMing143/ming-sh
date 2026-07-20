@@ -178,9 +178,12 @@ signed or digest-pinned update design. Updates stay disabled until then.
 
 - Milestones 1–4 are complete; Milestone 5's Docker-matrix isolation is done
   and its source-modularization is deferred by recommendation (a maintainer
-  decision, not a blocker). The open security item is container-image/release
-  digest pinning (the applicable remainder of CMD-013). Prefer these over new
-  features.
+  decision, not a blocker). Integrity pinning (CMD-002/CMD-013) is closed:
+  scripts, images, and releases are mutable by design, so there is no stable
+  digest to pin. The remaining security items are all accepted-by-design
+  tradeoffs (admin-selected passwordless sudo, intentional broad firewall
+  control, backup-automation credentials) rather than open bugs. Prefer the
+  documented follow-ups over new features.
 - Never hand-edit a generated file; regenerate it. After editing `ming.sh` run
   `python3 translate.py generate --all`; after editing anything in `lib/` run
   `python3 lib/inline.py` (then regenerate if `ming.sh` changed).
