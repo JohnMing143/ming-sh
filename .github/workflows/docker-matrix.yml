@@ -1,0 +1,26 @@
+name: docker-matrix
+
+# CMD-015: the OpenClaw manager matrix runs real Docker containers and pulls
+# images, so it is deliberately excluded from the default push/PR validation.
+# It runs only when triggered by hand, in a disposable GitHub-hosted runner.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  openclaw-manager-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run the OpenClaw manager matrix
+        run: |
+          chmod +x run_openclaw_manager_matrix.sh tests_openclaw_manager_smoke.sh
+          ./run_openclaw_manager_matrix.sh | tee matrix.log
+          # Fail the job if any image reported a failure.
+          if grep -q 'RESULT .* FAIL' matrix.log; then
+            echo "::error::one or more matrix images failed"
+            exit 1
+          fi

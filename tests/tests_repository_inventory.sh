@@ -16,7 +16,7 @@ unknown=""
 while IFS= read -r tracked_file; do
 	case "$tracked_file" in
 		# Repository metadata and documentation
-		.gitattributes|.gitignore|.github/workflows/validate.yml) ;;
+		.gitattributes|.gitignore|.github/workflows/validate.yml|.github/workflows/docker-matrix.yml) ;;
 		AGENTS.md|README.md|README.en.md|README.tw.md|README.ja.md|README.kr.md|ROADMAP.md) ;;
 		SECURITY_AUDIT.md|LICENSE|UPSTREAM_CHANGELOG.txt|apps/README.md) ;;
 
