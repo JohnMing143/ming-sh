@@ -4,7 +4,7 @@
 대화형 메뉴를 통해 시스템 유지 관리, Docker, 웹 사이트 구축, 네트워크 최적화
 등 일상적인 운영 작업을 수행할 수 있습니다.
 
-[简体中文](README.md) · [繁體中文](README.tw.md) · [日本語](README.ja.md)
+[简体中文](README.md) · [English](README.en.md) · [繁體中文](README.tw.md) · [日本語](README.ja.md)
 
 ## 주요 기능
 

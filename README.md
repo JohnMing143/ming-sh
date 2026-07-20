@@ -3,7 +3,7 @@
 一站式 Linux 服务器管理工具箱。安装后输入一个 `m` 命令，即可通过交互式菜单
 完成系统维护、Docker、建站、网络优化等日常运维工作。
 
-[繁體中文](README.tw.md) · [日本語](README.ja.md) · [한국어](README.kr.md)
+[English](README.en.md) · [繁體中文](README.tw.md) · [日本語](README.ja.md) · [한국어](README.kr.md)
 
 ## 功能一览
 

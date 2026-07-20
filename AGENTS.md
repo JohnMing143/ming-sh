@@ -40,8 +40,15 @@ cn|en|jp|kr|tw/ming.sh          Generated localized implementations
 config/project.conf             Canonical source for project and upstream settings
 lib/                            Shared shell helpers, inlined into consumers
 tests/                          Safety regressions and OpenClaw smoke tests
+README.md · README.en|tw|ja|kr.md  User-facing docs, one per shipped locale
 SECURITY_AUDIT.md               High-risk command and trust-boundary audit
 ```
+
+Documentation language policy: user-facing READMEs are maintained together,
+one per shipped entrypoint locale (zh/en/tw/ja/kr), and their language-selector
+lines must cross-link every sibling. Developer docs (`AGENTS.md`,
+`SECURITY_AUDIT.md`, `ROADMAP.md`) and code comments in the tooling are English
+only.
 
 Shared shell helpers live once under `lib/` and are inlined between
 generation markers into their consumers (`python3 lib/inline.py`); shipped

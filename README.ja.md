@@ -4,7 +4,7 @@
 `m` コマンドひとつで、対話式メニューからシステムメンテナンス、Docker、
 Web サイト構築、ネットワーク最適化などの日常的な運用作業を行えます。
 
-[简体中文](README.md) · [繁體中文](README.tw.md) · [한국어](README.kr.md)
+[简体中文](README.md) · [English](README.en.md) · [繁體中文](README.tw.md) · [한국어](README.kr.md)
 
 ## 主な機能
 

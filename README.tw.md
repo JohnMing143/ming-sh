@@ -3,7 +3,7 @@
 一站式 Linux 伺服器管理工具箱。安裝後輸入一個 `m` 命令，即可透過互動式選單
 完成系統維護、Docker、架站、網路最佳化等日常維運工作。
 
-[简体中文](README.md) · [日本語](README.ja.md) · [한국어](README.kr.md)
+[简体中文](README.md) · [English](README.en.md) · [日本語](README.ja.md) · [한국어](README.kr.md)
 
 ## 功能一覽
 

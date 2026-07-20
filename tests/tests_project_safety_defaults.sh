@@ -72,7 +72,7 @@ branding_matches=$(grep -R -n -i -E "$branding_pattern" \
 while IFS=: read -r match_file _ match_text; do
 	[ -n "$match_file" ] || continue
 	case "$match_file" in
-		"$repo_root/AGENTS.md"|"$repo_root/README.md"|"$repo_root/README.tw.md"|"$repo_root/README.ja.md"|"$repo_root/README.kr.md"|"$repo_root/ROADMAP.md"|"$repo_root/network-optimize.sh"|"$repo_root/apps/README.md")
+		"$repo_root/AGENTS.md"|"$repo_root/README.md"|"$repo_root/README.en.md"|"$repo_root/README.tw.md"|"$repo_root/README.ja.md"|"$repo_root/README.kr.md"|"$repo_root/ROADMAP.md"|"$repo_root/network-optimize.sh"|"$repo_root/apps/README.md")
 			printf '%s\n' "$match_text" | grep -Eqi 'upstream|derived|Apache|github\.com' || fail "unexpected branding context: $match_file"
 			;;
 		"$repo_root/config/project.conf"|"$repo_root/ming.sh"|"$repo_root/cn/ming.sh"|"$repo_root/en/ming.sh"|"$repo_root/jp/ming.sh"|"$repo_root/kr/ming.sh"|"$repo_root/tw/ming.sh"|"$repo_root/palworld.sh"|"$repo_root/SECURITY_AUDIT.md")

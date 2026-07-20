@@ -95,12 +95,11 @@ hand-edited or regeneration was skipped.
    (excluded for the documented resource reasons). Tightening the severity
    gate toward warning level, after triaging the legacy helpers in a
    ShellCheck-capable environment, is future work.
-7. **Documentation language policy, stated in AGENTS.md:** user-facing
-   READMEs in zh/tw/ja/kr maintained together; developer docs (AGENTS,
-   SECURITY_AUDIT, ROADMAP) in English only. Resolve the current mismatch:
-   `en/ming.sh` ships without an English README — either add `README.en.md`
-   to the maintained set or record that the English variant is documented
-   through the existing READMEs.
+7. **Documentation language policy — done 2026-07-19.** Stated in AGENTS.md:
+   user-facing READMEs are maintained together, one per shipped locale
+   (zh/en/tw/ja/kr) with cross-linked selectors; developer docs and tooling
+   comments are English only. The missing `README.en.md` for the shipped
+   English entrypoint was added and cross-linked.
 
 **Exit criteria:** grep finds exactly one definition of each shared helper in
 source form; every convention above has a failing-test guard.
