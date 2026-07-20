@@ -139,7 +139,6 @@ run_command() {
 	fi
 }
 
-
 safe_remove_path() {
 	local target="$1"
 	local parent_real target_name target_real
@@ -3330,8 +3329,8 @@ local -a tmux_command=()
 
 read -r -a tmux_command <<< "$tmuxd"
 if [ "${#tmux_command[@]}" -eq 0 ] || ! command -v "${tmux_command[0]}" >/dev/null 2>&1; then
-  echo "Enter a directly executable program and arguments; shell pipelines and redirections are not supported."
-  return 1
+	echo "请输入可直接执行的程序及参数；不支持管道、重定向或其他 shell 语法。"
+	return 1
 fi
 
 # 检查会话是否存在的函数
@@ -4861,11 +4860,8 @@ linux_clean() {
 	elif command -v apk &>/dev/null; then
 		echo "清理包管理器缓存..."
 		apk cache clean
-		echo "删除系统日志..."
+		echo "清理过期压缩日志与七天前的普通临时文件..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "删除APK缓存..."
-		find /var/cache/apk -xdev -type f -mtime +7 -delete 2>/dev/null
-		echo "删除临时文件..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pacman &>/dev/null; then
@@ -4883,9 +4879,8 @@ linux_clean() {
 		journalctl --vacuum-size=500M
 
 	elif command -v opkg &>/dev/null; then
-		echo "删除系统日志..."
+		echo "清理过期压缩日志与七天前的普通临时文件..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "删除临时文件..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pkg &>/dev/null; then
@@ -4893,9 +4888,8 @@ linux_clean() {
 		pkg autoremove -y
 		echo "清理包管理器缓存..."
 		pkg clean -y
-		echo "删除系统日志..."
+		echo "清理过期压缩日志与七天前的普通临时文件..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "删除临时文件..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	else
@@ -5025,6 +5019,7 @@ correct_ssh_config() {
 			   -e 's/^\s*#\?\s*PasswordAuthentication .*/PasswordAuthentication yes/' \
 			   -e 's/^\s*#\?\s*PubkeyAuthentication .*/PubkeyAuthentication yes/' "$sshd_config"
 	fi
+
 }
 
 
@@ -5039,8 +5034,8 @@ new_ssh_port() {
 
   correct_ssh_config
 
-  restart_ssh
-  open_port $new_port
+	restart_ssh
+	open_port $new_port
 
   echo "SSH 端口已修改为: $new_port"
 
@@ -5675,8 +5670,14 @@ bbrv3() {
 				fi
 				
 				# 兼容官方已移除的老系统代号（回退使用 releases 尝试旧包库）
-				if ! echo "bookworm trixie forky sid noble plucky questing resolute faye gigi wilma xia zara zena jammy" | grep -qw "$os_codename"; then
+				if ! echo "bookworm trixie forky sid noble plucky questing resolute faye gigi wilma xia zara zena" | grep -qw "$os_codename"; then
 					os_codename="releases"
+				fi
+				
+				# 官方已彻底移除对 jammy, focal, bullseye 等老系统的 apt 支持
+				if echo "jammy focal bullseye buster" | grep -qw "$os_codename" || [ "$os_codename" = "releases" ]; then
+					echo -e "${gl_hong}XanMod 官方已停止对当前系统($os_codename)的 APT 源支持，请升级至 Debian12 / Ubuntu24 或更高版本。${gl_bai}"
+					return 1
 				fi
 
 				if [ -z "$os_codename" ]; then
@@ -7264,8 +7265,9 @@ format_partition() {
 	read -e -p "请输入要格式化的分区名称（例如 sda1）: " PARTITION
 	local DEVICE="/dev/$PARTITION"
 
-	# 检查分区是否存在
-	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] || ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
+	# 只允许格式化真实分区，不允许整盘或任意设备路径
+	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] ||
+	   ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
 		echo "分区不存在！"
 		return
 	fi
@@ -7276,7 +7278,7 @@ format_partition() {
 		return
 	fi
 	if find "/sys/class/block/$PARTITION/holders" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null | grep -q .; then
-		echo "Partition is still held by another block device."
+		echo "分区仍被其他块设备占用，拒绝格式化！"
 		return
 	fi
 
@@ -7304,7 +7306,7 @@ format_partition() {
 	fi
 
 	# 格式化分区
-	echo "Formatting partition $DEVICE as $FS_TYPE ..."
+	echo "正在格式化分区 $DEVICE 为 $FS_TYPE ..."
 	case "$FS_TYPE" in
 		ext4) mkfs.ext4 -- "$DEVICE" ;;
 		xfs) mkfs.xfs -- "$DEVICE" ;;
@@ -21212,11 +21214,22 @@ while true; do
 			  local server_username=${server_username:-root}
 			  read -e -s -p "服务器用户密码: " server_password
 			  echo
-			  local server_password_encoded
-			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || { echo "密码编码失败。"; break_end; continue; }
-			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] || [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] || [[ ! "$server_port" =~ ^[0-9]+$ ]] || [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] || [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then
-				  echo "服务器信息格式无效。"; break_end; continue
+			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
+				 [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] ||
+				 [[ ! "$server_port" =~ ^[0-9]+$ ]] ||
+				 [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] ||
+				 [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  echo "服务器信息格式无效。"
+				  break_end
+				  continue
 			  fi
+			  local server_password_encoded
+			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || {
+				  echo "密码编码失败。"
+				  break_end
+				  continue
+			  }
+
 			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"base64:$server_password_encoded\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
 			  chmod 0600 "$HOME/cluster/servers.py"
 			  unset server_password server_password_encoded
@@ -21224,7 +21237,11 @@ while true; do
 			  ;;
 		  2)
 			  read -e -p "请输入需要删除的关键字: " rmserver
-			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"; else echo "服务器名称格式无效。"; fi
+			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"
+			  else
+				  echo "服务器名称格式无效。"
+			  fi
 			  ;;
 		  3)
 			  install nano
