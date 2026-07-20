@@ -128,9 +128,15 @@ allowlist).
    pinning container **images** and application **releases** to digests (a
    separate mechanism from the script validator); that is the remaining
    CMD-013 item. Transport (TLS), syntax check, and digest display stay as-is.
-9. **Cluster authentication (CMD-010).** SSH-key path for the cluster
-   feature, migration for the Base64 password store, and support for
-   pre-provisioned known hosts with `StrictHostKeyChecking=yes`.
+9. **Cluster authentication (CMD-010) — done 2026-07-19.** The cluster
+   feature now supports SSH-key auth: a blank add-server password stores the
+   credential `key` (or a hand-set `key:/path`), and `run_commands_on_servers`
+   connects with `ssh` using the default key/agent or identity file, storing
+   no password. Existing Base64 password entries are unchanged (backward
+   compatible), and host verification still follows the centralized
+   `SSH_STRICT_HOST_KEY_CHECKING` policy, which an administrator can set to
+   `yes` with pre-provisioned known hosts. `tests/tests_security_hardening_defaults.sh`
+   covers both the key and password paths.
 
 ## Milestone 5: modularize behind the stable entrypoint
 

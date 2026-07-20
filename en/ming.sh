@@ -21178,13 +21178,25 @@ run_commands_on_servers() {
 		local password
 		echo
 		echo -e "${gl_huang}Connect to$name ($hostname)...${gl_bai}"
-		if [[ "$stored_password" == base64:* ]]; then
-			password=$(printf '%s' "${stored_password#base64:}" | base64 -d 2>/dev/null) || password="$stored_password"
-		else
-			password="$stored_password"
-		fi
-		SSHPASS="$password" sshpass -e ssh -t -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$username@$hostname" -p "$port" "$1"
-		unset password
+		case "$stored_password" in
+			key)
+				# 密钥认证：使用默认密钥或 ssh-agent，条目不保存任何密码
+				ssh -t -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$username@$hostname" -p "$port" "$1"
+				;;
+			key:*)
+				# 密钥认证：使用指定的身份文件
+				ssh -t -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" -i "${stored_password#key:}" "$username@$hostname" -p "$port" "$1"
+				;;
+			*)
+				if [[ "$stored_password" == base64:* ]]; then
+					password=$(printf '%s' "${stored_password#base64:}" | base64 -d 2>/dev/null) || password="$stored_password"
+				else
+					password="$stored_password"
+				fi
+				SSHPASS="$password" sshpass -e ssh -t -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$username@$hostname" -p "$port" "$1"
+				unset password
+				;;
+		esac
 	done
 	echo
 	break_end
@@ -21232,6 +21244,7 @@ while true; do
 			  local server_port=${server_port:-22}
 			  read -e -p "Server username (root):" server_username
 			  local server_username=${server_username:-root}
+			  echo -e "${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}"
 			  read -e -s -p "Server user password:" server_password
 			  echo
 			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
@@ -21243,16 +21256,22 @@ while true; do
 				  break_end
 				  continue
 			  fi
-			  local server_password_encoded
-			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || {
-				  echo "Password encoding failed."
-				  break_end
-				  continue
-			  }
+			  local server_credential
+			  if [ -z "$server_password" ]; then
+				  server_credential="key"
+			  else
+				  local server_password_encoded
+				  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || {
+					  echo "密码编码失败。"
+					  break_end
+					  continue
+				  }
+				  server_credential="base64:$server_password_encoded"
+			  fi
 
-			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"base64:$server_password_encoded\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
+			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"$server_credential\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
 			  chmod 0600 "$HOME/cluster/servers.py"
-			  unset server_password server_password_encoded
+			  unset server_password server_credential
 
 			  ;;
 		  2)
