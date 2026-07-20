@@ -54,7 +54,7 @@ redundant copies:
 | `www.conf` / `www-1.conf` | PHP-FPM pool config; no suffix is the high-performance profile, `-1` is the standard (low-resource) profile |
 | `custom_mysql_config.cnf` / `custom_mysql_config-1.cnf` | MySQL config; no suffix is the high-performance profile, `-1` is the standard profile |
 | `auto_cert_renewal.sh` / `auto_cert_renewal-1.sh` | Certificate renewal; no suffix targets this project's `/home/web/certs` layout, `-1` targets the certbot `/etc/letsencrypt/live` layout |
-| `Limiting_Shut_down.sh` / `Limiting_Shut_down1.sh` | Traffic-based shutdown; the main entrypoint deploys `Limiting_Shut_down1.sh`, the unsuffixed file is the legacy implementation |
+| `Limiting_Shut_down1.sh` | Traffic-based shutdown template. The `1` suffix is kept because installed entrypoints fetch this exact filename by URL; the legacy unsuffixed implementation was removed on 2026-07-19 |
 
 ## Architecture direction
 
