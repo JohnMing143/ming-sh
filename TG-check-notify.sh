@@ -14,10 +14,10 @@ NETWORK_THRESHOLD_GB=1000
 
 
 # 获取设备信息的变量
-country=$(curl -s ipinfo.io/$public_ip/country)
-isp_info=$(curl -s ipinfo.io/org | sed -e 's/\"//g' | awk -F' ' '{print $2}')
+country=$(curl -s https://ipinfo.io/country)
+isp_info=$(curl -s https://ipinfo.io/org | sed -e 's/\"//g' | awk -F' ' '{print $2}')
 
-ipv4_address=$(curl -s ipv4.ip.sb)
+ipv4_address=$(curl -s https://ipv4.ip.sb)
 masked_ip=$(echo $ipv4_address | awk -F'.' '{print "*."$3"."$4}')
 
 # 发送Telegram通知的函数

@@ -591,8 +591,8 @@ show_network_status() {
 # ========================
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]] || [[ -z "${BASH_SOURCE[0]}" ]]; then
-    # 支持参数: bash xxx.sh restore / bash xxx.sh status
-    # 支持环境变量: ACTION=restore curl ... | bash
+    # 支持参数: bash network-optimize.sh restore / bash network-optimize.sh status
+    # 也支持环境变量: ACTION=restore bash network-optimize.sh（先下载审阅，再本地运行）
     _action="${1:-${ACTION:-optimize}}"
     case "$_action" in
         restore|rollback|回滚)
