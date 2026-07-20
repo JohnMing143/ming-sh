@@ -140,22 +140,47 @@ allowlist).
 
 ## Milestone 5: modularize behind the stable entrypoint
 
-Only after Milestones 1–3 provide guardrails: split the root script by
-feature area (OpenClaw first — self-contained with its own smoke suite; then
-sysctl/network, Docker apps, web stack) into source modules assembled into
-the single released `ming.sh`. The `m` command and one-file `curl` install
-never change. Alongside: run the Docker matrix (CMD-015) in a disposable CI
-environment on manual trigger only, and define a release process — tagging,
-a fork change log, and (before ever enabling `ENABLE_SELF_UPDATE`) a signed
-or digest-pinned update design. Updates stay disabled until that design
-exists.
+**Docker matrix isolation (CMD-015) — done 2026-07-19.** The
+`run_openclaw_manager_matrix.sh` matrix now runs only through
+`.github/workflows/docker-matrix.yml`, a `workflow_dispatch`-only workflow in
+a disposable runner; it never runs on the developer host or in default
+validation.
+
+**Source modularization — reassessed 2026-07-19, recommended to defer.** The
+premise "OpenClaw is self-contained, extract it first" holds: OpenClaw is a
+contiguous ~5,350-line block (`ming.sh` 10039–15389) with its own smoke suite,
+so a clean cut is feasible using the proven `lib/inline.py` inline-marker
+pattern, and byte-identical assembly would leave the catalogs and variants
+untouched. But the cost/benefit does not favor doing it now:
+
+- The shipped `ming.sh` is unchanged (the module is inlined back), so the only
+  benefit is editing a 5k-line file instead of a region of the 21k-line file.
+- It adds a third build stage (`modules → ming.sh`) on top of the existing
+  `lib → ming.sh` inline and `ming.sh → variants` generation. For a solo
+  maintainer, that build-pipeline complexity works against the "one person can
+  maintain" goal — the same goal modularization is meant to serve.
+- The generation pipeline already makes `ming.sh` the single source, so the
+  maintainability problem modularization targets is partly already solved.
+
+Recommendation: defer until the monolith's size is a concrete, felt pain
+point, then extract only OpenClaw (the largest, smoke-tested block) via the
+existing inline pattern — one module, not a framework. This is a maintainer
+decision, not a blocker.
+
+**Release process — deferred as premature.** With no release cadence yet and
+project updates deliberately disabled (`ENABLE_SELF_UPDATE=false`), building
+tagging/changelog machinery now would be process for its own sake. When
+releases begin: annotated tags, a fork change log distinct from the archived
+`UPSTREAM_CHANGELOG.txt`, and — only before ever enabling self-update — a
+signed or digest-pinned update design. Updates stay disabled until then.
 
 ## Standing rules
 
-- Consolidation (Milestones 1–3) and the security backlog (Milestone 4) are
-  complete. The remaining planned work is modularization (Milestone 5); prefer
-  it over new features. Container-image/release digest pinning (the applicable
-  remainder of CMD-013) is the open security item.
+- Milestones 1–4 are complete; Milestone 5's Docker-matrix isolation is done
+  and its source-modularization is deferred by recommendation (a maintainer
+  decision, not a blocker). The open security item is container-image/release
+  digest pinning (the applicable remainder of CMD-013). Prefer these over new
+  features.
 - Never hand-edit a generated file; regenerate it. After editing `ming.sh` run
   `python3 translate.py generate --all`; after editing anything in `lib/` run
   `python3 lib/inline.py` (then regenerate if `ming.sh` changed).
