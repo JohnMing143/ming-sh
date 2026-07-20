@@ -118,12 +118,16 @@ allowlist).
 
 ## Milestone 4: remaining security backlog (on the smaller surface)
 
-8. **Integrity pinning (CMD-002/CMD-013).** Repository-known SHA-256 values
-   for stable remote scripts, verified by `run_reviewed_remote_script` before
-   execution (one place to change after Milestone 3); recorded-digest display
-   for fast-moving upstreams like `get.docker.com`. Route the retained
-   NodeSource `dnf` pipeline through the validator or record a renewed
-   explicit maintainer decision.
+8. **Integrity pinning (CMD-002/CMD-013) — reassessed 2026-07-19.** A review
+   of the whole remote-script surface (19 URLs) found script-level pinning
+   does not apply: 14 target third-party moving refs (`latest`/branch heads)
+   and 5 interpolate the proxy-dependent project base, so there is no stable
+   digest to pin — building a pin registry here would be machinery for a case
+   that does not exist. The NodeSource `dnf` exception was re-affirmed as a
+   documented, allowlisted convenience. The applicable integrity work is
+   pinning container **images** and application **releases** to digests (a
+   separate mechanism from the script validator); that is the remaining
+   CMD-013 item. Transport (TLS), syntax check, and digest display stay as-is.
 9. **Cluster authentication (CMD-010).** SSH-key path for the cluster
    feature, migration for the Base64 password store, and support for
    pre-provisioned known hosts with `StrictHostKeyChecking=yes`.
