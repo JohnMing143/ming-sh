@@ -25,7 +25,7 @@ jobs:
           done
 
       - name: Python syntax checks
-        run: python3 -m py_compile translate.py tests/normalize_shell_skeleton.py
+        run: python3 -m py_compile translate.py lib/inline.py tests/normalize_shell_skeleton.py
 
       - name: Safety regression tests
         run: |

@@ -164,6 +164,7 @@ safe_remove_path() {
 	rm -rf -- "$target_real"
 }
 
+# --- ming-sh shared lib: remote_script (generated from lib/remote_script.sh; edit there, then run: python3 lib/inline.py) ---
 remote_script_sha256() {
 	local script_path="$1"
 	if command -v sha256sum >/dev/null 2>&1; then
@@ -185,7 +186,7 @@ run_reviewed_remote_script() {
 		https://*) ;;
 		*) echo "拒绝下载非 HTTPS 脚本: $script_url"; return 1 ;;
 	esac
-	cache_dir="${PROJECT_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/${PROJECT_ID}}/remote-scripts"
+	cache_dir="${PROJECT_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/${PROJECT_ID:-ming-sh}}/remote-scripts"
 	[ ! -L "$cache_dir" ] || { echo "拒绝使用符号链接缓存目录: $cache_dir"; return 1; }
 	mkdir -p -- "$cache_dir" || return 1
 	[ -O "$cache_dir" ] || { echo "远程脚本缓存目录不属于当前用户: $cache_dir"; return 1; }
@@ -218,6 +219,7 @@ run_reviewed_remote_script() {
 	rm -f -- "$script_path"
 	return "$exit_status"
 }
+# --- end ming-sh shared lib: remote_script ---
 
 
 project_entrypoint_is_managed_file() {

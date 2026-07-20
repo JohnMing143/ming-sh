@@ -34,8 +34,9 @@ while IFS= read -r tracked_file; do
 		www.conf|www-1.conf|custom_mysql_config.cnf|custom_mysql_config-1.cnf) ;;
 		optimized_php.ini|sshd.local|fail2ban-nginx-cc.conf|archive.key) ;;
 
-		# Development tooling and translation catalogs
+		# Development tooling, shared library sources, translation catalogs
 		translate.py|en/catalog.json|jp/catalog.json|kr/catalog.json|tw/catalog.json) ;;
+		lib/remote_script.sh|lib/inline.py) ;;
 
 		# Tests
 		tests/tests_*.sh|tests/openclaw/tests_*.sh|tests/openclaw/README.md) ;;

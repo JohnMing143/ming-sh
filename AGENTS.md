@@ -35,11 +35,18 @@ kejilion/sh under the Apache License 2.0.
 
 ```text
 ming.sh                         Canonical implementation and stable entrypoint
-cn|en|jp|kr|tw/ming.sh          Localized implementations
+cn|en|jp|kr|tw/ming.sh          Generated localized implementations
+<lang>/catalog.json             Per-line translation catalogs
 config/project.conf             Canonical source for project and upstream settings
+lib/                            Shared shell helpers, inlined into consumers
 tests/                          Safety regressions and OpenClaw smoke tests
 SECURITY_AUDIT.md               High-risk command and trust-boundary audit
 ```
+
+Shared shell helpers live once under `lib/` and are inlined between
+generation markers into their consumers (`python3 lib/inline.py`); shipped
+files stay self-contained and never source library code at runtime
+(`tests/tests_shared_lib_sync.sh` enforces this).
 
 Every localized entrypoint is generated from the root script — never edit
 one directly. `cn/ming.sh` is the root with only the `canshu="CN"` marker
