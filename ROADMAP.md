@@ -1,94 +1,133 @@
 # Roadmap
 
-Planning date: 2026-07-19. This roadmap continues the remediation order in
-[`SECURITY_AUDIT.md`](SECURITY_AUDIT.md) and the architecture direction in
-[`AGENTS.md`](AGENTS.md). Each stage should land as small, independently
-validated commits; nothing here authorizes running privileged features during
-development.
+Planning date: 2026-07-19 (refined the same day). Goal: a fork one person can
+maintain — smaller surface, one source of truth for every artifact, and
+conventions enforced by tests instead of memory. This continues the
+remediation order in [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md) and the
+architecture direction in [`AGENTS.md`](AGENTS.md). Work lands as small,
+independently validated commits; nothing here authorizes running privileged
+features during development.
 
-## Stage 1: stop variant drift at the source
+## Fork posture
 
-The 2026-07-19 audit found that hand-applied fixes had diverged the six
-`ming.sh` copies (missing XanMod end-of-support guard and untranslated
-messages in `cn/ming.sh`). The cn copy is now regenerated and pinned by
-`tests/tests_variant_sync.sh`; the translated copies are still edited by hand.
+This repository is a **hard fork** of kejilion/sh (baseline 4.5.2, archived in
+`UPSTREAM_CHANGELOG.txt`). There are no wholesale upstream merges; individual
+upstream fixes may be backported after review. Upstream services remain
+runtime *content* dependencies (templates, compose files, images) tracked as
+`UPSTREAM_*` variables in `config/project.conf` and are subject to the
+integrity-pinning milestone. Complexity that exists only because upstream
+shipped it — and that this fork does not use — is removed, not maintained.
 
-1. **Structure-sync check for translated variants.** Add a test that compares
-   a normalized code skeleton (string literals and comments stripped) of
-   `en|jp|kr|tw/ming.sh` against the root script so functional edits can no
-   longer miss a copy silently. Follow the existing extraction-test style;
-   no network, no execution.
-2. **Regeneration pipeline instead of hand edits.** Extend the `to-*.py`
-   tools into a deterministic pipeline: root script + per-language string
-   catalog → generated variant. Translation of new strings stays behind
-   `ALLOW_REMOTE_TRANSLATION=true`; regeneration from already-translated
-   catalogs must work fully offline. Done when a functional change to
-   `ming.sh` reaches all variants with one command and no manual editing.
-3. **ShellCheck in CI for small files.** Run ShellCheck on helpers and tests
-   (the monolithic entrypoints stay excluded for resource reasons, as
-   documented in `SECURITY_AUDIT.md`). Fix or annotate findings.
+## Principles
 
-## Stage 2: finish the security remediation backlog
+1. **Single source of truth.** Anything that exists in more than one copy is
+   generated from one canonical source, never hand-edited (entrypoint
+   variants, shared shell helpers, translations).
+2. **Smallest maintainable surface.** A file stays only if something
+   references it or the maintainer explicitly wants it; every kept file
+   appears in the AGENTS.md layout with a purpose.
+3. **Mechanical consistency.** Every convention (paths, cron tags, naming,
+   generated-file contracts) is enforced by a test that fails in CI, in the
+   style of `tests/tests_variant_sync.sh`.
 
-Continue `SECURITY_AUDIT.md` items in order:
+## Milestone 1: prune inherited dead weight
 
-4. **Integrity pinning (CMD-002/CMD-013).** Add repository-known SHA-256
-   values for remote scripts with stable contents, verified by
-   `run_reviewed_remote_script` before execution; for fast-moving upstreams
-   (`get.docker.com`), record and display the digest against the last
-   reviewed value. Route the retained NodeSource `dnf` pipeline through the
-   validator or record a renewed explicit decision.
-5. **Shared tagged cron helpers (CMD-012).** `PROJECT_CRON_TAG` exists in
-   `config/project.conf` but most cron writers still build their own
-   `crontab -l | grep -v` filters. Provide add/remove helpers that tag every
-   project-managed entry and migrate the remaining writers (backup jobs,
-   certificate renewal, monitoring). The traffic-limit reset job fix
-   (CMD-018) is the pattern to follow.
-6. **Cluster authentication (CMD-010).** Add an SSH-key path for the cluster
-   feature, migrate existing Base64 password stores on first use, and prefer
-   pre-provisioned known hosts with `StrictHostKeyChecking=yes` where
-   configured.
+Cheap, high-leverage removals first — every later milestone gets smaller.
+Reference scan on 2026-07-19 found no functional consumer for:
 
-## Stage 3: shrink the monolith without breaking the install flow
+| Candidate | Evidence |
+| --- | --- |
+| `PandoraNext/` | Referenced only by hardening-test assertions that document its example credentials (CMD-010); no entrypoint or helper deploys it, and the upstream service is defunct |
+| `ldnmp.sh` | The main entrypoints ship their own self-contained LDNMP functions; only tests reference the standalone file. Removing it also retires its user-input password `sed` weakness (the built-in path generates its own credentials and is delimiter-safe) |
+| `valkey.conf`, `cloudflare.conf`, `nginx.local` | Zero references anywhere in the repository |
+| `Limiting_Shut_down.sh` | Legacy implementation; deployment fetches `Limiting_Shut_down1.sh` and only reuses this name as the *installed* filename |
+| `mc_log.sh` | Zero references (`pal_log.sh` is test-referenced only; decide both together with the game-server scripts) |
 
-7. **Shared helper library with build-time inlining.**
-   `run_reviewed_remote_script` is now duplicated in the entrypoints,
-   `mc.sh`, `palworld.sh`, `ldnmp.sh`, and `hermes_manager.sh`. Extract one
-   canonical copy under `lib/` and inline it into the shipped standalone
-   files with an assemble step plus a sync test (same contract style as
-   `tests/tests_variant_sync.sh`). Downloaded files must remain
-   self-contained; do not source remote code at runtime.
-8. **Module extraction.** Split the root script by feature area (OpenClaw,
-   sysctl/network, Docker apps, web stack) into source modules assembled
-   into the single released `ming.sh`, keeping the `m` entrypoint and the
-   one-file `curl` install unchanged. The OpenClaw block goes first: it is
-   self-contained and already has its own smoke suite.
+Each removal is a separate commit that also updates the tests and docs that
+mention the file. Candidates need maintainer sign-off before deletion —
+especially the game-server log helpers if they are used out-of-band.
+**Exit criteria:** every tracked file is referenced or documented as a
+standalone tool in AGENTS.md; a test enumerates tracked files against that
+inventory so new orphans fail CI.
 
-## Stage 4: verification and release hygiene
+## Milestone 2: one canonical entrypoint source
 
-9. **Isolated Docker matrix (CMD-015).** Run
-   `run_openclaw_manager_matrix.sh` in a disposable CI environment on a
-   manual trigger or schedule, never in the default push validation.
-10. **Release process.** `PROJECT_VERSION` is static at 0.1.0. Define a
-    tagging scheme, a change log for this fork (distinct from the archived
-    `UPSTREAM_CHANGELOG.txt`), and — before ever enabling
-    `ENABLE_SELF_UPDATE` — a signed or digest-pinned update design. Update
-    policy stays "disabled" until that design exists.
+The audit showed hand-applied edits drift the six `ming.sh` copies apart.
+`cn/ming.sh` is already regenerated and pinned by `tests/tests_variant_sync.sh`.
 
-## Recorded smaller items
+1. **Structure-sync test for `en|jp|kr|tw`.** Compare a normalized code
+   skeleton (string literals and comments stripped) against the root script
+   so a functional edit can no longer miss a translated copy silently.
+2. **Offline regeneration pipeline.** Merge the five near-identical
+   translation tools (`translate.py` + four `to-*.py`, ~485 lines for one
+   ~110-line program) into a single tool with a language parameter and
+   per-language string catalogs. Remote translation of *new* strings stays
+   behind `ALLOW_REMOTE_TRANSLATION=true`; regeneration from existing
+   catalogs works fully offline.
 
-- `network-optimize.sh` does not read `config/project.conf` and writes
-  `/etc/sysctl.d/99-network-optimize.conf` instead of a project-tagged path;
-  its restore action also re-applies the previous optimization backup rather
-  than returning to system defaults. Align paths and semantics, with
-  migration for the existing file name (READMEs currently document both).
-- `ldnmp.sh` substitutes user passwords into `docker-compose.yml` with
-  `sed`, which breaks on `/`, `&`, and newline characters; switch to
-  delimiter-safe substitution or compose environment variables.
-- The traffic accounting in `Limiting_Shut_down1.sh`, `TG-check-notify.sh`,
-  and the status views counts only `eth|ens|enp|eno` interfaces, missing
-  OpenVZ (`venet0`) and WireGuard-only hosts.
-- `auto_cert_renewal.sh` ships a literal `your@email.com`; parameterize it
-  at deployment.
-- `PandoraNext/` retains upstream example credentials by compatibility
-  design (CMD-010); revisit whether generated first-run secrets are possible.
+**Exit criteria:** a functional change is edited in `ming.sh` only and
+reaches every variant via one offline command; CI fails if any generated
+file was hand-edited.
+
+## Milestone 3: one copy of shared plumbing, one set of conventions
+
+3. **Shared helper library with build-time inlining.**
+   `run_reviewed_remote_script` currently exists in 10 copies (6 entrypoints,
+   `mc.sh`, `palworld.sh`, `hermes_manager.sh`, plus `ldnmp.sh` until pruned).
+   Keep one canonical copy under `lib/`, inline it into shipped standalone
+   files with an assemble step, and pin the result with a sync test. Shipped
+   files stay self-contained; no runtime sourcing of remote code.
+4. **Tagged cron helpers (CMD-012).** `PROJECT_CRON_TAG` exists but most cron
+   writers still build ad-hoc `crontab -l | grep -v` filters. Provide shared
+   add/remove helpers that tag every project-managed entry and migrate the
+   remaining writers; the CMD-018 exact-format filter is the interim pattern.
+5. **One sysctl path convention.** Align `network-optimize.sh` with
+   `config/project.conf` (project-tagged config path, marker comment) with
+   migration for the existing `99-network-optimize.conf` name, and make its
+   restore action return to system defaults instead of re-applying the
+   previous optimization backup.
+6. **ShellCheck in CI** for helpers and tests (the monolithic entrypoints
+   stay excluded for the resource reasons documented in the audit).
+7. **Documentation language policy, stated in AGENTS.md:** user-facing
+   READMEs in zh/tw/ja/kr maintained together; developer docs (AGENTS,
+   SECURITY_AUDIT, ROADMAP) in English only. Resolve the current mismatch:
+   `en/ming.sh` ships without an English README — either add `README.en.md`
+   to the maintained set or record that the English variant is documented
+   through the existing READMEs.
+
+**Exit criteria:** grep finds exactly one definition of each shared helper in
+source form; every convention above has a failing-test guard.
+
+## Milestone 4: remaining security backlog (on the smaller surface)
+
+8. **Integrity pinning (CMD-002/CMD-013).** Repository-known SHA-256 values
+   for stable remote scripts, verified by `run_reviewed_remote_script` before
+   execution (one place to change after Milestone 3); recorded-digest display
+   for fast-moving upstreams like `get.docker.com`. Route the retained
+   NodeSource `dnf` pipeline through the validator or record a renewed
+   explicit maintainer decision.
+9. **Cluster authentication (CMD-010).** SSH-key path for the cluster
+   feature, migration for the Base64 password store, and support for
+   pre-provisioned known hosts with `StrictHostKeyChecking=yes`.
+
+## Milestone 5: modularize behind the stable entrypoint
+
+Only after Milestones 1–3 provide guardrails: split the root script by
+feature area (OpenClaw first — self-contained with its own smoke suite; then
+sysctl/network, Docker apps, web stack) into source modules assembled into
+the single released `ming.sh`. The `m` command and one-file `curl` install
+never change. Alongside: run the Docker matrix (CMD-015) in a disposable CI
+environment on manual trigger only, and define a release process — tagging,
+a fork change log, and (before ever enabling `ENABLE_SELF_UPDATE`) a signed
+or digest-pinned update design. Updates stay disabled until that design
+exists.
+
+## Standing rules during consolidation
+
+- No new features until Milestone 3 is complete.
+- Never hand-edit a generated file; regenerate it.
+- Recorded low-priority items: traffic accounting in
+  `Limiting_Shut_down1.sh` / `TG-check-notify.sh` counts only
+  `eth|ens|enp|eno` interfaces (misses OpenVZ `venet0` and WireGuard-only
+  hosts); `auto_cert_renewal.sh` ships a literal `your@email.com` that should
+  be parameterized at deployment.
