@@ -5765,8 +5765,8 @@
 "\t  # 获取redis版本": [
 "\t  # Redis バージョンを取得する"
 ],
-"\t  [ -z \"$current_mode\" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode=\"自动调优模式\"": [
-"\t  [ -z \"$current_mode\" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode=\"オートチューニングモード\""
+"\t  [ -z \"$current_mode\" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode=\"自动调优模式\"": [
+"\t  [ -z \"$current_mode\" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode=\"オートチューニングモード\""
 ],
 "\t  echo \"$webname 安装信息如下: \"": [
 "\t  echo \"$webnameインストール情報は次のとおりです。\""

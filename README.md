@@ -46,7 +46,8 @@ m
 
 系统调优相关功能使用 `/etc/sysctl.d/99-ming-sh-*.conf` 配置文件和
 `# ming-sh-optimize` 标记；网络自动调优模式使用
-`/etc/sysctl.d/99-network-optimize.conf`，便于识别和清理。
+`/etc/sysctl.d/99-ming-sh-network.conf`（旧版路径 `99-network-optimize.conf`
+会在运行时自动迁移），便于识别和清理。
 
 ## 隐私与安全默认值
 

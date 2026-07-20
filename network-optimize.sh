@@ -147,8 +147,9 @@ classify_bandwidth() {
 # ======================== 核心优化函数 ========================
 
 auto_optimize_network() {
-    local CONF="/etc/sysctl.d/99-network-optimize.conf"
-    local BACKUP="/etc/sysctl.d/99-network-optimize.conf.bak.$(date +%s)"
+    local CONF="/etc/sysctl.d/99-ming-sh-network.conf"
+    local OLD_CONF="/etc/sysctl.d/99-network-optimize.conf"
+    local BACKUP="${CONF}.bak.$(date +%s)"
     local KVER
     KVER=$(kernel_version)
     local DISTRO
@@ -349,6 +350,7 @@ net.ipv4.tcp_notsent_lowat = 16384"
     cat > "$CONF" << SYSCTL
 # ============================================================================
 # 自动网络优化配置
+# ming-sh-network-optimize
 # 生成时间: $(date '+%Y-%m-%d %H:%M:%S')
 # 带宽等级: $BW_CLASS (${SPEED}Mbps)
 # 平均延迟: ${LATENCY}ms | 丢包率: ${LOSS}%
@@ -442,6 +444,12 @@ SYSCTL
 
     ok "配置已写入: $CONF"
 
+    # 迁移：移除旧文件名，避免新旧配置同时被 sysctl 加载
+    if [ "$OLD_CONF" != "$CONF" ] && [ -f "$OLD_CONF" ]; then
+        rm -f "$OLD_CONF"
+        ok "已移除旧版配置文件: $OLD_CONF"
+    fi
+
     # ── 应用配置 ──
     title "应用优化"
     local apply_errors
@@ -504,7 +512,8 @@ LIMITS
 # ======================== 回滚函数 ========================
 
 restore_network_defaults() {
-    local CONF="/etc/sysctl.d/99-network-optimize.conf"
+    local CONF="/etc/sysctl.d/99-ming-sh-network.conf"
+    local OLD_CONF="/etc/sysctl.d/99-network-optimize.conf"
 
     title "回滚网络优化"
 
@@ -513,22 +522,23 @@ restore_network_defaults() {
         return 1
     fi
 
-    # 查找最近的备份
-    local latest_bak
-    latest_bak=$(ls -t /etc/sysctl.d/99-network-optimize.conf.bak.* 2>/dev/null | head -1)
+    # 回滚即返回系统默认：删除本功能写入的配置（含旧文件名），不再重新套用历史备份。
+    # 历史备份文件保留在磁盘上供手动查阅。
+    local removed=0
+    for conf in "$CONF" "$OLD_CONF"; do
+        if [ -f "$conf" ]; then
+            rm -f "$conf"
+            removed=1
+        fi
+    done
 
-    if [ -n "$latest_bak" ]; then
-        cp "$latest_bak" "$CONF"
-        sysctl -p "$CONF" 2>/dev/null
-        ok "已从备份恢复: $latest_bak"
-    elif [ -f "$CONF" ]; then
-        rm -f "$CONF"
-        sysctl --system 2>/dev/null
-        ok "已删除优化配置，恢复系统默认"
-    else
+    if [ "$removed" -eq 0 ]; then
         warn "没有优化配置需要回滚"
         return 0
     fi
+
+    sysctl --system 2>/dev/null
+    ok "已删除网络优化配置，恢复系统默认"
 
     # 清理 limits.conf 添加的部分
     if grep -q "# network-optimize" /etc/security/limits.conf 2>/dev/null; then
@@ -570,9 +580,12 @@ show_network_status() {
         printf "  %-45s = %s\n" "$p" "$val"
     done
 
-    if [ -f /etc/sysctl.d/99-network-optimize.conf ]; then
+    if [ -f /etc/sysctl.d/99-ming-sh-network.conf ]; then
         echo ""
-        ok "优化配置已安装: /etc/sysctl.d/99-network-optimize.conf"
+        ok "优化配置已安装: /etc/sysctl.d/99-ming-sh-network.conf"
+    elif [ -f /etc/sysctl.d/99-network-optimize.conf ]; then
+        echo ""
+        ok "优化配置已安装（旧版路径）: /etc/sysctl.d/99-network-optimize.conf"
     else
         echo ""
         warn "未检测到优化配置"

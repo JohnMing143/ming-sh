@@ -6417,6 +6417,7 @@ restore_defaults() {
 
 	# 刪除最佳化設定檔（含外鏈自動調優配置）
 	rm -f "$CONF"
+	rm -f /etc/sysctl.d/99-ming-sh-network.conf
 	rm -f /etc/sysctl.d/99-network-optimize.conf
 
 	# 清理 sysctl.conf 裡可能殘留的 bbr 配置
@@ -6446,7 +6447,7 @@ Kernel_optimize() {
 	while true; do
 	  clear
 	  local current_mode=$(grep "^# 模式:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)
-	  [ -z "$current_mode" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode="自動調優模式"
+	  [ -z "$current_mode" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode="自動調優模式"
 	  echo "Linux系統核心參數優化"
 	  if [ -n "$current_mode" ]; then
 		  echo -e "當前模式:${gl_lv}${current_mode}${gl_bai}"

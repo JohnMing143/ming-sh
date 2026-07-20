@@ -6417,6 +6417,7 @@ restore_defaults() {
 
 	# 最適化設定ファイル(外部リンク自動チューニング設定含む)を削除します。
 	rm -f "$CONF"
+	rm -f /etc/sysctl.d/99-ming-sh-network.conf
 	rm -f /etc/sysctl.d/99-network-optimize.conf
 
 	# sysctl.conf に残っている可能性のある bbr 設定をクリーンアップする
@@ -6446,7 +6447,7 @@ Kernel_optimize() {
 	while true; do
 	  clear
 	  local current_mode=$(grep "^# モード:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# モード: //' | awk -F'|' '{print $1}' | xargs)
-	  [ -z "$current_mode" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode="オートチューニングモード"
+	  [ -z "$current_mode" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode="オートチューニングモード"
 	  echo "Linuxシステムのカーネルパラメータの最適化"
 	  if [ -n "$current_mode" ]; then
 		  echo -e "現在のモード:${gl_lv}${current_mode}${gl_bai}"

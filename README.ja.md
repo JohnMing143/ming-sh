@@ -49,8 +49,9 @@ m
 
 システムチューニング関連の機能は `/etc/sysctl.d/99-ming-sh-*.conf` 設定
 ファイルと `# ming-sh-optimize` マーカーを使用します。ネットワーク自動
-チューニングモードは `/etc/sysctl.d/99-network-optimize.conf` を使用する
-ため、識別と後始末が容易です。
+チューニングモードは `/etc/sysctl.d/99-ming-sh-network.conf` を使用し
+（旧パス `99-network-optimize.conf` は実行時に自動移行されます）、識別と
+後始末が容易です。
 
 ## プライバシーとセキュリティのデフォルト
 

@@ -6417,6 +6417,7 @@ restore_defaults() {
 
 	# Delete the optimization configuration file (including external link automatic tuning configuration)
 	rm -f "$CONF"
+	rm -f /etc/sysctl.d/99-ming-sh-network.conf
 	rm -f /etc/sysctl.d/99-network-optimize.conf
 
 	# Clean up possible remaining bbr configuration in sysctl.conf
@@ -6446,7 +6447,7 @@ Kernel_optimize() {
 	while true; do
 	  clear
 	  local current_mode=$(grep "^# Mode:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# mode: //' | awk -F'|' '{print $1}' | xargs)
-	  [ -z "$current_mode" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode="Automatic tuning mode"
+	  [ -z "$current_mode" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode="Automatic tuning mode"
 	  echo "Linux system kernel parameter optimization"
 	  if [ -n "$current_mode" ]; then
 		  echo -e "Current mode:${gl_lv}${current_mode}${gl_bai}"

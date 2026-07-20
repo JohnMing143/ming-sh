@@ -83,11 +83,13 @@ hand-edited or regeneration was skipped.
    writers still build ad-hoc `crontab -l | grep -v` filters. Provide shared
    add/remove helpers that tag every project-managed entry and migrate the
    remaining writers; the CMD-018 exact-format filter is the interim pattern.
-5. **One sysctl path convention.** Align `network-optimize.sh` with
-   `config/project.conf` (project-tagged config path, marker comment) with
-   migration for the existing `99-network-optimize.conf` name, and make its
-   restore action return to system defaults instead of re-applying the
-   previous optimization backup.
+5. **One sysctl path convention — done 2026-07-19.** `network-optimize.sh`
+   now writes `/etc/sysctl.d/99-ming-sh-network.conf` with a
+   `# ming-sh-network-optimize` marker, auto-migrates the legacy
+   `99-network-optimize.conf` name on run and restore, and its restore action
+   removes the config and reloads system defaults instead of re-applying a
+   prior optimization backup. The entrypoints detect and clean both paths;
+   `tests/tests_network_optimize_paths.sh` guards it.
 6. **ShellCheck in CI** for helpers and tests (the monolithic entrypoints
    stay excluded for the resource reasons documented in the audit).
 7. **Documentation language policy, stated in AGENTS.md:** user-facing
@@ -132,4 +134,6 @@ exists.
   `Limiting_Shut_down1.sh` / `TG-check-notify.sh` counts only
   `eth|ens|enp|eno` interfaces (misses OpenVZ `venet0` and WireGuard-only
   hosts); `auto_cert_renewal.sh` ships a literal `your@email.com` that should
-  be parameterized at deployment.
+  be parameterized at deployment; the remove-only FRP (`grep -v 'frps'`/
+  `'frpc'`) and OpenClaw gateway (`grep -v "s gateway"`) crontab filters
+  still need their add sites identified before they can be retagged (CMD-012).

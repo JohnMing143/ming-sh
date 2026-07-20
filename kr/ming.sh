@@ -6417,6 +6417,7 @@ restore_defaults() {
 
 	# 최적화 구성 파일 삭제(외부 링크 자동 튜닝 구성 포함)
 	rm -f "$CONF"
+	rm -f /etc/sysctl.d/99-ming-sh-network.conf
 	rm -f /etc/sysctl.d/99-network-optimize.conf
 
 	# sysctl.conf에서 가능한 나머지 bbr 구성을 정리합니다.
@@ -6446,7 +6447,7 @@ Kernel_optimize() {
 	while true; do
 	  clear
 	  local current_mode=$(grep "^# 모드:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 모드: //' | awk -F'|' '{print $1}' | xargs)
-	  [ -z "$current_mode" ] && [ -f /etc/sysctl.d/99-network-optimize.conf ] && current_mode="자동 튜닝 모드"
+	  [ -z "$current_mode" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode="자동 튜닝 모드"
 	  echo "Linux 시스템 커널 매개변수 최적화"
 	  if [ -n "$current_mode" ]; then
 		  echo -e "현재 모드:${gl_lv}${current_mode}${gl_bai}"
