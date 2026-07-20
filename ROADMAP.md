@@ -53,9 +53,12 @@ and fails CI on unregistered additions.
 The audit showed hand-applied edits drift the six `ming.sh` copies apart.
 `cn/ming.sh` is already regenerated and pinned by `tests/tests_variant_sync.sh`.
 
-1. **Structure-sync test for `en|jp|kr|tw`.** Compare a normalized code
-   skeleton (string literals and comments stripped) against the root script
-   so a functional edit can no longer miss a translated copy silently.
+1. **Structure-sync test for `en|jp|kr|tw` — done 2026-07-19.**
+   `tests/tests_variant_structure_sync.sh` reduces every implementation to a
+   language-neutral code skeleton and requires it to match the root script
+   exactly; the structural drift it surfaced (retained APK-cache deletion,
+   argument-array construction before image validation, collapsed guard
+   formatting) was ported the same day.
 2. **Offline regeneration pipeline.** Merge the five near-identical
    translation tools (`translate.py` + four `to-*.py`, ~485 lines for one
    ~110-line program) into a single tool with a language parameter and
