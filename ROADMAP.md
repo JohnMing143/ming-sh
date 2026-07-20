@@ -71,7 +71,7 @@ The audit showed hand-applied edits drift the six `ming.sh` copies apart.
 `tests/tests_variant_generation_sync.sh` fails CI if a generated file was
 hand-edited or regeneration was skipped.
 
-## Milestone 3: one copy of shared plumbing, one set of conventions
+## Milestone 3: one copy of shared plumbing, one set of conventions — done 2026-07-19
 
 3. **Shared helper library with build-time inlining.**
    `run_reviewed_remote_script` currently exists in 9 copies (6 entrypoints,
@@ -101,8 +101,12 @@ hand-edited or regeneration was skipped.
    comments are English only. The missing `README.en.md` for the shipped
    English entrypoint was added and cross-linked.
 
-**Exit criteria:** grep finds exactly one definition of each shared helper in
-source form; every convention above has a failing-test guard.
+**Exit criteria met (2026-07-19):** the remote-script validator has one
+editable source (`lib/remote_script.sh`), and `lib/inline.py --check` proves
+every shipped copy matches it; each convention above has a failing-test guard
+(`tests_shared_lib_sync.sh`, `tests_cron_tagging.sh`,
+`tests_network_optimize_paths.sh`, the CI ShellCheck step, and the inventory
+allowlist).
 
 ## Milestone 4: remaining security backlog (on the smaller surface)
 
@@ -128,10 +132,14 @@ a fork change log, and (before ever enabling `ENABLE_SELF_UPDATE`) a signed
 or digest-pinned update design. Updates stay disabled until that design
 exists.
 
-## Standing rules during consolidation
+## Standing rules
 
-- No new features until Milestone 3 is complete.
-- Never hand-edit a generated file; regenerate it.
+- Consolidation (Milestones 1–3) is complete. Remaining work is the security
+  backlog (Milestone 4) and modularization (Milestone 5); prefer those over
+  new features.
+- Never hand-edit a generated file; regenerate it. After editing `ming.sh` run
+  `python3 translate.py generate --all`; after editing anything in `lib/` run
+  `python3 lib/inline.py` (then regenerate if `ming.sh` changed).
 - Recorded low-priority items: traffic accounting in
   `Limiting_Shut_down1.sh` / `TG-check-notify.sh` counts only
   `eth|ens|enp|eno` interfaces (misses OpenVZ `venet0` and WireGuard-only
