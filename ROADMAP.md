@@ -31,25 +31,22 @@ shipped it — and that this fork does not use — is removed, not maintained.
    generated-file contracts) is enforced by a test that fails in CI, in the
    style of `tests/tests_variant_sync.sh`.
 
-## Milestone 1: prune inherited dead weight
+## Milestone 1: prune inherited dead weight — done 2026-07-19
 
-Cheap, high-leverage removals first — every later milestone gets smaller.
-Reference scan on 2026-07-19 found no functional consumer for:
+Removed after a reference scan found no functional consumer (each in its own
+reviewed commit, with test and audit-document updates):
 
-| Candidate | Evidence |
+| Removed | Evidence |
 | --- | --- |
-| `PandoraNext/` | Referenced only by hardening-test assertions that document its example credentials (CMD-010); no entrypoint or helper deploys it, and the upstream service is defunct |
-| `ldnmp.sh` | The main entrypoints ship their own self-contained LDNMP functions; only tests reference the standalone file. Removing it also retires its user-input password `sed` weakness (the built-in path generates its own credentials and is delimiter-safe) |
+| `PandoraNext/` | Referenced only by hardening-test assertions that documented its example credentials (CMD-010); no entrypoint or helper deployed it, and the upstream service is defunct |
+| `ldnmp.sh` | The main entrypoints ship their own self-contained LDNMP functions; only tests referenced the standalone file. Its removal also retired its user-input password `sed` weakness (the built-in path generates its own credentials and is delimiter-safe) |
 | `valkey.conf`, `cloudflare.conf`, `nginx.local` | Zero references anywhere in the repository |
-| `Limiting_Shut_down.sh` | Legacy implementation; deployment fetches `Limiting_Shut_down1.sh` and only reuses this name as the *installed* filename |
-| `mc_log.sh` | Zero references (`pal_log.sh` is test-referenced only; decide both together with the game-server scripts) |
+| `Limiting_Shut_down.sh` | Legacy implementation; deployment fetches `Limiting_Shut_down1.sh` and only reuses this name as the *installed* filename, so the shipped template keeps its suffix |
+| `mc_log.sh`, `pal_log.sh` | Display-only changelog echo blocks nothing downloads or sources |
 
-Each removal is a separate commit that also updates the tests and docs that
-mention the file. Candidates need maintainer sign-off before deletion —
-especially the game-server log helpers if they are used out-of-band.
-**Exit criteria:** every tracked file is referenced or documented as a
-standalone tool in AGENTS.md; a test enumerates tracked files against that
-inventory so new orphans fail CI.
+**Exit criterion met:** `tests/tests_repository_inventory.sh` matches every
+tracked file against a registered category, keeps the removed files removed,
+and fails CI on unregistered additions.
 
 ## Milestone 2: one canonical entrypoint source
 
@@ -73,8 +70,8 @@ file was hand-edited.
 ## Milestone 3: one copy of shared plumbing, one set of conventions
 
 3. **Shared helper library with build-time inlining.**
-   `run_reviewed_remote_script` currently exists in 10 copies (6 entrypoints,
-   `mc.sh`, `palworld.sh`, `hermes_manager.sh`, plus `ldnmp.sh` until pruned).
+   `run_reviewed_remote_script` currently exists in 9 copies (6 entrypoints,
+   `mc.sh`, `palworld.sh`, `hermes_manager.sh`).
    Keep one canonical copy under `lib/`, inline it into shipped standalone
    files with an assemble step, and pin the result with a sync test. Shipped
    files stay self-contained; no runtime sourcing of remote code.
