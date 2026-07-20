@@ -56,8 +56,9 @@ m
 - **相依來源透明**：部分 Nginx 範本、Docker Compose 檔案、Docker 映像檔等仍來自
   上游專案，所有位址集中在 [`config/project.conf`](config/project.conf) 中以
   `UPSTREAM_*` 變數維護，完整清單見 [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)。
-- **開發用翻譯腳本預設停用**：該腳本會把原始碼片段傳送給 Google Translate，
-  僅在明確設定 `ALLOW_REMOTE_TRANSLATION=true` 後才會執行，一般使用無需理會。
+- **開發用翻譯工具預設離線**：語言變體由儲存庫內的翻譯目錄離線產生；只有
+  補翻新增文字的子命令會把原始碼片段傳送給 Google Translate，且僅在明確設定
+  `ALLOW_REMOTE_TRANSLATION=true` 後才會執行，一般使用無需理會。
 
 ## 參與開發
 

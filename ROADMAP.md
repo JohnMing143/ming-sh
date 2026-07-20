@@ -59,16 +59,17 @@ The audit showed hand-applied edits drift the six `ming.sh` copies apart.
    exactly; the structural drift it surfaced (retained APK-cache deletion,
    argument-array construction before image validation, collapsed guard
    formatting) was ported the same day.
-2. **Offline regeneration pipeline.** Merge the five near-identical
-   translation tools (`translate.py` + four `to-*.py`, ~485 lines for one
-   ~110-line program) into a single tool with a language parameter and
-   per-language string catalogs. Remote translation of *new* strings stays
-   behind `ALLOW_REMOTE_TRANSLATION=true`; regeneration from existing
-   catalogs works fully offline.
+2. **Offline regeneration pipeline — done 2026-07-19.** The five translation
+   tools are merged into `translate.py` with offline `harvest`/`generate`/
+   `check`/`status` subcommands and per-line catalogs (`<lang>/catalog.json`,
+   ~2,800 entries per language, byte-exact roundtrip). Only the
+   `translate-missing` subcommand contacts Google Translate, still behind
+   `ALLOW_REMOTE_TRANSLATION=true`.
 
-**Exit criteria:** a functional change is edited in `ming.sh` only and
-reaches every variant via one offline command; CI fails if any generated
-file was hand-edited.
+**Exit criteria met:** a functional change is edited in `ming.sh` only and
+`python3 translate.py generate --all` reaches every variant offline;
+`tests/tests_variant_generation_sync.sh` fails CI if a generated file was
+hand-edited or regeneration was skipped.
 
 ## Milestone 3: one copy of shared plumbing, one set of conventions
 

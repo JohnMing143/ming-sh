@@ -40,13 +40,16 @@ the user, or pulling an application image.
 
 ## Privacy-relevant development tooling
 
-The scheduled translation workflow has been removed. The manual `translate.py`
-and locale-specific `to-*.py` tools now refuse to run unless
-`ALLOW_REMOTE_TRANSLATION=true` is set explicitly. When enabled, they send
-Chinese source-text fragments to Google Translate through `deep_translator`.
-This is not telemetry and it is never invoked by the main entrypoint, but the
-opt-in can still disclose source text to a third party. Review the input before
-enabling remote translation.
+The scheduled translation workflow has been removed. Since 2026-07-19 the
+localized variants are regenerated offline by `translate.py` from the root
+script and per-language `<lang>/catalog.json` translation catalogs; the
+`harvest`, `generate`, `check`, and `status` subcommands never contact the
+network. Only the `translate-missing` subcommand sends Chinese source-text
+fragments to Google Translate through `deep_translator`, and it refuses to
+run unless `ALLOW_REMOTE_TRANSLATION=true` is set explicitly. This is not
+telemetry and it is never invoked by the main entrypoint, but the opt-in can
+still disclose source text to a third party. Review the input before enabling
+remote translation.
 
 ## Architecture and trust boundaries
 
@@ -151,7 +154,7 @@ bash tests_openclaw_manager_smoke.sh
 for test_file in tests/openclaw/*.sh; do bash "$test_file"; done
 bash cn/tests/openclaw/tests_openclaw_memory_auto_setup_smoke.sh
 bash cn/tests/openclaw/tests_openclaw_memory_menu_smoke.sh
-python3 -m py_compile translate.py en/to-en.py jp/to-jp.py kr/to-kr.py tw/to-tw.py
+python3 -m py_compile translate.py tests/normalize_shell_skeleton.py
 git diff --check
 ```
 

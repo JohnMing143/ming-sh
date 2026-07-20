@@ -56,8 +56,9 @@ m
 - **依赖地址透明**：部分 Nginx 模板、Docker Compose 文件、Docker 镜像等仍来自
   上游项目，所有地址集中在 [`config/project.conf`](config/project.conf) 中以
   `UPSTREAM_*` 变量维护，完整清单见 [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)。
-- **开发用翻译脚本默认禁用**：该脚本会把源码片段发送给 Google Translate，
-  仅在显式设置 `ALLOW_REMOTE_TRANSLATION=true` 后才会运行，普通使用无需关心。
+- **开发用翻译工具默认离线**：语言变体由仓库内的翻译目录离线生成；只有
+  补翻新增文本的子命令会把源码片段发送给 Google Translate，且仅在显式设置
+  `ALLOW_REMOTE_TRANSLATION=true` 后才会运行，普通使用无需关心。
 
 ## 参与开发
 

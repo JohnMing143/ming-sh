@@ -63,9 +63,11 @@ m
   이미지 등은 여전히 업스트림 프로젝트에서 가져옵니다. 이러한 주소는 모두
   [`config/project.conf`](config/project.conf)의 `UPSTREAM_*` 변수로 관리되며,
   전체 목록은 [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md)를 참조하십시오.
-- **개발용 번역 스크립트 기본 비활성화**: 이 스크립트는 소스 코드 조각을
-  Google Translate로 전송하므로 `ALLOW_REMOTE_TRANSLATION=true`를 명시적으로
-  설정한 경우에만 실행됩니다. 일반 사용에서는 신경 쓸 필요가 없습니다.
+- **개발용 번역 도구 기본 오프라인**: 언어 변형은 저장소 내 번역 카탈로그에서
+  오프라인으로 생성됩니다. 새 텍스트를 보충 번역하는 하위 명령만 소스 코드
+  조각을 Google Translate로 전송하며, `ALLOW_REMOTE_TRANSLATION=true`를
+  명시적으로 설정한 경우에만 실행됩니다. 일반 사용에서는 신경 쓸 필요가
+  없습니다.
 
 ## 개발 참여
 

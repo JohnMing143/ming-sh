@@ -41,10 +41,17 @@ tests/                          Safety regressions and OpenClaw smoke tests
 SECURITY_AUDIT.md               High-risk command and trust-boundary audit
 ```
 
-`cn/ming.sh` must stay byte-identical to the root entrypoint except for the
-`canshu="CN"` variant marker; regenerate it from `ming.sh` instead of editing
-it directly (`tests/tests_variant_sync.sh` enforces this). The translated
-variants must receive every functional change applied to the root script.
+Every localized entrypoint is generated from the root script — never edit
+one directly. `cn/ming.sh` is the root with only the `canshu="CN"` marker
+changed; `en|jp|kr|tw/ming.sh` substitute translated lines from
+`<lang>/catalog.json`. After changing `ming.sh`, run
+`python3 translate.py generate --all` and commit the regenerated variants
+(plus catalog updates when translations change). `tests/tests_variant_sync.sh`,
+`tests/tests_variant_structure_sync.sh`, and
+`tests/tests_variant_generation_sync.sh` enforce this; new untranslated lines
+are allowed to pass through in Chinese and are listed by
+`python3 translate.py status --all`. Translating them remotely
+(`translate-missing`) is optional and gated by `ALLOW_REMOTE_TRANSLATION=true`.
 
 Some templates exist as same-name variants for different scenarios, not as
 redundant copies:

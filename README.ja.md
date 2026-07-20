@@ -63,8 +63,9 @@ m
   Docker イメージなどは上流プロジェクト由来です。これらのアドレスはすべて
   [`config/project.conf`](config/project.conf) の `UPSTREAM_*` 変数に集約されて
   おり、完全な一覧は [`SECURITY_AUDIT.md`](SECURITY_AUDIT.md) を参照してください。
-- **開発用翻訳スクリプトはデフォルト無効**: このスクリプトはソースコードの
-  断片を Google Translate に送信するため、明示的に
+- **開発用翻訳ツールはデフォルトでオフライン**: 言語バリアントはリポジトリ
+  内の翻訳カタログからオフラインで生成されます。新規テキストを補訳する
+  サブコマンドのみがソースコードの断片を Google Translate に送信し、明示的に
   `ALLOW_REMOTE_TRANSLATION=true` を設定した場合にのみ実行されます。通常の
   利用では関係ありません。
 
