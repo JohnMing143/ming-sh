@@ -931,6 +931,24 @@ install_crontab() {
 }
 
 
+# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。
+# 标记形如 "# ming-sh:<名称>"：安装先按标记去重再追加，卸载按标记精确删除。
+cron_install_tagged() {
+	local tag="# ${PROJECT_CRON_TAG}:$1"
+	local job="$2 ${tag}"
+	check_crontab_installed
+	{
+		crontab -l 2>/dev/null | grep -vF "$tag"
+		printf '%s\n' "$job"
+	} | crontab -
+}
+
+cron_remove_tagged() {
+	local tag="# ${PROJECT_CRON_TAG}:$1"
+	crontab -l 2>/dev/null | grep -vF "$tag" | crontab -
+}
+
+
 
 docker_ipv6_on() {
 	root_use
@@ -1610,8 +1628,7 @@ install_ldnmp() {
 
 	  cd /home/web && docker compose up -d
 	  sleep 1
-		  crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
-		  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
+		  cron_install_tagged logrotate '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf'
 
 	  fix_phpfpm_conf php
 	  fix_phpfpm_conf php74
@@ -1641,9 +1658,7 @@ install_certbot() {
 	chmod +x auto_cert_renewal.sh
 
 	check_crontab_installed
-	local cron_job="0 0 * * * ~/auto_cert_renewal.sh"
-	crontab -l 2>/dev/null | grep -vF "$cron_job" | crontab -
-	(crontab -l 2>/dev/null; echo "$cron_job") | crontab -
+	cron_install_tagged cert-renew '0 0 * * * ~/auto_cert_renewal.sh'
 	echo "续签任务已更新"
 }
 
@@ -1907,8 +1922,7 @@ nginx_upgrade() {
   docker images --filter=reference="${UPSTREAM_IMAGE_NAMESPACE}/${ldnmp_pods}*" -q | xargs docker rmi > /dev/null 2>&1
   docker images --filter=reference="${ldnmp_pods}*" -q | xargs docker rmi > /dev/null 2>&1
   docker compose up -d --force-recreate $ldnmp_pods
-  crontab -l 2>/dev/null | grep -v 'logrotate' | crontab -
-  (crontab -l 2>/dev/null; echo '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf') | crontab -
+  cron_install_tagged logrotate '0 2 * * * docker exec nginx apk add logrotate && docker exec nginx logrotate -f /etc/logrotate.conf'
   docker exec nginx chown -R nginx:nginx /var/www/html
   docker exec nginx mkdir -p /var/cache/nginx/proxy
   docker exec nginx mkdir -p /var/cache/nginx/fastcgi
@@ -20717,8 +20731,7 @@ EOF
 				  fi
 				  tmux kill-session -t TG-check-notify > /dev/null 2>&1
 				  tmux new -d -s TG-check-notify "~/TG-check-notify.sh"
-				  crontab -l | grep -v '~/TG-check-notify.sh' | crontab - > /dev/null 2>&1
-				  (crontab -l ; echo "@reboot tmux new -d -s TG-check-notify '~/TG-check-notify.sh'") | crontab - > /dev/null 2>&1
+				  cron_install_tagged tg-monitor "@reboot tmux new -d -s TG-check-notify '~/TG-check-notify.sh'" > /dev/null 2>&1
 
 				  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "3i$(grep '^TELEGRAM_BOT_TOKEN=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh > /dev/null 2>&1
