@@ -10,7 +10,8 @@ features during development.
 
 ## Fork posture
 
-This repository is a **hard fork** of kejilion/sh (baseline 4.5.2, archived in
+This repository is a **hard fork** of the upstream kejilion/sh project
+(baseline 4.5.2, archived in
 `UPSTREAM_CHANGELOG.txt`). There are no wholesale upstream merges; individual
 upstream fixes may be backported after review. Upstream services remain
 runtime *content* dependencies (templates, compose files, images) tracked as

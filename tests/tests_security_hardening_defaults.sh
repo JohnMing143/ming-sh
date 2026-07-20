@@ -97,10 +97,7 @@ fi
 if grep -En '^[[:space:]]*[^#]*(curl|wget)[^[:space:]]*[[:space:]].*\.sh.*(&&|;).*(bash|sh|source|\./)' "${production_shell_files[@]}"; then
 	fail "a download-and-execute command remains"
 fi
-grep -Fq '"bind": "0.0.0.0:8181"' "$repo_root/PandoraNext/config.json" || fail "PandoraNext network access default is unavailable"
-grep -Fq '"server_tokens": true' "$repo_root/PandoraNext/config.json" || fail "PandoraNext server tokens are disabled"
-grep -Fq '"disable_signup": false' "$repo_root/PandoraNext/config.json" || fail "PandoraNext signup is disabled"
-grep -Fq '"test-1"' "$repo_root/PandoraNext/tokens.json" || fail "PandoraNext token examples are missing"
+[ ! -e "$repo_root/PandoraNext" ] || fail "the unused PandoraNext example configuration should stay removed"
 
 if grep -Eq '123456|0\.0\.0\.0|StrictHostKeyChecking=no|sshpass[[:space:]]+-p' "$repo_root/beifen.sh"; then
 	fail "backup helper contains insecure connection defaults"

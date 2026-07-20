@@ -1,4 +1,4 @@
 __pycache__/
 *.py[cod]
 .DS_Store
-.openclaw-api-sync-test.*
+.openclaw-*-test.*
