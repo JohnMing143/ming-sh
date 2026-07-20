@@ -116,7 +116,7 @@ every shipped copy matches it; each convention above has a failing-test guard
 `tests_network_optimize_paths.sh`, the CI ShellCheck step, and the inventory
 allowlist).
 
-## Milestone 4: remaining security backlog (on the smaller surface)
+## Milestone 4: remaining security backlog (on the smaller surface) — done 2026-07-19
 
 8. **Integrity pinning (CMD-002/CMD-013) — reassessed 2026-07-19.** A review
    of the whole remote-script surface (19 URLs) found script-level pinning
@@ -152,9 +152,10 @@ exists.
 
 ## Standing rules
 
-- Consolidation (Milestones 1–3) is complete. Remaining work is the security
-  backlog (Milestone 4) and modularization (Milestone 5); prefer those over
-  new features.
+- Consolidation (Milestones 1–3) and the security backlog (Milestone 4) are
+  complete. The remaining planned work is modularization (Milestone 5); prefer
+  it over new features. Container-image/release digest pinning (the applicable
+  remainder of CMD-013) is the open security item.
 - Never hand-edit a generated file; regenerate it. After editing `ming.sh` run
   `python3 translate.py generate --all`; after editing anything in `lib/` run
   `python3 lib/inline.py` (then regenerate if `ming.sh` changed).
