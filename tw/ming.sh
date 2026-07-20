@@ -20659,23 +20659,27 @@ EOF
 					tx_threshold_gb=${tx_threshold_gb:-100}
 					read -e -p "請輸入流量重置日期（預設每月1日重設）:" cz_day
 					cz_day=${cz_day:-1}
+					case "$rx_threshold_gb" in ''|*[!0-9]*) rx_threshold_gb=100 ;; esac
+					case "$tx_threshold_gb" in ''|*[!0-9]*) tx_threshold_gb=100 ;; esac
+					case "$cz_day" in ''|*[!0-9]*) cz_day=1 ;; esac
+					[ "$cz_day" -ge 1 ] && [ "$cz_day" -le 31 ] || cz_day=1
 
 					cd ~
 					curl -Ss -o ~/Limiting_Shut_down.sh ${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh
 					chmod +x ~/Limiting_Shut_down.sh
-					sed -i "s/110/$rx_threshold_gb/g" ~/Limiting_Shut_down.sh
-					sed -i "s/120/$tx_threshold_gb/g" ~/Limiting_Shut_down.sh
+					sed -i "s/^rx_threshold_gb=110$/rx_threshold_gb=$rx_threshold_gb/" ~/Limiting_Shut_down.sh
+					sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/" ~/Limiting_Shut_down.sh
 					check_crontab_installed
 					crontab -l | grep -v '~/Limiting_Shut_down.sh' | crontab -
 					(crontab -l ; echo "* * * * * ~/Limiting_Shut_down.sh") | crontab - > /dev/null 2>&1
-					crontab -l | grep -v 'reboot' | crontab -
+					crontab -l | grep -vE '^0 1 [0-9]+ \* \* reboot$' | crontab -
 					(crontab -l ; echo "0 1 $cz_day * * reboot") | crontab - > /dev/null 2>&1
 					echo "限流關機已設定"
 					;;
 				  2)
 					check_crontab_installed
 					crontab -l | grep -v '~/Limiting_Shut_down.sh' | crontab -
-					crontab -l | grep -v 'reboot' | crontab -
+					crontab -l | grep -vE '^0 1 [0-9]+ \* \* reboot$' | crontab -
 					rm ~/Limiting_Shut_down.sh
 					echo "已關閉限流關機功能"
 					;;

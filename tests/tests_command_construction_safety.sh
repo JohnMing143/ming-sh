@@ -36,6 +36,12 @@ for script in "${implementations[@]}"; do
 		fail "shortcut name allowlist is missing: $script"
 	grep -Fq 'shortcut_conflict="false"' "$script" ||
 		fail "shortcut conflict protection is missing: $script"
+	grep -Fq "case \"\$rx_threshold_gb\" in ''|*[!0-9]*) rx_threshold_gb=100 ;; esac" "$script" ||
+		fail "traffic-limit threshold input is not normalized to numeric: $script"
+	grep -Fq 'sed -i "s/^rx_threshold_gb=110$/rx_threshold_gb=$rx_threshold_gb/"' "$script" ||
+		fail "traffic-limit rx substitution is not anchored to its assignment: $script"
+	grep -Fq 'sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/"' "$script" ||
+		fail "traffic-limit tx substitution is not anchored to its assignment: $script"
 
 	if grep -Eq '^[[:space:]]*\$dockername[[:space:]]*$' "$script"; then
 		fail "interactive input is still executed as a command: $script"
@@ -51,6 +57,9 @@ for script in "${implementations[@]}"; do
 	fi
 	if grep -Eq 'read .*get\.docker\.com.*\|.*sh' "$script"; then
 		fail "interactive help still recommends piping a remote installer to a shell: $script"
+	fi
+	if grep -Fq "grep -v 'reboot'" "$script"; then
+		fail "a broad crontab reboot filter that can delete unrelated jobs remains: $script"
 	fi
 done
 
