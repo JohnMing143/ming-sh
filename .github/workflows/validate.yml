@@ -18,7 +18,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Bash syntax checks
-        run: bash -n ming.sh cn/ming.sh en/ming.sh jp/ming.sh kr/ming.sh tw/ming.sh
+        run: |
+          git ls-files '*.sh' | while IFS= read -r shell_file; do
+            echo "== $shell_file"
+            bash -n "$shell_file"
+          done
 
       - name: Python syntax checks
         run: python3 -m py_compile translate.py en/to-en.py jp/to-jp.py kr/to-kr.py tw/to-tw.py
