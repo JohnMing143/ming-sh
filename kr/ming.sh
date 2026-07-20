@@ -4861,11 +4861,8 @@ linux_clean() {
 	elif command -v apk &>/dev/null; then
 		echo "패키지 관리자 캐시 정리..."
 		apk cache clean
-		echo "시스템 로그 삭제..."
+		echo "만료된 압축 로그와 7일 지난 임시 파일을 삭제합니다..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "APK 캐시 삭제..."
-		find /var/cache/apk -xdev -type f -mtime +7 -delete 2>/dev/null
-		echo "임시 파일 삭제..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pacman &>/dev/null; then
@@ -4883,9 +4880,8 @@ linux_clean() {
 		journalctl --vacuum-size=500M
 
 	elif command -v opkg &>/dev/null; then
-		echo "시스템 로그 삭제..."
+		echo "만료된 압축 로그와 7일 지난 임시 파일을 삭제합니다..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "임시 파일 삭제..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pkg &>/dev/null; then
@@ -4893,9 +4889,8 @@ linux_clean() {
 		pkg autoremove -y
 		echo "패키지 관리자 캐시 정리..."
 		pkg clean -y
-		echo "시스템 로그 삭제..."
+		echo "만료된 압축 로그와 7일 지난 임시 파일을 삭제합니다..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "임시 파일 삭제..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	else
@@ -7271,7 +7266,8 @@ format_partition() {
 	local DEVICE="/dev/$PARTITION"
 
 	# 파티션이 존재하는지 확인
-	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] || ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
+	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] ||
+	   ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
 		echo "파티션이 존재하지 않습니다!"
 		return
 	fi
@@ -8264,8 +8260,8 @@ docker_ssh_migration() {
 			fi
 
 			IMAGE=$(jq -r '.[0].Config.Image' "$json")
-			local -a docker_run_args=(docker run -d --name "$container")
 			[[ -z "$IMAGE" || "$IMAGE" == "null" ]] && { echo -e "${gl_hong}미러 정보를 찾을 수 없습니다. 건너뛰세요:$container${gl_bai}"; continue; }
+			local -a docker_run_args=(docker run -d --name "$container")
 
 			# 포트 매핑
 			local -a PORTS=()
@@ -21223,9 +21219,21 @@ while true; do
 			  local server_username=${server_username:-root}
 			  read -e -s -p "서버 사용자 비밀번호:" server_password
 			  echo
+			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
+				 [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] ||
+				 [[ ! "$server_port" =~ ^[0-9]+$ ]] ||
+				 [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] ||
+				 [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  echo "서버 정보가 올바르지 않습니다."
+				  break_end
+				  continue
+			  fi
 			  local server_password_encoded
-			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || { echo "비밀번호 인코딩에 실패했습니다."; break_end; continue; }
-			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] || [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] || [[ ! "$server_port" =~ ^[0-9]+$ ]] || [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] || [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then echo "서버 정보가 올바르지 않습니다."; break_end; continue; fi
+			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || {
+				  echo "비밀번호 인코딩에 실패했습니다."
+				  break_end
+				  continue
+			  }
 			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"base64:$server_password_encoded\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
 			  chmod 0600 "$HOME/cluster/servers.py"
 			  unset server_password server_password_encoded
@@ -21233,7 +21241,11 @@ while true; do
 			  ;;
 		  2)
 			  read -e -p "삭제할 키워드를 입력하세요:" rmserver
-			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"; else echo "서버 이름이 올바르지 않습니다."; fi
+			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"
+			  else
+				  echo "서버 이름이 올바르지 않습니다."
+			  fi
 			  ;;
 		  3)
 			  install nano

@@ -4861,11 +4861,8 @@ linux_clean() {
 	elif command -v apk &>/dev/null; then
 		echo "Clean package manager cache..."
 		apk cache clean
-		echo "Delete system log..."
+		echo "Delete expired compressed logs and 7-day-old temporary files..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "Delete APK cache..."
-		find /var/cache/apk -xdev -type f -mtime +7 -delete 2>/dev/null
-		echo "Delete temporary files..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pacman &>/dev/null; then
@@ -4883,9 +4880,8 @@ linux_clean() {
 		journalctl --vacuum-size=500M
 
 	elif command -v opkg &>/dev/null; then
-		echo "Delete system log..."
+		echo "Delete expired compressed logs and 7-day-old temporary files..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "Delete temporary files..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pkg &>/dev/null; then
@@ -4893,9 +4889,8 @@ linux_clean() {
 		pkg autoremove -y
 		echo "Clean package manager cache..."
 		pkg clean -y
-		echo "Delete system log..."
+		echo "Delete expired compressed logs and 7-day-old temporary files..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "Delete temporary files..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	else
@@ -7271,7 +7266,8 @@ format_partition() {
 	local DEVICE="/dev/$PARTITION"
 
 	# Check if the partition exists
-	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] || ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
+	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] ||
+	   ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
 		echo "The partition does not exist!"
 		return
 	fi
@@ -21222,11 +21218,21 @@ while true; do
 			  local server_username=${server_username:-root}
 			  read -e -s -p "Server user password:" server_password
 			  echo
-			  local server_password_encoded
-			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || { echo "Password encoding failed."; break_end; continue; }
-			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] || [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] || [[ ! "$server_port" =~ ^[0-9]+$ ]] || [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] || [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then
-				  echo "Invalid server fields."; break_end; continue
+			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
+				 [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] ||
+				 [[ ! "$server_port" =~ ^[0-9]+$ ]] ||
+				 [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] ||
+				 [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  echo "Invalid server fields."
+				  break_end
+				  continue
 			  fi
+			  local server_password_encoded
+			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || {
+				  echo "Password encoding failed."
+				  break_end
+				  continue
+			  }
 			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"base64:$server_password_encoded\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
 			  chmod 0600 "$HOME/cluster/servers.py"
 			  unset server_password server_password_encoded
@@ -21234,7 +21240,11 @@ while true; do
 			  ;;
 		  2)
 			  read -e -p "Please enter the keywords to be deleted:" rmserver
-			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"; else echo "Invalid server name."; fi
+			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"
+			  else
+				  echo "Invalid server name."
+			  fi
 			  ;;
 		  3)
 			  install nano

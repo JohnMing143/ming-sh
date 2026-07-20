@@ -4861,11 +4861,8 @@ linux_clean() {
 	elif command -v apk &>/dev/null; then
 		echo "パッケージマネージャーのキャッシュをクリーンアップ..."
 		apk cache clean
-		echo "システムログを削除します..."
+		echo "期限切れの圧縮ログと7日以上前の一時ファイルを削除します..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "APKキャッシュを削除..."
-		find /var/cache/apk -xdev -type f -mtime +7 -delete 2>/dev/null
-		echo "一時ファイルを削除します..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pacman &>/dev/null; then
@@ -4883,9 +4880,8 @@ linux_clean() {
 		journalctl --vacuum-size=500M
 
 	elif command -v opkg &>/dev/null; then
-		echo "システムログを削除します..."
+		echo "期限切れの圧縮ログと7日以上前の一時ファイルを削除します..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "一時ファイルを削除します..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	elif command -v pkg &>/dev/null; then
@@ -4893,9 +4889,8 @@ linux_clean() {
 		pkg autoremove -y
 		echo "パッケージマネージャーのキャッシュをクリーンアップ..."
 		pkg clean -y
-		echo "システムログを削除します..."
+		echo "期限切れの圧縮ログと7日以上前の一時ファイルを削除します..."
 		find /var/log -xdev -type f -name '*.gz' -delete 2>/dev/null
-		echo "一時ファイルを削除します..."
 		find /tmp -xdev -mindepth 1 -maxdepth 1 -type f -mtime +7 -delete 2>/dev/null
 
 	else
@@ -7271,7 +7266,8 @@ format_partition() {
 	local DEVICE="/dev/$PARTITION"
 
 	# パーティションが存在するかどうかを確認する
-	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] || ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
+	if [[ ! "$PARTITION" =~ ^[A-Za-z0-9._-]+$ ]] ||
+	   ! lsblk -dnro TYPE "$DEVICE" 2>/dev/null | grep -qx 'part'; then
 		echo "パーティションが存在しません!"
 		return
 	fi
@@ -8264,8 +8260,8 @@ docker_ssh_migration() {
 			fi
 
 			IMAGE=$(jq -r '.[0].Config.Image' "$json")
-			local -a docker_run_args=(docker run -d --name "$container")
 			[[ -z "$IMAGE" || "$IMAGE" == "null" ]] && { echo -e "${gl_hong}ミラー情報が見つかりません。スキップしてください:$container${gl_bai}"; continue; }
+			local -a docker_run_args=(docker run -d --name "$container")
 
 			# ポートマッピング
 			local -a PORTS=()
@@ -21223,9 +21219,21 @@ while true; do
 			  local server_username=${server_username:-root}
 			  read -e -s -p "サーバーユーザーのパスワード:" server_password
 			  echo
+			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
+				 [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] ||
+				 [[ ! "$server_port" =~ ^[0-9]+$ ]] ||
+				 [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] ||
+				 [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  echo "サーバー情報が無効です。"
+				  break_end
+				  continue
+			  fi
 			  local server_password_encoded
-			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || { echo "パスワードのエンコードに失敗しました。"; break_end; continue; }
-			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] || [[ ! "$server_ip" =~ ^[A-Za-z0-9._:-]+$ ]] || [[ ! "$server_port" =~ ^[0-9]+$ ]] || [ "$server_port" -lt 1 ] || [ "$server_port" -gt 65535 ] || [[ ! "$server_username" =~ ^[A-Za-z0-9._-]+$ ]]; then echo "サーバー情報が無効です。"; break_end; continue; fi
+			  server_password_encoded=$(printf '%s' "$server_password" | base64 | tr -d '\n') || {
+				  echo "パスワードのエンコードに失敗しました。"
+				  break_end
+				  continue
+			  }
 			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"base64:$server_password_encoded\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
 			  chmod 0600 "$HOME/cluster/servers.py"
 			  unset server_password server_password_encoded
@@ -21233,7 +21241,11 @@ while true; do
 			  ;;
 		  2)
 			  read -e -p "削除するキーワードを入力してください:" rmserver
-			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"; else echo "サーバー名が無効です。"; fi
+			  if [[ "$rmserver" =~ ^[A-Za-z0-9._-]+$ ]]; then
+				  sed -i "/\"name\": \"$rmserver\"/d" "$HOME/cluster/servers.py"
+			  else
+				  echo "サーバー名が無効です。"
+			  fi
 			  ;;
 		  3)
 			  install nano
