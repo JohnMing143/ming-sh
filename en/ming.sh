@@ -4533,7 +4533,6 @@ frps_panel() {
 				echo "The FRP server has been installed"
 				;;
 			2)
-				crontab -l | grep -v 'frps' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frps >/dev/null 2>&1
 				docker rm -f frps && docker rmi "$UPSTREAM_FRP_IMAGE" >/dev/null 2>&1
 				[ -f /home/frp/frps.toml ] || cp /home/frp/frp_0.61.0_linux_amd64/frps.toml /home/frp/frps.toml
@@ -4543,7 +4542,6 @@ frps_panel() {
 				echo "The FRP server has been updated"
 				;;
 			3)
-				crontab -l | grep -v 'frps' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frps >/dev/null 2>&1
 				docker rm -f frps && docker rmi "$UPSTREAM_FRP_IMAGE"
 				rm -rf /home/frp
@@ -4625,7 +4623,6 @@ frpc_panel() {
 				echo "The FRP client has been installed"
 				;;
 			2)
-				crontab -l | grep -v 'frpc' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frpc >/dev/null 2>&1
 				docker rm -f frpc && docker rmi "$UPSTREAM_FRP_IMAGE" >/dev/null 2>&1
 				[ -f /home/frp/frpc.toml ] || cp /home/frp/frp_0.61.0_linux_amd64/frpc.toml /home/frp/frpc.toml
@@ -4636,7 +4633,6 @@ frpc_panel() {
 				;;
 
 			3)
-				crontab -l | grep -v 'frpc' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frpc >/dev/null 2>&1
 				docker rm -f frpc && docker rmi "$UPSTREAM_FRP_IMAGE"
 				rm -rf /home/frp
@@ -15178,7 +15174,6 @@ openclaw_backup_restore_menu() {
 		git config --global url."${gh_proxy}github.com/".insteadOf ssh://git@github.com/
 		git config --global url."${gh_proxy}github.com/".insteadOf git@github.com:
 		npm install -g openclaw@latest
-		crontab -l 2>/dev/null | grep -v "s gateway" | crontab -
 		start_gateway
 		hash -r
 		add_app_id
@@ -15191,7 +15186,6 @@ openclaw_backup_restore_menu() {
 		echo "Uninstall OpenClaw..."
 		openclaw uninstall
 		npm uninstall -g openclaw
-		crontab -l 2>/dev/null | grep -v "s gateway" | crontab -
 		safe_remove_path "$HOME/.openclaw"
 		[ "$HOME" != "/root" ] && [ -d /root/.openclaw ] && echo "⚠️ It is detected that /root/.openclaw still exists in the root directory. If you need to clean it, please handle it manually."
 		hash -r

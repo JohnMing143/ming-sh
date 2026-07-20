@@ -4533,7 +4533,6 @@ frps_panel() {
 				echo "FRP 서버가 설치되었습니다"
 				;;
 			2)
-				crontab -l | grep -v 'frps' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frps >/dev/null 2>&1
 				docker rm -f frps && docker rmi "$UPSTREAM_FRP_IMAGE" >/dev/null 2>&1
 				[ -f /home/frp/frps.toml ] || cp /home/frp/frp_0.61.0_linux_amd64/frps.toml /home/frp/frps.toml
@@ -4543,7 +4542,6 @@ frps_panel() {
 				echo "FRP 서버가 업데이트되었습니다"
 				;;
 			3)
-				crontab -l | grep -v 'frps' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frps >/dev/null 2>&1
 				docker rm -f frps && docker rmi "$UPSTREAM_FRP_IMAGE"
 				rm -rf /home/frp
@@ -4625,7 +4623,6 @@ frpc_panel() {
 				echo "FRP 클라이언트가 설치되었습니다"
 				;;
 			2)
-				crontab -l | grep -v 'frpc' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frpc >/dev/null 2>&1
 				docker rm -f frpc && docker rmi "$UPSTREAM_FRP_IMAGE" >/dev/null 2>&1
 				[ -f /home/frp/frpc.toml ] || cp /home/frp/frp_0.61.0_linux_amd64/frpc.toml /home/frp/frpc.toml
@@ -4636,7 +4633,6 @@ frpc_panel() {
 				;;
 
 			3)
-				crontab -l | grep -v 'frpc' | crontab - > /dev/null 2>&1
 				tmux kill-session -t frpc >/dev/null 2>&1
 				docker rm -f frpc && docker rmi "$UPSTREAM_FRP_IMAGE"
 				rm -rf /home/frp
@@ -15178,7 +15174,6 @@ openclaw_backup_restore_menu() {
 		git config --global url."${gh_proxy}github.com/".insteadOf ssh://git@github.com/
 		git config --global url."${gh_proxy}github.com/".insteadOf git@github.com:
 		npm install -g openclaw@latest
-		crontab -l 2>/dev/null | grep -v "s gateway" | crontab -
 		start_gateway
 		hash -r
 		add_app_id
@@ -15191,7 +15186,6 @@ openclaw_backup_restore_menu() {
 		echo "OpenClaw 제거..."
 		openclaw uninstall
 		npm uninstall -g openclaw
-		crontab -l 2>/dev/null | grep -v "s gateway" | crontab -
 		safe_remove_path "$HOME/.openclaw"
 		[ "$HOME" != "/root" ] && [ -d /root/.openclaw ] && echo "⚠️ 루트 디렉터리에 /root/.openclaw가 여전히 존재하는 것으로 감지됩니다. 청소가 필요한 경우 수동으로 처리하십시오."
 		hash -r

@@ -188,6 +188,6 @@ signed or digest-pinned update design. Updates stay disabled until then.
   `Limiting_Shut_down1.sh` / `TG-check-notify.sh` counts only
   `eth|ens|enp|eno` interfaces (misses OpenVZ `venet0` and WireGuard-only
   hosts); `auto_cert_renewal.sh` ships a literal `your@email.com` that should
-  be parameterized at deployment; the remove-only FRP (`grep -v 'frps'`/
-  `'frpc'`) and OpenClaw gateway (`grep -v "s gateway"`) crontab filters
-  still need their add sites identified before they can be retagged (CMD-012).
+  be parameterized at deployment. (The remove-only FRP/gateway crontab filters
+  were found to have no add site and removed on 2026-07-19, closing that part
+  of CMD-012.)

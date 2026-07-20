@@ -44,6 +44,11 @@ for script in "${implementations[@]}"; do
 	if grep -Fq "grep -v '~/TG-check-notify.sh'" "$script"; then
 		fail "the untagged TG monitor crontab filter returned: $script"
 	fi
+	# The vestigial FRP/gateway filters (removed 2026-07-19) had no matching
+	# add site and only risked deleting unrelated user cron; they must stay gone.
+	if grep -Eq "grep -v 'frp[sc]'|grep -v \"s gateway\"" "$script"; then
+		fail "a vestigial FRP/gateway crontab filter with no add site returned: $script"
+	fi
 done
 
 echo "PASS: cron tagging"
