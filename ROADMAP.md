@@ -30,6 +30,11 @@ shipped it — and that this fork does not use — is removed, not maintained.
 3. **Mechanical consistency.** Every convention (paths, cron tags, naming,
    generated-file contracts) is enforced by a test that fails in CI, in the
    style of `tests/tests_variant_sync.sh`.
+4. **Proportion over defense.** Match the solution to the actual risk. Prefer
+   the simplest thing that works, guarded by one load-bearing test; do not add
+   parameters, layers, or overlapping checks for hypothetical cases. One
+   direct guard beats several redundant ones. This applies to the plan itself:
+   avoid overthinking that produces over-engineered, defensive scaffolding.
 
 ## Milestone 1: prune inherited dead weight — done 2026-07-19
 
@@ -73,16 +78,19 @@ hand-edited or regeneration was skipped.
 
 ## Milestone 3: one copy of shared plumbing, one set of conventions — done 2026-07-19
 
-3. **Shared helper library with build-time inlining.**
-   `run_reviewed_remote_script` currently exists in 9 copies (6 entrypoints,
-   `mc.sh`, `palworld.sh`, `hermes_manager.sh`).
-   Keep one canonical copy under `lib/`, inline it into shipped standalone
-   files with an assemble step, and pin the result with a sync test. Shipped
-   files stay self-contained; no runtime sourcing of remote code.
-4. **Tagged cron helpers (CMD-012).** `PROJECT_CRON_TAG` exists but most cron
-   writers still build ad-hoc `crontab -l | grep -v` filters. Provide shared
-   add/remove helpers that tag every project-managed entry and migrate the
-   remaining writers; the CMD-018 exact-format filter is the interim pattern.
+3. **Shared helper library with build-time inlining — done 2026-07-19.**
+   `run_reviewed_remote_script` (formerly 9 copies: 6 entrypoints, `mc.sh`,
+   `palworld.sh`, `hermes_manager.sh`) now has one source in
+   `lib/remote_script.sh`, inlined between generation markers by
+   `lib/inline.py`. Shipped files stay self-contained; nothing sources the
+   library at runtime. `tests/tests_shared_lib_sync.sh` pins every copy.
+4. **Tagged cron helpers (CMD-012) — done 2026-07-19.** Added
+   `cron_install_tagged`/`cron_remove_tagged` and migrated the co-located
+   project-managed writers (logrotate, certificate renewal, TG monitor),
+   removing their broad `grep -v` filters. The remove-only FRP and OpenClaw
+   gateway broad filters are intentionally left in place until their add sites
+   are identified (still tracked under CMD-012); `tests/tests_cron_tagging.sh`
+   guards the migrated writers.
 5. **One sysctl path convention — done 2026-07-19.** `network-optimize.sh`
    now writes `/etc/sysctl.d/99-ming-sh-network.conf` with a
    `# ming-sh-network-optimize` marker, auto-migrates the legacy
