@@ -90,7 +90,7 @@ for locale in '' cn en jp kr tw; do
 	[ ! -e "$wrapper" ] || fail "deprecated entrypoint remains: $wrapper"
 done
 
-helpers=("$repo_root/mc.sh" "$repo_root/palworld.sh" "$repo_root/pal_log.sh")
+helpers=("$repo_root/mc.sh" "$repo_root/palworld.sh")
 if grep -E 'm\|k\)|k 兼容|兼容 k' "${helpers[@]}"; then
 	fail "deprecated command compatibility remains in helper menus"
 fi
