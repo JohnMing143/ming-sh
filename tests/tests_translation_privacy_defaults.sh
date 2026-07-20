@@ -15,39 +15,40 @@ fail() {
 	exit 1
 }
 
-translation_scripts=(
-	"$repo_root/translate.py"
-	"$repo_root/en/to-en.py"
-	"$repo_root/jp/to-jp.py"
-	"$repo_root/kr/to-kr.py"
-	"$repo_root/tw/to-tw.py"
+tool="$repo_root/translate.py"
+
+# The remote-translation subcommand must refuse to run without the explicit
+# opt-in, before importing its network client or writing anything.
+set +e
+output=$(
+	cd "$workdir"
+	env -u ALLOW_REMOTE_TRANSLATION python3 "$tool" translate-missing --lang en 2>&1
 )
+status=$?
+set -e
 
-for script in "${translation_scripts[@]}"; do
-	set +e
-	output=$(
-		cd "$workdir"
-		env -u ALLOW_REMOTE_TRANSLATION python3 "$script" 2>&1
-	)
-	status=$?
-	set -e
+[ "$status" -eq 2 ] ||
+	fail "remote translation did not stop with the privacy guard (status $status)"
+printf '%s\n' "$output" | grep -Fq 'disabled by default' ||
+	fail "remote translation did not explain the default denial"
+printf '%s\n' "$output" | grep -Fq 'ALLOW_REMOTE_TRANSLATION=true' ||
+	fail "remote translation did not document the explicit opt-in"
 
-	[ "$status" -eq 2 ] ||
-		fail "translator did not stop with the privacy guard: $script (status $status)"
-	printf '%s\n' "$output" | grep -Fq 'disabled by default' ||
-		fail "translator did not explain the default denial: $script"
-	printf '%s\n' "$output" | grep -Fq 'ALLOW_REMOTE_TRANSLATION=true' ||
-		fail "translator did not document the explicit opt-in: $script"
+grep -Fq "REMOTE_TRANSLATION_ENV = 'ALLOW_REMOTE_TRANSLATION'" "$tool" ||
+	fail "the shared opt-in name is missing"
+if grep -Eq '^from deep_translator import |^import deep_translator' "$tool"; then
+	fail "the network client is imported before opt-in"
+fi
 
-	grep -Fq "REMOTE_TRANSLATION_ENV = 'ALLOW_REMOTE_TRANSLATION'" "$script" ||
-		fail "translator is missing the shared opt-in name: $script"
-	if grep -Eq '^from deep_translator import ' "$script"; then
-		fail "translator imports its network client before opt-in: $script"
-	fi
-done
+# Offline subcommands must work without the opt-in and without the network:
+# check verifies every committed variant against regeneration.
+env -u ALLOW_REMOTE_TRANSLATION python3 "$tool" check --all >/dev/null ||
+	fail "offline variant check requires the remote opt-in or fails"
+env -u ALLOW_REMOTE_TRANSLATION python3 "$tool" status --all >/dev/null ||
+	fail "offline status report requires the remote opt-in or fails"
 
 if find "$workdir" -mindepth 1 -print -quit | grep -q .; then
-	fail "default-denied translators wrote files"
+	fail "default-denied translation wrote files"
 fi
 
 echo "PASS: translation privacy defaults"

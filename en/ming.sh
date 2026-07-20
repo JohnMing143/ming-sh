@@ -3330,7 +3330,7 @@ local -a tmux_command=()
 read -r -a tmux_command <<< "$tmuxd"
 if [ "${#tmux_command[@]}" -eq 0 ] || ! command -v "${tmux_command[0]}" >/dev/null 2>&1; then
   echo "Enter a directly executable program and arguments; shell pipelines and redirections are not supported."
-  return 1
+	return 1
 fi
 
 # Function to check if session exists
@@ -5034,8 +5034,8 @@ new_ssh_port() {
 
   correct_ssh_config
 
-  restart_ssh
-  open_port $new_port
+	restart_ssh
+	open_port $new_port
 
   echo "The SSH port has been modified to:$new_port"
 

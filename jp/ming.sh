@@ -3330,7 +3330,7 @@ local -a tmux_command=()
 read -r -a tmux_command <<< "$tmuxd"
 if [ "${#tmux_command[@]}" -eq 0 ] || ! command -v "${tmux_command[0]}" >/dev/null 2>&1; then
   echo "Enter a directly executable program and arguments; shell pipelines and redirections are not supported."
-  return 1
+	return 1
 fi
 
 # セッションが存在するかどうかを確認する機能
@@ -5034,8 +5034,8 @@ new_ssh_port() {
 
   correct_ssh_config
 
-  restart_ssh
-  open_port $new_port
+	restart_ssh
+	open_port $new_port
 
   echo "SSH ポートは次のように変更されました。$new_port"
 
@@ -14455,7 +14455,7 @@ try:
     if not exists:
         print("  (审批文件不存在，使用系统内置安全兜底)")
 except Exception as e:
-    print("  (解析失败: " + str(e) + ")")
+    print("(解析に失敗しました:" + str(e) + ")")
 ' "$approvals_json"
 			else
 				echo "(openclaw の承認では --json が出力されません)"

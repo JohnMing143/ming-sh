@@ -3330,7 +3330,7 @@ local -a tmux_command=()
 read -r -a tmux_command <<< "$tmuxd"
 if [ "${#tmux_command[@]}" -eq 0 ] || ! command -v "${tmux_command[0]}" >/dev/null 2>&1; then
   echo "Enter a directly executable program and arguments; shell pipelines and redirections are not supported."
-  return 1
+	return 1
 fi
 
 # 세션이 존재하는지 확인하는 함수
@@ -5034,8 +5034,8 @@ new_ssh_port() {
 
   correct_ssh_config
 
-  restart_ssh
-  open_port $new_port
+	restart_ssh
+	open_port $new_port
 
   echo "SSH 포트가 다음과 같이 수정되었습니다.$new_port"
 
@@ -7181,7 +7181,7 @@ mount_partition() {
 	DEVICE="/dev/$PARTITION"
 	MOUNT_POINT="/mnt/$PARTITION"
 
-	# 检查分区是否存在
+	# 파티션이 존재하는지 확인
 	if ! lsblk -no NAME | grep -qw "$PARTITION"; then
 		echo "파티션이 존재하지 않습니다!"
 		return 1
@@ -19568,7 +19568,7 @@ net_menu() {
 				if ip link show "$nic" &>/dev/null; then
 					ip link set "$nic" up && echo "✔ 네트워크 카드$nic활성화됨"
 				else
-					echo "✘ 网卡不存在"
+					echo "✘ 네트워크 카드가 존재하지 않습니다."
 				fi
 				read -erp "계속하려면 Enter를 누르세요..."
 				;;

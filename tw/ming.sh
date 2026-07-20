@@ -3330,7 +3330,7 @@ local -a tmux_command=()
 read -r -a tmux_command <<< "$tmuxd"
 if [ "${#tmux_command[@]}" -eq 0 ] || ! command -v "${tmux_command[0]}" >/dev/null 2>&1; then
   echo "Enter a directly executable program and arguments; shell pipelines and redirections are not supported."
-  return 1
+	return 1
 fi
 
 # 檢查會話是否存在的函數
@@ -5034,8 +5034,8 @@ new_ssh_port() {
 
   correct_ssh_config
 
-  restart_ssh
-  open_port $new_port
+	restart_ssh
+	open_port $new_port
 
   echo "SSH 連接埠已修改為:$new_port"
 
@@ -7103,7 +7103,7 @@ use_connection() {
 	else
 		# 使用密碼連接
 		if ! command -v sshpass &> /dev/null; then
-			echo "错误：未安装 sshpass，请先安装 sshpass。"
+			echo "錯誤：未安裝 sshpass，請先安裝 sshpass。"
 			echo "安裝方法："
 			echo "  - Ubuntu/Debian: apt install sshpass"
 			echo "  - CentOS/RHEL: yum install sshpass"
