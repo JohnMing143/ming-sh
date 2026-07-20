@@ -139,7 +139,6 @@ run_command() {
 	fi
 }
 
-
 safe_remove_path() {
 	local target="$1"
 	local parent_real target_name target_real
@@ -5020,6 +5019,7 @@ correct_ssh_config() {
 			   -e 's/^\s*#\?\s*PasswordAuthentication .*/PasswordAuthentication yes/' \
 			   -e 's/^\s*#\?\s*PubkeyAuthentication .*/PubkeyAuthentication yes/' "$sshd_config"
 	fi
+
 }
 
 
@@ -8163,7 +8163,6 @@ docker_ssh_migration() {
 				local -a ENVS=()
 				mapfile -t ENVS < <(jq -r '.[0].Config.Env[]?' "$inspect_file")
 
-				# ボリュームマッピング
 				local -a docker_run_args=(docker run -d --name "$c")
 				for p in "${PORTS[@]}"; do
 					[[ -n "$p" ]] && docker_run_args+=(-p "$p")
@@ -21234,6 +21233,7 @@ while true; do
 				  break_end
 				  continue
 			  }
+
 			  sed -i "/servers = \[/a\    {\"name\": \"$server_name\", \"hostname\": \"$server_ip\", \"port\": $server_port, \"username\": \"$server_username\", \"password\": \"base64:$server_password_encoded\", \"remote_path\": \"/home/\"}," "$HOME/cluster/servers.py"
 			  chmod 0600 "$HOME/cluster/servers.py"
 			  unset server_password server_password_encoded
