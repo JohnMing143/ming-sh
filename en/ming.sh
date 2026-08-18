@@ -178,18 +178,31 @@ remote_script_sha256() {
 	fi
 }
 
-run_reviewed_remote_script() {
+# Download a remote script over HTTPS, syntax-check it, and print its
+# digest. With --install DEST the validated copy replaces DEST (0755); with
+# --run (or neither flag) it runs with any extra arguments and is removed.
+download_reviewed_remote_script() {
+	local mode="run"
+	if [ "${1:-}" = "--install" ]; then
+		mode="install"
+		shift
+	fi
 	local script_url="$1"
 	shift
+	local install_dest=""
+	if [ "$mode" = "install" ]; then
+		install_dest="$1"
+		shift
+	fi
 	local cache_dir script_path digest exit_status
 	case "$script_url" in
 		https://*) ;;
 		*) echo "拒绝下载非 HTTPS 脚本: $script_url"; return 1 ;;
 	esac
 	cache_dir="${PROJECT_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/${PROJECT_ID:-ming-sh}}/remote-scripts"
-	[ ! -L "$cache_dir" ] || { echo "拒绝使用符号链接缓存目录: $cache_dir"; return 1; }
+	[ ! -L "$cache_dir" ] || { echo "Refuse to use symbolic link cache directory:$cache_dir"; return 1; }
 	mkdir -p -- "$cache_dir" || return 1
-	[ -O "$cache_dir" ] || { echo "远程脚本缓存目录不属于当前用户: $cache_dir"; return 1; }
+	[ -O "$cache_dir" ] || { echo "The remote script cache directory does not belong to the current user:$cache_dir"; return 1; }
 	chmod 0700 "$cache_dir" || return 1
 	script_path=$(mktemp "$cache_dir/review.XXXXXX.sh") || return 1
 	chmod 0600 "$script_path"
@@ -209,15 +222,26 @@ run_reviewed_remote_script() {
 		rm -f -- "$script_path"
 		return 1
 	fi
-	[ -s "$script_path" ] || { echo "下载结果为空。"; rm -f -- "$script_path"; return 1; }
-	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; rm -f -- "$script_path"; return 1; }
+	[ -s "$script_path" ] || { echo "The download result is empty. "; rm -f -- "$script_path"; return 1; }
+	bash -n "$script_path" || { echo "The remote script failed the Bash syntax check:$script_path"; rm -f -- "$script_path"; return 1; }
 	digest=$(remote_script_sha256 "$script_path" 2>/dev/null) || digest="unavailable"
+
+	if [ "$mode" = "install" ]; then
+		printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+		mv -f -- "$script_path" "$install_dest" || { rm -f -- "$script_path"; return 1; }
+		chmod 0755 "$install_dest"
+		return 0
+	fi
 
 	printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
 	bash "$script_path" "$@"
 	exit_status=$?
 	rm -f -- "$script_path"
 	return "$exit_status"
+}
+
+run_reviewed_remote_script() {
+	download_reviewed_remote_script "$@"
 }
 # --- end ming-sh shared lib: remote_script ---
 
@@ -338,7 +362,7 @@ UserLicenseAgreement() {
 migrate_legacy_license_acceptance || true
 CheckFirstRun_false
 
-# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。
+# Maintain the original out-of-box command installation behavior; do not block the main function when the security check fails.
 if [ -r "${BASH_SOURCE[0]}" ]; then
 	install_project_entrypoint >/dev/null 2>&1 || true
 fi
@@ -931,8 +955,8 @@ install_crontab() {
 }
 
 
-# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。
-# 标记形如 "# ming-sh:<名称>"：安装先按标记去重再追加，卸载按标记精确删除。
+# Manage cron tasks with project tags to avoid accidentally deleting irrelevant tasks with broad grep filters.
+# The mark is in the form of "# ming-sh:<name>": when installing, press the mark to remove duplicates and then append, and when uninstalling, press the mark to delete exactly.
 cron_install_tagged() {
 	local tag="# ${PROJECT_CRON_TAG}:$1"
 	local job="$2 ${tag}"
@@ -1057,7 +1081,7 @@ backup_iptables_rules() {
 
 iptables_open() {
 	install iptables
-	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}"
+	backup_iptables_rules || echo -e "${gl_huang}Warning: Automatic backup of firewall rules failed, continue to open all ports.${gl_bai}"
 	iptables -P INPUT ACCEPT
 	iptables -P FORWARD ACCEPT
 	iptables -P OUTPUT ACCEPT
@@ -1654,8 +1678,7 @@ install_ldnmp() {
 install_certbot() {
 
 	cd ~
-	curl -sS -O ${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh
-	chmod +x auto_cert_renewal.sh
+	download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh" ~/auto_cert_renewal.sh
 
 	check_crontab_installed
 	cron_install_tagged cert-renew '0 0 * * * ~/auto_cert_renewal.sh'
@@ -1970,7 +1993,7 @@ cf_purge_cache() {
 	ZONE_IDS=($ZONE_IDS)
   else
 	# Prompt user whether to clear cache
-	read -e -p "需要清理 Cloudflare 的缓存吗？ (y/n):" answer
+	read -e -p "Clean the Cloudflare cache? (y/n): " answer
 	if [[ "$answer" == "y" ]]; then
 	  echo "CF information is stored in$CONFIG_FILE, you can modify the CF information later"
 	  read -e -p "Please enter your API_TOKEN:" API_TOKEN
@@ -2128,7 +2151,7 @@ patch_wp_memory_limit() {
 patch_wp_debug() {
   local DEBUG="${1:-false}"           # 第一个参数，默认false
   local DEBUG_DISPLAY="${2:-false}"   # 第二个参数，默认false
-  local DEBUG_LOG="${3:-false}"       # 第三个参数，默认false
+  local DEBUG_LOG="${3:-false}"       # third parameter, default false
   local TARGET_DIR="/home/web/html"   # 路径写死
 
   find "$TARGET_DIR" -type f -name "wp-config.php" | while read -r FILE; do
@@ -2469,8 +2492,7 @@ web_security() {
 					  cd ~
 					  install jq bc
 					  check_crontab_installed
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh
-					  chmod +x CF-Under-Attack.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh" ~/CF-Under-Attack.sh
 					  sed -i "s/AAAA/$cfuser/g" ~/CF-Under-Attack.sh
 					  sed -i "s/BBBB/$cftoken/g" ~/CF-Under-Attack.sh
 					  sed -i "s/CCCC/$cfzonID/g" ~/CF-Under-Attack.sh
@@ -6034,7 +6056,7 @@ clamav_scan() {
 		clamav/clamav-debian:latest \
 		clamscan -r --log=/var/log/clamav/scan.log $SCAN_PARAMS
 
-	echo -e "${gl_lv}$* 扫描完成，病毒报告存放在${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}"
+	echo -e "${gl_lv}$* scan complete; virus report at ${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}"
 	echo -e "${gl_lv}If there is a virus please${gl_huang}scan.log${gl_lv}Search the file for the FOUND keyword to confirm the location of the virus${gl_bai}"
 
 }
@@ -6266,7 +6288,7 @@ net.ipv4.tcp_slow_start_after_idle = 0"
 	cat > "$CONF" << SYSCTL
 # ${PROJECT_NAME} kernel tuning configuration
 # Mode: $mode_name | Scene: $scene
-# Memory: ${MEM_MB}MB | Generation time: $(date '+%Y-%m-%d %H:%M:%S')
+# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')
 
 # ──TCP Congestion Control──
 net.core.default_qdisc = $QDISC
@@ -6316,7 +6338,7 @@ vm.vfs_cache_pressure = $VFS_PRESSURE
 
 # ──CPU/kernel scheduling──
 kernel.sched_autogroup_enabled = $SCHED_AUTOGROUP
-$([ -f /proc/sys/kernel/numa_balancing ] && echo "kernel.numa_balancing = $NUMA" || echo "# numa_balancing not supported")
+$([ -f /proc/sys/kernel/numa_balancing ] && echo "kernel.numa_balancing = $NUMA" || echo "# numa_balancing 不支持")
 
 # ──Safety protection──
 net.ipv4.conf.all.rp_filter = 1
@@ -6442,7 +6464,7 @@ Kernel_optimize() {
 	root_use
 	while true; do
 	  clear
-	  local current_mode=$(grep "^# Mode:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# mode: //' | awk -F'|' '{print $1}' | xargs)
+	  local current_mode=$(grep "^# 模式:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)
 	  [ -z "$current_mode" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode="Automatic tuning mode"
 	  echo "Linux system kernel parameter optimization"
 	  if [ -n "$current_mode" ]; then
@@ -9291,9 +9313,7 @@ linux_ldnmp() {
 	  mkdir $yuming
 	  cd $yuming
 
-	  docker exec php sh -c "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\""
-	  docker exec php sh -c "php composer-setup.php"
-	  docker exec php sh -c "php -r \"unlink('composer-setup.php');\""
+	  docker exec php sh -c "curl -fsSL -o composer-setup.php https://getcomposer.org/installer && curl -fsSL -o composer-setup.sig https://composer.github.io/installer.sig && php -r \"exit(hash_file('sha384', 'composer-setup.php') === trim(file_get_contents('composer-setup.sig')) ? 0 : 1);\" && php composer-setup.php --quiet && rm -f composer-setup.php composer-setup.sig"
 	  docker exec php sh -c "mv composer.phar /usr/local/bin/composer"
 
 	  docker exec php composer create-project flarum/flarum /var/www/html/$yuming
@@ -11749,7 +11769,7 @@ PYTHON_EOF
 				gum style --faint "↑↓ Select / Enter to test / Esc to exit"
 				echo ""
 
-				selected_model=$(echo "$models_list" | gum filter 					--placeholder "Search models (such as cli-api/gpt-5.2)" 					--prompt "Select model >" 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
+				selected_model=$(echo "$models_list" | gum filter 					--placeholder "搜索模型（如 cli-api/gpt-5.2）" 					--prompt "选择模型 > " 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
 
 				if [ -z "$selected_model" ] || echo "$selected_model" | head -n 1 | grep -iqE '^(error|usage|gum:)'; then
 					echo "Operation canceled, exiting..."
@@ -13256,7 +13276,7 @@ EOF
 		local count=0
 		local agent_lines agent_id workspace
 		agent_lines=$(openclaw_memory_list_agents)
-		echo "Check and prepare $(printf '%s\n'"$agent_lines"| sed '/^\s*$/d' | wc -l | tr -d ' ') agent workspace"
+		echo "检查并准备 $(printf '%s\n' "$agent_lines" | sed '/^\s*$/d' | wc -l | tr -d ' ') 个智能体工作区"
 		while IFS=$'\t' read -r agent_id workspace; do
 			[ -z "$agent_id" ] && continue
 			openclaw_memory_prepare_workspace "$agent_id"
@@ -20671,8 +20691,7 @@ EOF
 					[ "$cz_day" -ge 1 ] && [ "$cz_day" -le 31 ] || cz_day=1
 
 					cd ~
-					curl -Ss -o ~/Limiting_Shut_down.sh ${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh
-					chmod +x ~/Limiting_Shut_down.sh
+					download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh" ~/Limiting_Shut_down.sh
 					sed -i "s/^rx_threshold_gb=110$/rx_threshold_gb=$rx_threshold_gb/" ~/Limiting_Shut_down.sh
 					sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/" ~/Limiting_Shut_down.sh
 					check_crontab_installed
@@ -20720,18 +20739,16 @@ EOF
 					  chmod +x ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  else
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh
-					  chmod +x ~/TG-check-notify.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh" ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  fi
 				  tmux kill-session -t TG-check-notify > /dev/null 2>&1
 				  tmux new -d -s TG-check-notify "~/TG-check-notify.sh"
 				  cron_install_tagged tg-monitor "@reboot tmux new -d -s TG-check-notify '~/TG-check-notify.sh'" > /dev/null 2>&1
 
-				  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh > /dev/null 2>&1
+				  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh" ~/TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "3i$(grep '^TELEGRAM_BOT_TOKEN=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "4i$(grep '^CHAT_ID=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh
-				  chmod +x ~/TG-SSH-check-notify.sh
 
 				  # Add to ~/.profile file
 				  if ! grep -q 'bash ~/TG-SSH-check-notify.sh' ~/.profile > /dev/null 2>&1; then
@@ -21238,7 +21255,7 @@ while true; do
 			  local server_port=${server_port:-22}
 			  read -e -p "Server username (root):" server_username
 			  local server_username=${server_username:-root}
-			  echo -e "${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}"
+			  echo -e "${gl_hui}Leaving the password blank will use SSH key authentication (default key or ssh-agent)${gl_bai}"
 			  read -e -s -p "Server user password:" server_password
 			  echo
 			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||

@@ -18,9 +18,22 @@ remote_script_sha256() {
 	fi
 }
 
-run_reviewed_remote_script() {
+# Download a remote script over HTTPS, syntax-check it, and print its
+# digest. With --install DEST the validated copy replaces DEST (0755); with
+# --run (or neither flag) it runs with any extra arguments and is removed.
+download_reviewed_remote_script() {
+	local mode="run"
+	if [ "${1:-}" = "--install" ]; then
+		mode="install"
+		shift
+	fi
 	local script_url="$1"
 	shift
+	local install_dest=""
+	if [ "$mode" = "install" ]; then
+		install_dest="$1"
+		shift
+	fi
 	local cache_dir script_path digest exit_status
 	case "$script_url" in
 		https://*) ;;
@@ -53,9 +66,20 @@ run_reviewed_remote_script() {
 	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; rm -f -- "$script_path"; return 1; }
 	digest=$(remote_script_sha256 "$script_path" 2>/dev/null) || digest="unavailable"
 
+	if [ "$mode" = "install" ]; then
+		printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+		mv -f -- "$script_path" "$install_dest" || { rm -f -- "$script_path"; return 1; }
+		chmod 0755 "$install_dest"
+		return 0
+	fi
+
 	printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
 	bash "$script_path" "$@"
 	exit_status=$?
 	rm -f -- "$script_path"
 	return "$exit_status"
+}
+
+run_reviewed_remote_script() {
+	download_reviewed_remote_script "$@"
 }

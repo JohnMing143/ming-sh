@@ -43,6 +43,28 @@ for script in "${implementations[@]}"; do
 	grep -Fq 'sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/"' "$script" ||
 		fail "traffic-limit tx substitution is not anchored to its assignment: $script"
 
+	# Project-owned scripts that are installed for cron/tmux/profile use must
+	# be fetched through the reviewed downloader (HTTPS + bash -n + digest),
+	# not raw curl/wget.
+	grep -Fq 'download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh" ~/auto_cert_renewal.sh' "$script" ||
+		fail "auto_cert_renewal.sh is not installed through the reviewed downloader: $script"
+	grep -Fq 'download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh" ~/CF-Under-Attack.sh' "$script" ||
+		fail "CF-Under-Attack.sh is not installed through the reviewed downloader: $script"
+	grep -Fq 'download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh" ~/Limiting_Shut_down.sh' "$script" ||
+		fail "Limiting_Shut_down1.sh is not installed through the reviewed downloader: $script"
+	grep -Fq 'download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh" ~/TG-check-notify.sh' "$script" ||
+		fail "TG-check-notify.sh is not installed through the reviewed downloader: $script"
+	grep -Fq 'download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh" ~/TG-SSH-check-notify.sh' "$script" ||
+		fail "TG-SSH-check-notify.sh is not installed through the reviewed downloader: $script"
+
+	# The Composer installer must be verified against the published
+	# installer.sig digest, not fetched blindly via php copy().
+	grep -Fq 'https://composer.github.io/installer.sig' "$script" ||
+		fail "Composer install does not verify the installer digest: $script"
+	if grep -Fq "php -r \"copy('https://getcomposer.org/installer'" "$script"; then
+		fail "Composer installer is still fetched via unverified php copy(): $script"
+	fi
+
 	if grep -Eq '^[[:space:]]*\$dockername[[:space:]]*$' "$script"; then
 		fail "interactive input is still executed as a command: $script"
 	fi
@@ -62,5 +84,22 @@ for script in "${implementations[@]}"; do
 		fail "a broad crontab reboot filter that can delete unrelated jobs remains: $script"
 	fi
 done
+
+# palworld.sh interactive values must not reach a sed replacement unescaped
+# (a literal delimiter or GNU sed `e` flag would turn them into commands).
+palworld="$repo_root/palworld.sh"
+bash -n "$palworld"
+grep -Fq 'sed_escape_replacement "$server_password"' "$palworld" ||
+	fail "PalWorld server password is not escaped for the sed replacement"
+grep -Fq 'ServerPassword=\"$server_password_escaped\"' "$palworld" ||
+	fail "PalWorld password substitution does not use the escaped value"
+if grep -Fq 'sed -i "s/ServerPassword=' "$palworld"; then
+	fail "PalWorld password still uses a /-delimited sed replacement"
+fi
+grep -Fq "case \$exp_rate in" "$palworld" ||
+	fail "PalWorld exp-rate input is not case-normalized"
+if grep -Fq 'sed -i "s/ExpRate=1.000000/ExpRate=$ExpRate/"' "$palworld"; then
+	fail "PalWorld exp-rate still reaches an unescaped /-delimited sed replacement"
+fi
 
 echo "PASS: command construction safety"

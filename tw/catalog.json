@@ -1,4 +1,7 @@
 {
+"\t\t\t\t\t\t\t\t  break  # 跳出": [
+"\t\t\t\t\t\t\t\t  break  # 跳出"
+],
 "\t\t\t\t\t\t\t\t  read -e -p \"输入每小时的第几分钟执行任务？（分钟，0-60）: \" minute": [
 "\t\t\t\t\t\t\t\t  read -e -p \"輸入每小時的第幾分鐘執行任務？ （分鐘，0-60）:\" minute"
 ],
@@ -20,6 +23,9 @@
 "\t\t\t\t\t\t\t  echo -e \"${gl_hong}拒绝覆盖现有命令: $shortcut_path${gl_bai}\"": [
 "\t\t\t\t\t\t\t  echo -e \"${gl_hong}拒絕覆蓋現有指令: $shortcut_path${gl_bai}\""
 ],
+"\t\t\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t\t\t  echo \"1. 每月任务                 2. 每周任务\"": [
 "\t\t\t\t\t\t  echo \"1. 每月任務 2. 每週任務\""
 ],
@@ -31,6 +37,9 @@
 ],
 "\t\t\t\t\t\t  echo \"高负载自动开盾脚本已添加\"": [
 "\t\t\t\t\t\t  echo \"高負載自動開盾腳本已新增\""
+],
+"\t\t\t\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有未使用的卷吗？(Y/N): \")\" choice": [
+"\t\t\t\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有未使用的卷吗？(Y/N): \")\" choice"
 ],
 "\t\t\t\t\t\t  read -e -p \"加入网络名: \" dockernetwork": [
 "\t\t\t\t\t\t  read -e -p \"加入網路名稱:\" dockernetwork"
@@ -113,6 +122,9 @@
 "\t\t\t\t\t\techo \"已切换为 IPv6 优先\"": [
 "\t\t\t\t\t\techo \"已切換為 IPv6 優先\""
 ],
+"\t\t\t\t\t\techo \"已取消。\"": [
+"\t\t\t\t\t\techo \"已取消。\""
+],
 "\t\t\t\t\t\techo \"端口号无效，请输入1到65535之间的数字。\"": [
 "\t\t\t\t\t\techo \"連接埠號碼無效，請輸入1到65535之間的數字。\""
 ],
@@ -152,11 +164,17 @@
 "\t\t\t\t\t  # 其他系统，如 Debian, Ubuntu, CentOS 等": [
 "\t\t\t\t\t  # 其他系統，如 Debian, Ubuntu, CentOS 等"
 ],
+"\t\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t\t  echo \"Fail2Ban防御程序已卸载\"": [
 "\t\t\t\t\t  echo \"Fail2Ban防禦程序已卸載\""
 ],
 "\t\t\t\t\t  echo \"到cf后台右上角我的个人资料，选择左侧API令牌，获取Global API Key\"": [
 "\t\t\t\t\t  echo \"到cf後台右上角我的個人資料，選擇左側API令牌，取得Global API Key\""
+],
+"\t\t\t\t\t  echo \"密码编码失败。\"": [
+"\t\t\t\t\t  echo \"密码编码失败。\""
 ],
 "\t\t\t\t\t  echo \"已配置cloudflare模式，可在cf后台，站点-安全性-事件中查看拦截记录\"": [
 "\t\t\t\t\t  echo \"已設定cloudflare模式，可在cf後台，網站-安全性-事件中查看攔截記錄\""
@@ -211,6 +229,9 @@
 ],
 "\t\t\t\t\t[ -z \"$pattern\" ] && { echo \"不能为空\"; break_end; continue; }": [
 "\t\t\t\t\t[ -z \"$pattern\" ] && { echo \"不能為空\"; break_end; continue; }"
+],
+"\t\t\t\t\tbreak  # 结束循环": [
+"\t\t\t\t\tbreak  # 结束循环"
 ],
 "\t\t\t\t\techo \"  ${PROJECT_COMMAND} sshkey                  进入交互菜单\"": [
 "\t\t\t\t\techo \"${PROJECT_COMMAND} sshkey 進入互動選單\""
@@ -326,6 +347,12 @@
 "\t\t\t\t\techo \"推荐：输入 rebuild 进行安全重建（先备份索引库）。\"": [
 "\t\t\t\t\techo \"建議：輸入 rebuild 進行安全重建（先備份索引庫）。\""
 ],
+"\t\t\t\t\techo \"操作已取消。\"": [
+"\t\t\t\t\techo \"操作已取消。\""
+],
+"\t\t\t\t\techo \"操作已取消，正在退出...\"": [
+"\t\t\t\t\techo \"操作已取消，正在退出...\""
+],
 "\t\t\t\t\techo \"文件传送失败。\"": [
 "\t\t\t\t\techo \"文件傳送失敗。\""
 ],
@@ -364,6 +391,9 @@
 ],
 "\t\t\t\t\techo \"正在安装技能：$skill_name ...\"": [
 "\t\t\t\t\techo \"正在安裝技能：$skill_name ...\""
+],
+"\t\t\t\t\techo \"用法：\"": [
+"\t\t\t\t\techo \"用法：\""
 ],
 "\t\t\t\t\techo \"输入无效，请输入数字。\"": [
 "\t\t\t\t\techo \"輸入無效，請輸入數字。\""
@@ -442,6 +472,18 @@
 ],
 "\t\t\t\t\techo -e \"当前网络优先级设置: ${gl_huang}IPv6${gl_bai} 优先\"": [
 "\t\t\t\t\techo -e \"目前網路優先權設定:${gl_huang}IPv6${gl_bai}優先\""
+],
+"\t\t\t\t\tif [ \"$confirm\" = \"FULL\" ]; then openclaw_permission_apply_full; else echo \"已取消\"; fi": [
+"\t\t\t\t\tif [ \"$confirm\" = \"FULL\" ]; then openclaw_permission_apply_full; else echo \"已取消\"; fi"
+],
+"\t\t\t\t\tif [ \"$confirm\" = \"yes\" ]; then openclaw_permission_apply_developer; else echo \"已取消\"; fi": [
+"\t\t\t\t\tif [ \"$confirm\" = \"yes\" ]; then openclaw_permission_apply_developer; else echo \"已取消\"; fi"
+],
+"\t\t\t\t\tif [ \"$confirm\" = \"yes\" ]; then openclaw_permission_apply_standard; else echo \"已取消\"; fi": [
+"\t\t\t\t\tif [ \"$confirm\" = \"yes\" ]; then openclaw_permission_apply_standard; else echo \"已取消\"; fi"
+],
+"\t\t\t\t\tif [ \"$confirm\" = \"yes\" ]; then openclaw_permission_restore_official_defaults; else echo \"已取消\"; fi": [
+"\t\t\t\t\tif [ \"$confirm\" = \"yes\" ]; then openclaw_permission_restore_official_defaults; else echo \"已取消\"; fi"
 ],
 "\t\t\t\t\tif [ -z \"$code\" ]; then echo \"错误：连接码不能为空。\"; sleep 1; continue; fi": [
 "\t\t\t\t\tif [ -z \"$code\" ]; then echo \"錯誤：連接碼不能為空。\"; sleep 1; continue; fi"
@@ -533,11 +575,20 @@
 "\t\t\t\t  # 添加到 ~/.profile 文件中": [
 "\t\t\t\t  # 加入 ~/.profile 檔案中"
 ],
+"\t\t\t\t  # 清除指定 IP": [
+"\t\t\t\t  # 清除指定 IP"
+],
+"\t\t\t\t  # 禁用 PING": [
+"\t\t\t\t  # 禁用 PING"
+],
 "\t\t\t\t  # 设置默认值": [
 "\t\t\t\t  # 設定預設值"
 ],
 "\t\t\t\t  # 运行Docker容器": [
 "\t\t\t\t  # 運行Docker容器"
+],
+"\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t  break  # 跳出循环，退出菜单"
 ],
 "\t\t\t\t  echo \"0. 返回上一级选单\"": [
 "\t\t\t\t  echo \"0. 返回上一級選單\""
@@ -584,6 +635,9 @@
 "\t\t\t\t  echo \"5. 删除账号\"": [
 "\t\t\t\t  echo \"5. 刪除帳號\""
 ],
+"\t\t\t\t  echo \"Docker卷列表\"": [
+"\t\t\t\t  echo \"Docker卷列表\""
+],
 "\t\t\t\t  echo \"Docker网络列表\"": [
 "\t\t\t\t  echo \"Docker網路列表\""
 ],
@@ -602,6 +656,9 @@
 "\t\t\t\t  echo \"内核管理\"": [
 "\t\t\t\t  echo \"核心管理\""
 ],
+"\t\t\t\t  echo \"卷操作\"": [
+"\t\t\t\t  echo \"卷操作\""
+],
 "\t\t\t\t  echo \"如果你在这里添加解析匹配，将不再使用动态解析了\"": [
 "\t\t\t\t  echo \"如果你在這裡添加解析匹配，將不再使用動態解析了\""
 ],
@@ -610,6 +667,9 @@
 ],
 "\t\t\t\t  echo \"密码编码失败。\"": [
 "\t\t\t\t  echo \"密碼編碼失敗。\""
+],
+"\t\t\t\t  echo \"已取消\"": [
+"\t\t\t\t  echo \"已取消\""
 ],
 "\t\t\t\t  echo \"已退出，未更改主机名。\"": [
 "\t\t\t\t  echo \"已退出，未更改主機名稱。\""
@@ -625,6 +685,9 @@
 ],
 "\t\t\t\t  echo \"您已安装xanmod的BBRv3内核\"": [
 "\t\t\t\t  echo \"您已安裝xanmod的BBRv3內核\""
+],
+"\t\t\t\t  echo \"操作\"": [
+"\t\t\t\t  echo \"操作\""
 ],
 "\t\t\t\t  echo \"文件已传送至远程服务器/根目录。\"": [
 "\t\t\t\t  echo \"檔案已傳送至遠端伺服器/根目錄。\""
@@ -758,6 +821,9 @@
 "\t\t\t\t  sed -i '/# 自动进入 tmux 会话/,+4d' ~/.bashrc": [
 "\t\t\t\t  sed -i '/# 自動進入 tmux 會話/,+4d' ~/.bashrc"
 ],
+"\t\t\t\t  sleep 2  # 添加等待时间": [
+"\t\t\t\t  sleep 2  # 添加等待时间"
+],
 "\t\t\t\t\"其他备份文件\") has_other=1 ;;": [
 "\t\t\t\t\"其他備份文件\") has_other=1 ;;"
 ],
@@ -787,6 +853,12 @@
 ],
 "\t\t\t\t# 官方已彻底移除对 jammy, focal, bullseye 等老系统的 apt 支持": [
 "\t\t\t\t# 官方已徹底移除對 jammy, focal, bullseye 等舊系統的 apt 支持"
+],
+"\t\t\t\t# 密钥认证：使用指定的身份文件": [
+"\t\t\t\t# 密钥认证：使用指定的身份文件"
+],
+"\t\t\t\t# 密钥认证：使用默认密钥或 ssh-agent，条目不保存任何密码": [
+"\t\t\t\t# 密钥认证：使用默认密钥或 ssh-agent，条目不保存任何密码"
 ],
 "\t\t\t\t# 打印当前的 SSH 端口号": [
 "\t\t\t\t# 列印目前的 SSH 連接埠號碼"
@@ -833,6 +905,9 @@
 "\t\t\t\t# 镜像": [
 "\t\t\t\t# 鏡像"
 ],
+"\t\t\t\t*) current_label=\"未配置\" ;;": [
+"\t\t\t\t*) current_label=\"未配置\" ;;"
+],
 "\t\t\t\t*) echo \"无效的选择，请重试。\"; sleep 1 ;;": [
 "\t\t\t\t*) echo \"無效的選擇，請重試。\"; sleep 1 ;;"
 ],
@@ -875,6 +950,9 @@
 "\t\t\t\t[[ -z \"$original_path\" ]] && read -e -p  \"未找到原始路径，请输入还原目录路径: \" original_path": [
 "\t\t\t\t[[ -z \"$original_path\" ]] && read -e -p  \"未找到原始路徑，請輸入還原目錄路徑:\" original_path"
 ],
+"\t\t\t\tbreak  # 跳出循环，退出菜单": [
+"\t\t\t\tbreak  # 跳出循环，退出菜单"
+],
 "\t\t\t\tcd \"$dirname\" 2>/dev/null || echo \"无法进入目录\"": [
 "\t\t\t\tcd \"$dirname\" 2>/dev/null || echo \"無法進入目錄\""
 ],
@@ -896,8 +974,14 @@
 "\t\t\t\techo \"${docker_name}域名访问设置\"": [
 "\t\t\t\techo \"${docker_name}域名存取設定\""
 ],
+"\t\t\t\techo \"--- 模型管理 ---\"": [
+"\t\t\t\techo \"--- 模型管理 ---\""
+],
 "\t\t\t\techo \"0. 返回上一级选单\"": [
 "\t\t\t\techo \"0. 返回上一級選單\""
+],
+"\t\t\t\techo \"1) 保留最近 7 天\"": [
+"\t\t\t\techo \"1) 保留最近 7 天\""
 ],
 "\t\t\t\techo \"1) 系统日志\"": [
 "\t\t\t\techo \"1) 系統日誌\""
@@ -925,6 +1009,9 @@
 ],
 "\t\t\t\techo \"15. 荷兰尤特赖赫特时间       16. 西班牙马德里时间\"": [
 "\t\t\t\techo \"15. 荷蘭尤特賴赫特時間 16. 西班牙馬德里時間\""
+],
+"\t\t\t\techo \"2) 保留最近 3 天\"": [
+"\t\t\t\techo \"2) 保留最近 3 天\""
 ],
 "\t\t\t\techo \"2) 指定服务日志\"": [
 "\t\t\t\techo \"2) 指定服務日誌\""
@@ -1079,6 +1166,9 @@
 "\t\t\t\techo \"将内网穿透服务反代成域名访问\"": [
 "\t\t\t\techo \"將內網穿透服務反代成域名訪問\""
 ],
+"\t\t\t\techo \"已取消。\"": [
+"\t\t\t\techo \"已取消。\""
+],
 "\t\t\t\techo \"已取消自动部署。\"": [
 "\t\t\t\techo \"已取消自動部署。\""
 ],
@@ -1157,6 +1247,9 @@
 "\t\t\t\techo \"正在安装 yt-dlp...\"": [
 "\t\t\t\techo \"正在安裝 yt-dlp...\""
 ],
+"\t\t\t\techo \"正在更新 yt-dlp...\"": [
+"\t\t\t\techo \"正在更新 yt-dlp...\""
+],
 "\t\t\t\techo \"注意: 目前备份仅包含docker项目，不包含宝塔，1panel等建站面板的数据备份。\"": [
 "\t\t\t\techo \"注意: 目前備份僅包含docker項目，不包含寶塔，1panel等建站面板的資料備份。\""
 ],
@@ -1166,6 +1259,9 @@
 "\t\t\t\techo \"用户列表\"": [
 "\t\t\t\techo \"使用者列表\""
 ],
+"\t\t\t\techo \"用法: manage_country_rules {block|allow|unblock} <country_code...>\"": [
+"\t\t\t\techo \"用法: manage_country_rules {block|allow|unblock} <country_code...>\""
+],
 "\t\t\t\techo \"端口号范围1到65535之间的数字。（输入0退出）\"": [
 "\t\t\t\techo \"連接埠號碼範圍1到65535之間的數字。 （輸入0退出）\""
 ],
@@ -1174,6 +1270,9 @@
 ],
 "\t\t\t\techo \"系统每分钟会检测实际流量是否到达阈值，到达后会自动关闭服务器！\"": [
 "\t\t\t\techo \"系統每分鐘會偵測實際流量是否到達閾值，到達後會自動關閉伺服器！\""
+],
+"\t\t\t\techo \"美洲\"": [
+"\t\t\t\techo \"美洲\""
 ],
 "\t\t\t\techo \"获取模型列表失败：配置文件中未找到 agents.defaults.models。\"": [
 "\t\t\t\techo \"取得模型清單失敗：設定檔中未找到 agents.defaults.models。\""
@@ -1274,8 +1373,23 @@
 "\t\t\t\tgum style --faint \"↑↓ 选择 / Enter 测试 / Esc 退出\"": [
 "\t\t\t\tgum style --faint \"↑↓ 選擇 / Enter 測試 / Esc 退出\""
 ],
+"\t\t\t\tgum style --foreground \"$orange\" \"可用模型（Auth=yes）：${model_count}\"": [
+"\t\t\t\tgum style --foreground \"$orange\" \"可用模型（Auth=yes）：${model_count}\""
+],
 "\t\t\t\tgum style --foreground \"$orange\" \"当前默认：${default_model}\"": [
 "\t\t\t\tgum style --foreground \"$orange\" \"目前預設：${default_model}\""
+],
+"\t\t\t\tgum style --foreground \"$orange\" --bold \"模型管理\"": [
+"\t\t\t\tgum style --foreground \"$orange\" --bold \"模型管理\""
+],
+"\t\t\t\tif [[ $new_port =~ ^[0-9]+$ ]]; then  # 检查输入是否为数字": [
+"\t\t\t\tif [[ $new_port =~ ^[0-9]+$ ]]; then  # 检查输入是否为数字"
+],
+"\t\t\t\timg|镜像)": [
+"\t\t\t\timg|镜像)"
+],
+"\t\t\t\tinstall|安装)": [
+"\t\t\t\tinstall|安装)"
 ],
 "\t\t\t\tkj_ssh_read_host_port \"请输入远端服务器IP:  \" \"目标服务器SSH端口 [默认22]: \" \"22\"": [
 "\t\t\t\tkj_ssh_read_host_port \"請輸入遠端伺服器IP:\" \"目標伺服器SSH連接埠 [預設22]:\" \"22\""
@@ -1298,8 +1412,17 @@
 "\t\t\t\tmv \"$src_path\" \"$dest_path\" && echo \"文件或目录已移动到 $dest_path\" || echo \"移动文件或目录失败\"": [
 "\t\t\t\tmv \"$src_path\" \"$dest_path\" && echo \"檔案或目錄已移動到$dest_path\" || echo \"移動檔案或目錄失敗\""
 ],
+"\t\t\t\topenclaw_probe_status_line \"不可用\"": [
+"\t\t\t\topenclaw_probe_status_line \"不可用\""
+],
+"\t\t\t\topenclaw_probe_status_line \"可用\"": [
+"\t\t\t\topenclaw_probe_status_line \"可用\""
+],
 "\t\t\t\tprintf \"%-24s %-34s %-20s %-10s\\n\" \"用户名\" \"用户权限\" \"用户组\" \"sudo权限\"": [
 "\t\t\t\tprintf \"%-24s %-34s %-20s %-10s\\n\" \"使用者名稱\" \"使用者權限\" \"使用者群組\" \"sudo權限\""
+],
+"\t\t\t\tprintf \"%b最小检测结果：%s%b": [
+"\t\t\t\tprintf \"%b最小检测结果：%s%b"
 ],
 "\t\t\t\tprintf '%b\\n' \"[$idx] ${name} | API: ${base_url} | 协议: ${api_type} | 模型数量: ${gl_huang}${model_count}${gl_bai} | 延迟/状态: ${latency_color}${latency_txt}${gl_bai}\"": [
 "\t\t\t\tprintf '%b\\n' \"[$idx] ${name} | API: ${base_url}| 協議:${api_type}| 模型數量:${gl_huang}${model_count}${gl_bai}| 延遲/狀態:${latency_color}${latency_txt}${gl_bai}\""
@@ -1307,8 +1430,14 @@
 "\t\t\t\tprintf '\\n# 还原容器: %q\\n' \"$c\" >> \"$RESTORE_SCRIPT\"": [
 "\t\t\t\tprintf '\\n# 還原容器: %q\\n' \"$c\" >> \"$RESTORE_SCRIPT\""
 ],
+"\t\t\t\tps|容器)": [
+"\t\t\t\tps|容器)"
+],
 "\t\t\t\tread -e -p  \"确认还原 Compose 项目 [$project_name] 到路径 [$original_path] ? (y/n): \" confirm": [
 "\t\t\t\tread -e -p  \"確認還原 Compose 項目 [$project_name] 到路徑 [$original_path] ? (y/n): \" confirm"
+],
+"\t\t\t\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}长时间不更新环境的用户，请慎重更新LDNMP环境，会有数据库更新失败的风险。确定更新LDNMP环境吗？(Y/N): \")\" choice": [
+"\t\t\t\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}长时间不更新环境的用户，请慎重更新LDNMP环境，会有数据库更新失败的风险。确定更新LDNMP环境吗？(Y/N): \")\" choice"
 ],
 "\t\t\t\tread -e -p \"下载完成，按任意键继续...\" ;;": [
 "\t\t\t\tread -e -p \"下載完成，按任何鍵繼續...\" ;;"
@@ -1482,7 +1611,10 @@
 "\t\t\t\tsafe_remove_path \"$dirname\" && echo \"目錄已刪除\" || echo \"刪除失敗\""
 ],
 "\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"搜索模型（如 cli-api/gpt-5.2）\" \t\t\t\t\t--prompt \"选择模型 > \" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)": [
-"\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"搜尋模型（如 cli-api/gpt-5.2）\" \t\t\t\t\t--prompt \"選擇模型 >\" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)"
+"\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"搜索模型（如 cli-api/gpt-5.2）\" \t\t\t\t\t--prompt \"选择模型 > \" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)"
+],
+"\t\t\t\tsleep 2  # 等待时间": [
+"\t\t\t\tsleep 2  # 等待时间"
 ],
 "\t\t\t\ttar -czvf \"$name.tar.gz\" \"$name\" && echo \"已压缩为 $name.tar.gz\" || echo \"压缩失败\"": [
 "\t\t\t\ttar -czvf \"$name.tar.gz\" \"$name\" && echo \"已壓縮為$name.tar.gz\" || echo \"壓縮失敗\""
@@ -1519,6 +1651,12 @@
 ],
 "\t\t\t  _kernel_optimize_core \"直播优化模式\" \"stream\"": [
 "\t\t\t  _kernel_optimize_core \"直播優化模式\" \"stream\""
+],
+"\t\t\t  break  # 跳出": [
+"\t\t\t  break  # 跳出"
+],
+"\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t  break  # 跳出循环，退出菜单"
 ],
 "\t\t\t  echo \"0. 返回上一级选单\"": [
 "\t\t\t  echo \"0. 返回上一級選單\""
@@ -1571,6 +1709,12 @@
 "\t\t\t  echo \"9. 卸载防御程序\"": [
 "\t\t\t  echo \"9. 卸載防禦程序\""
 ],
+"\t\t\t  echo \"BBR管理\"": [
+"\t\t\t  echo \"BBR管理\""
+],
+"\t\t\t  echo \"Docker版本\"": [
+"\t\t\t  echo \"Docker版本\""
+],
 "\t\t\t  echo \"TG-bot监控预警功能\"": [
 "\t\t\t  echo \"TG-bot監控預警功能\""
 ],
@@ -1612,6 +1756,9 @@
 ],
 "\t\t\t  echo \"工具已安装，使用方法如下：\"": [
 "\t\t\t  echo \"工具已安裝，使用方法如下：\""
+],
+"\t\t\t  echo \"已取消\"": [
+"\t\t\t  echo \"已取消\""
 ],
 "\t\t\t  echo \"已经安装完成\"": [
 "\t\t\t  echo \"已經安裝完成\""
@@ -1670,6 +1817,9 @@
 "\t\t\t  echo \"无效的选择，请输入 Y 或 N。\"": [
 "\t\t\t  echo \"無效的選擇，請輸入 Y 或 N。\""
 ],
+"\t\t\t  echo \"更新${ldnmp_pods}完成\"": [
+"\t\t\t  echo \"更新${ldnmp_pods}完成\""
+],
 "\t\t\t  echo \"未找到要传送的文件。\"": [
 "\t\t\t  echo \"未找到要傳送的文件。\""
 ],
@@ -1705,6 +1855,9 @@
 ],
 "\t\t\t  echo -e \"${gl_hui}-关于流量，重启服务器将重新计算-${gl_bai}\"": [
 "\t\t\t  echo -e \"${gl_hui}-關於流量，重啟伺服器將重新計算-${gl_bai}\""
+],
+"\t\t\t  echo -e \"${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}\"": [
+"\t\t\t  echo -e \"${gl_hui}留空密碼將使用 SSH 金鑰認證（預設金鑰或 ssh-agent）${gl_bai}\""
 ],
 "\t\t\t  echo -e \"${gl_lv}端口 $port 当前可用${gl_bai}\"": [
 "\t\t\t  echo -e \"${gl_lv}連接埠$port目前可用${gl_bai}\""
@@ -1771,6 +1924,12 @@
 ],
 "\t\t\t  local tiaoyou_moshi=\"高性能优化模式\"": [
 "\t\t\t  local tiaoyou_moshi=\"高效能最佳化模式\""
+],
+"\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定卸载docker环境吗？(Y/N): \")\" choice": [
+"\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定卸载docker环境吗？(Y/N): \")\" choice"
+],
+"\t\t\t  read -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}将清理无用的镜像容器网络，包括停止的容器，确定清理吗？(Y/N): \")\" choice": [
+"\t\t\t  read -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}将清理无用的镜像容器网络，包括停止的容器，确定清理吗？(Y/N): \")\" choice"
 ],
 "\t\t\t  read -e -p \"也可以输入下载链接，远程下载备份数据，直接回车将跳过远程下载： \" url_download_db": [
 "\t\t\t  read -e -p \"也可以輸入下載鏈接，遠端下載備份數據，直接回車將跳過遠端下載：\" url_download_db"
@@ -1847,6 +2006,21 @@
 "\t\t\t  read -e -s -p \"服务器用户密码: \" server_password": [
 "\t\t\t  read -e -s -p \"伺服器用戶密碼:\" server_password"
 ],
+"\t\t\t  sleep 2  # 添加等待时间": [
+"\t\t\t  sleep 2  # 添加等待时间"
+],
+"\t\t\t 25) # 传送文件至远端服务器": [
+"\t\t\t 25) # 传送文件至远端服务器"
+],
+"\t\t\t\"/etc\"              # 配置文件和软件包配置": [
+"\t\t\t\"/etc\"              # 配置文件和软件包配置"
+],
+"\t\t\t\"/home\"             # 用户数据": [
+"\t\t\t\"/home\"             # 用户数据"
+],
+"\t\t\t\"/usr\"              # 已安装的软件文件": [
+"\t\t\t\"/usr\"              # 已安装的软件文件"
+],
 "\t\t\t# 1. 输入证书 (ECC 和 RSA 证书开头都是 BEGIN CERTIFICATE)": [
 "\t\t\t# 1. 輸入憑證 (ECC 和 RSA 憑證開頭都是 BEGIN CERTIFICATE)"
 ],
@@ -1898,8 +2072,14 @@
 "\t\t\t# 定义文件路径": [
 "\t\t\t# 定義檔案路徑"
 ],
+"\t\t\t# 提取 export VAR=xxx 或 VAR=xxx": [
+"\t\t\t# 提取 export VAR=xxx 或 VAR=xxx"
+],
 "\t\t\t# 检查容器是否已经存在且正在运行": [
 "\t\t\t# 檢查容器是否已經存在且正在運行"
+],
+"\t\t\t# 清除之前的值": [
+"\t\t\t# 清除之前的值"
 ],
 "\t\t\t# 环境变量": [
 "\t\t\t# 環境變數"
@@ -1925,11 +2105,62 @@
 "\t\t\t# 高性能/直播/游戏：激进参数": [
 "\t\t\t# 高效能/直播/遊戲：激進參數"
 ],
+"\t\t\t*)  # 处理无效输入": [
+"\t\t\t*)  # 处理无效输入"
+],
 "\t\t\t*) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型文件不存在或不可用\") ;;": [
 "\t\t\t*) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型檔案不存在或不可用\") ;;"
 ],
 "\t\t\t*) echo \"无效的选择，请重试。\" ;;": [
 "\t\t\t*) echo \"無效的選擇，請重試。\" ;;"
+],
+"\t\t\t0)  # 返回上一级选单": [
+"\t\t\t0)  # 返回上一级选单"
+],
+"\t\t\t1)  # 进入目录": [
+"\t\t\t1)  # 进入目录"
+],
+"\t\t\t11) # 创建文件": [
+"\t\t\t11) # 创建文件"
+],
+"\t\t\t12) # 编辑文件": [
+"\t\t\t12) # 编辑文件"
+],
+"\t\t\t13) # 修改文件权限": [
+"\t\t\t13) # 修改文件权限"
+],
+"\t\t\t14) # 重命名文件": [
+"\t\t\t14) # 重命名文件"
+],
+"\t\t\t15) # 删除文件": [
+"\t\t\t15) # 删除文件"
+],
+"\t\t\t2)  # 创建目录": [
+"\t\t\t2)  # 创建目录"
+],
+"\t\t\t21) # 压缩文件/目录": [
+"\t\t\t21) # 压缩文件/目录"
+],
+"\t\t\t22) # 解压文件/目录": [
+"\t\t\t22) # 解压文件/目录"
+],
+"\t\t\t23) # 移动文件或目录": [
+"\t\t\t23) # 移动文件或目录"
+],
+"\t\t\t3)  # 修改目录权限": [
+"\t\t\t3)  # 修改目录权限"
+],
+"\t\t\t4)  # 重命名目录": [
+"\t\t\t4)  # 重命名目录"
+],
+"\t\t\t5)  # 删除目录": [
+"\t\t\t5)  # 删除目录"
+],
+"\t\t\t6)  # 返回上一级选单目录": [
+"\t\t\t6)  # 返回上一级选单目录"
+],
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"QMD 可用\")": [
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"QMD 可用\")"
 ],
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"hf-mirror.com 可访问\")": [
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"hf-mirror.com 可訪問\")"
@@ -1961,11 +2192,17 @@
 "\t\t\t[ -n \"$skipped_list\" ] && echo \"⏭️ 跳过:$skipped_list\"": [
 "\t\t\t[ -n \"$skipped_list\" ] && echo \"⏭️ 跳過:$skipped_list\""
 ],
+"\t\t\t[ -z \"$reply_trimmed\" ] && reply_trimmed=\"(空返回)\"": [
+"\t\t\t[ -z \"$reply_trimmed\" ] && reply_trimmed=\"(空返回)\""
+],
 "\t\t\t[ -z \"$theme\" ] && theme=\"助手\"": [
 "\t\t\t[ -z \"$theme\" ] && theme=\"助理\""
 ],
 "\t\t\t[[ -z \"$IMAGE\" || \"$IMAGE\" == \"null\" ]] && { echo -e \"${gl_hong}未找到镜像信息，跳过: $container${gl_bai}\"; continue; }": [
 "\t\t\t[[ -z \"$IMAGE\" || \"$IMAGE\" == \"null\" ]] && { echo -e \"${gl_hong}未找到鏡像訊息，跳過:$container${gl_bai}\"; continue; }"
+],
+"\t\t\tbreak  # 跳出循环，退出菜单": [
+"\t\t\tbreak  # 跳出循环，退出菜单"
 ],
 "\t\t\tcurrent_mode=\"\\033[1;31m完全开放模式\\033[0m\"": [
 "\t\t\tcurrent_mode=\"\\033[1;31m完全開放模式\\033[0m\""
@@ -1975,6 +2212,9 @@
 ],
 "\t\t\tcurrent_mode=\"\\033[1;33m开发增强模式\\033[0m\"": [
 "\t\t\tcurrent_mode=\"\\033[1;33m開發增強模式\\033[0m\""
+],
+"\t\t\tcurrent_mode=\"\\033[1;36m官方沙盒兜底\\033[0m\"": [
+"\t\t\tcurrent_mode=\"\\033[1;36m官方沙盒兜底\\033[0m\""
 ],
 "\t\t\techo \"            技能管理 (安装/删除)            \"": [
 "\t\t\techo \"技能管理 (安裝/刪除)\""
@@ -2069,11 +2309,20 @@
 "\t\t\techo \"(空文件)\"": [
 "\t\t\techo \"(空白文件)\""
 ],
+"\t\t\techo \"0) 返回\"": [
+"\t\t\techo \"0) 返回\""
+],
+"\t\t\techo \"0. 返回\"": [
+"\t\t\techo \"0. 返回\""
+],
 "\t\t\techo \"0. 返回上一级\"": [
 "\t\t\techo \"0. 返回上一級\""
 ],
 "\t\t\techo \"0. 返回上一级选单\"": [
 "\t\t\techo \"0. 返回上一級選單\""
+],
+"\t\t\techo \"0. 退出\"": [
+"\t\t\techo \"0. 退出\""
 ],
 "\t\t\techo \"1) 安装/启用插件\"": [
 "\t\t\techo \"1) 安裝/啟用插件\""
@@ -2083,6 +2332,9 @@
 ],
 "\t\t\techo \"1. Telegram 机器人对接\"": [
 "\t\t\techo \"1. Telegram 機器人對接\""
+],
+"\t\t\techo \"1. 使用\"": [
+"\t\t\techo \"1. 使用\""
 ],
 "\t\t\techo \"1. 切换 QMD（自动部署/已装则跳过）\"": [
 "\t\t\techo \"1. 切換 QMD（自動部署/已安裝則跳過）\""
@@ -2237,6 +2489,9 @@
 "\t\t\techo \"====== 操作汇总 ======\"": [
 "\t\t\techo \"====== 操作匯總 ======\""
 ],
+"\t\t\techo \"========== 查看文件：$file ==========\"": [
+"\t\t\techo \"========== 查看文件：$file ==========\""
+],
 "\t\t\techo \">>> 来源文件：$file\"": [
 "\t\t\techo \">>> 來源文件：$file\""
 ],
@@ -2245,6 +2500,9 @@
 ],
 "\t\t\techo \"Local: 本地向量检索，依赖 embedding 模型文件\"": [
 "\t\t\techo \"Local: 本機向量檢索，依賴 embedding 模型文件\""
+],
+"\t\t\techo \"OpenClaw API 管理\"": [
+"\t\t\techo \"OpenClaw API 管理\""
 ],
 "\t\t\techo \"OpenClaw 备份与还原\"": [
 "\t\t\techo \"OpenClaw 備份與還原\""
@@ -2288,6 +2546,9 @@
 "\t\t\techo \"himalaya           # 终端邮件管理 (IMAP/SMTP 强力工具)\"": [
 "\t\t\techo \"himalaya # 終端郵件管理 (IMAP/SMTP 強力工具)\""
 ],
+"\t\t\techo \"includeDefaultMemory 配置正常。\"": [
+"\t\t\techo \"includeDefaultMemory 配置正常。\""
+],
 "\t\t\techo \"notion             # 操作 Notion 页面、数据库和块\"": [
 "\t\t\techo \"notion # 操作 Notion 頁面、資料庫和區塊\""
 ],
@@ -2299,6 +2560,9 @@
 ],
 "\t\t\techo \"poste.io 是一个开源的邮件服务器解决方案，\"": [
 "\t\t\techo \"poste.io 是一個開源的郵件伺服器解決方案，\""
+],
+"\t\t\techo \"python版本管理\"": [
+"\t\t\techo \"python版本管理\""
 ],
 "\t\t\techo \"rocket.chat已经安装完成\"": [
 "\t\t\techo \"rocket.chat已經安裝完成\""
@@ -2357,8 +2621,20 @@
 "\t\t\techo \"✅ bun 安装完成\"": [
 "\t\t\techo \"✅ bun 安裝完成\""
 ],
+"\t\t\techo \"✅ bun 已存在\"": [
+"\t\t\techo \"✅ bun 已存在\""
+],
+"\t\t\techo \"✅ memory.backend 已是 builtin\"": [
+"\t\t\techo \"✅ memory.backend 已是 builtin\""
+],
+"\t\t\techo \"✅ memory.backend 已是 qmd\"": [
+"\t\t\techo \"✅ memory.backend 已是 qmd\""
+],
 "\t\t\techo \"✅ memory.qmd.command 已正确\"": [
 "\t\t\techo \"✅ memory.qmd.command 已正確\""
+],
+"\t\t\techo \"✅ memorySearch.provider 已是 local\"": [
+"\t\t\techo \"✅ memorySearch.provider 已是 local\""
 ],
 "\t\t\techo \"✅ 仅写入默认模型：$default_model\"": [
 "\t\t\techo \"✅ 僅寫入預設模型：$default_model\""
@@ -2392,6 +2668,9 @@
 ],
 "\t\t\techo \"✅ 当前 API 协议类型: $DETECTED_API\"": [
 "\t\t\techo \"✅ 當前 API 協定類型:$DETECTED_API\""
+],
+"\t\t\techo \"✅ 成功:$success_list\"": [
+"\t\t\techo \"✅ 成功:$success_list\""
 ],
 "\t\t\techo \"✅ 成功添加 $model_count 个模型到 $provider_name\"": [
 "\t\t\techo \"✅ 成功添加$model_count個模型到$provider_name\""
@@ -2485,6 +2764,9 @@
 ],
 "\t\t\techo \"❌ 未找到 OpenClaw 根目录: $openclaw_root\"": [
 "\t\t\techo \"❌ 未找到 OpenClaw 根目錄:$openclaw_root\""
+],
+"\t\t\techo \"❌ 未找到任何模型\"": [
+"\t\t\techo \"❌ 未找到任何模型\""
 ],
 "\t\t\techo \"❌ 未找到可备份的 OpenClaw 项目内容\"": [
 "\t\t\techo \"❌ 未找到可備份的 OpenClaw 專案內容\""
@@ -2624,6 +2906,9 @@
 "\t\t\techo \"已连接\"": [
 "\t\t\techo \"已連接\""
 ],
+"\t\t\techo \"已配置\"": [
+"\t\t\techo \"已配置\""
+],
 "\t\t\techo \"已阻止IP $ip\"": [
 "\t\t\techo \"已阻止IP$ip\""
 ],
@@ -2654,6 +2939,15 @@
 "\t\t\techo \"当前白名单：\"": [
 "\t\t\techo \"目前白名單：\""
 ],
+"\t\t\techo \"拒绝删除关键系统路径: $target_real\"": [
+"\t\t\techo \"拒绝删除关键系统路径: $target_real\""
+],
+"\t\t\techo \"拒绝覆盖指向其他目标的命令链接: $PROJECT_INSTALL_PATH\"": [
+"\t\t\techo \"拒绝覆盖指向其他目标的命令链接: $PROJECT_INSTALL_PATH\""
+],
+"\t\t\techo \"拒绝覆盖现有非本项目命令: $PROJECT_INSTALL_PATH\"": [
+"\t\t\techo \"拒绝覆盖现有非本项目命令: $PROJECT_INSTALL_PATH\""
+],
 "\t\t\techo \"推荐版本:  3.12    3.11    3.10    3.9    3.8    2.7\"": [
 "\t\t\techo \"推薦版本: 3.12 3.11 3.10 3.9 3.8 2.7\""
 ],
@@ -2662,6 +2956,12 @@
 ],
 "\t\t\techo \"推荐的常用插件 ID (直接复制括号内的 ID 即可):\"": [
 "\t\t\techo \"推薦的常用外掛 ID (直接複製括號內的 ID 即可):\""
+],
+"\t\t\techo \"摘要：$OPENCLAW_PROBE_REPLY\"": [
+"\t\t\techo \"摘要：$OPENCLAW_PROBE_REPLY\""
+],
+"\t\t\techo \"文件不存在：$file\"": [
+"\t\t\techo \"文件不存在：$file\""
 ],
 "\t\t\techo \"无效的输入!\"": [
 "\t\t\techo \"無效的輸入!\""
@@ -2687,6 +2987,9 @@
 "\t\t\techo \"未知的包管理器!\"": [
 "\t\t\techo \"未知的套件管理器!\""
 ],
+"\t\t\techo \"未配置\"": [
+"\t\t\techo \"未配置\""
+],
 "\t\t\techo \"查询更多版本: https://www.python.org/downloads/\"": [
 "\t\t\techo \"查詢更多版本: https://www.python.org/downloads/\""
 ],
@@ -2701,6 +3004,9 @@
 ],
 "\t\t\techo \"正在检测模型: $selected_model\"": [
 "\t\t\techo \"正在檢測模型:$selected_model\""
+],
+"\t\t\techo \"正在等待 Lucky 初始化...\"": [
+"\t\t\techo \"正在等待 Lucky 初始化...\""
 ],
 "\t\t\techo \"正在配置智能体身份...\"": [
 "\t\t\techo \"正在配置智能體身份...\""
@@ -2933,11 +3239,17 @@
 "\t\t\thf) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"模型来自 HF 下载源（国内可能慢/失败）\") ;;": [
 "\t\t\thf) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"模型來自 HF 下載來源（國內可能慢/失敗）\") ;;"
 ],
+"\t\t\tif [ \"$status_text\" = \"可用\" ]; then": [
+"\t\t\tif [ \"$status_text\" = \"可用\" ]; then"
+],
 "\t\t\tkj_ssh_read_host_port \"请输入远端服务器IP:  \" \"目标服务器SSH端口 [默认22]: \" \"22\"": [
 "\t\t\tkj_ssh_read_host_port \"請輸入遠端伺服器IP:\" \"目標伺服器SSH連接埠 [預設22]:\" \"22\""
 ],
 "\t\t\tok) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型文件存在\") ;;": [
 "\t\t\tok) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型檔案存在\") ;;"
+],
+"\t\t\tprintf \"%-15s %-10s %-18s %-20s\\n\" \"$nic\" \"$state\" \"${ipaddr:-无}\" \"$mac\"": [
+"\t\t\tprintf \"%-15s %-10s %-18s %-20s\\n\" \"$nic\" \"$state\" \"${ipaddr:-无}\" \"$mac\""
 ],
 "\t\t\tprintf \"%-25s %-25s %-25s\\n\" \"容器名称\" \"网络名称\" \"IP地址\"": [
 "\t\t\tprintf \"%-25s %-25s %-25s\\n\" \"容器名稱\" \"網路名稱\" \"IP位址\""
@@ -2950,6 +3262,12 @@
 ],
 "\t\t\tread -e -p  \"请选择: \" choice": [
 "\t\t\tread -e -p  \"請選擇:\" choice"
+],
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有容器吗？(Y/N): \")\" choice": [
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有容器吗？(Y/N): \")\" choice"
+],
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有镜像吗？(Y/N): \")\" choice": [
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有镜像吗？(Y/N): \")\" choice"
 ],
 "\t\t\tread -e -p \"是否恢复为 true 并重建索引？(Y/n): \" fix_choice": [
 "\t\t\tread -e -p \"是否恢復為 true 並重建索引？ (Y/n):\" fix_choice"
@@ -3095,11 +3413,23 @@
 "\t\t\tupdate_status=\"${gl_huang}发现新版本!${gl_bai}\"": [
 "\t\t\tupdate_status=\"${gl_huang}發現新版本!${gl_bai}\""
 ],
+"\t\t\t已连接) echo -e \"${gl_lv}${status}${gl_bai}\" ;;": [
+"\t\t\t已连接) echo -e \"${gl_lv}${status}${gl_bai}\" ;;"
+],
+"\t\t\t已配置) echo -e \"${gl_huang}${status}${gl_bai}\" ;;": [
+"\t\t\t已配置) echo -e \"${gl_huang}${status}${gl_bai}\" ;;"
+],
+"\t\t\t异常) echo -e \"${gl_hong}${status}${gl_bai}\" ;;": [
+"\t\t\t异常) echo -e \"${gl_hong}${status}${gl_bai}\" ;;"
+],
 "\t\t  \t  echo -e \"10. 设置网络为${gl_huang}ipv4优先${gl_bai}\"": [
 "\t\t  \t  echo -e \"10. 設定網路為${gl_huang}ipv4優先${gl_bai}\""
 ],
 "\t\t  \techo \"请再次尝试部署 $webname\"": [
 "\t\t  \techo \"請再次嘗試部署$webname\""
+],
+"\t\t   24) # 复制文件目录": [
+"\t\t   24) # 复制文件目录"
 ],
 "\t\t   local YTDLP_STATUS=\"${gl_hui}未安装${gl_bai}\"": [
 "\t\t   local YTDLP_STATUS=\"${gl_hui}未安裝${gl_bai}\""
@@ -3170,11 +3500,17 @@
 "\t\t  echo \"发现新版本的组件\"": [
 "\t\t  echo \"發現新版本的元件\""
 ],
+"\t\t  echo \"回收站已清空。\"": [
+"\t\t  echo \"回收站已清空。\""
+],
 "\t\t  echo \"将会生成密钥对，更安全的方式SSH登录\"": [
 "\t\t  echo \"將會產生金鑰對，更安全的方式SSH登錄\""
 ],
 "\t\t  echo \"接入LinuxMirrors切换系统更新源\"": [
 "\t\t  echo \"接入LinuxMirrors切換系統更新來源\""
+],
+"\t\t  echo \"文件不存在。\"": [
+"\t\t  echo \"文件不存在。\""
 ],
 "\t\t  echo \"无效的选择，请重新输入。\"": [
 "\t\t  echo \"無效的選擇，請重新輸入。\""
@@ -3401,6 +3737,9 @@
 "\t\t# 小内存缩小缓冲区": [
 "\t\t# 小記憶體縮小緩衝區"
 ],
+"\t\t# 左列": [
+"\t\t# 左列"
+],
 "\t\t# 开启 Brotli：去掉注释": [
 "\t\t# 開啟 Brotli：去掉註釋"
 ],
@@ -3455,6 +3794,9 @@
 "\t\t# 清理旧的 sysctl.conf 里的 bbr 配置（避免冲突）": [
 "\t\t# 清理舊的 sysctl.conf 裡的 bbr 設定（避免衝突）"
 ],
+"\t\t# 清理空值": [
+"\t\t# 清理空值"
+],
 "\t\t# 生成 JSON 并通过 openclaw approvals set --stdin 写入（优先）": [
 "\t\t# 產生 JSON 並透過 openclaw approvals set --stdin 寫入（優先）"
 ],
@@ -3494,8 +3836,17 @@
 "\t\t# 默认本地 IP": [
 "\t\t# 預設本地 IP"
 ],
+"\t\t''|/|.|..) echo \"拒绝删除含糊路径: $target\"; return 1 ;;": [
+"\t\t''|/|.|..) echo \"拒绝删除含糊路径: $target\"; return 1 ;;"
+],
+"\t\t''|/|//*) echo \"拒绝删除空路径、根路径或含糊的双斜杠路径: $target\"; return 1 ;;": [
+"\t\t''|/|//*) echo \"拒绝删除空路径、根路径或含糊的双斜杠路径: $target\"; return 1 ;;"
+],
 "\t\t) || { echo \"❌ sha256 校验失败，拒绝还原\"; return 1; }": [
 "\t\t) || { echo \"❌ sha256 校驗失敗，拒絕還原\"; return 1; }"
+],
+"\t\t*) echo \"拒绝下载非 HTTPS 脚本: $script_url\"; return 1 ;;": [
+"\t\t*) echo \"拒绝下载非 HTTPS 脚本: $script_url\"; return 1 ;;"
 ],
 "\t\t*) echo \"无效的选择！\"; return ;;": [
 "\t\t*) echo \"無效的選擇！\"; return ;;"
@@ -3509,6 +3860,15 @@
 "\t\t*) echo \"错误: 请输入有效的选项！\" ; return ;;": [
 "\t\t*) echo \"錯誤: 請輸入有效的選項！\" ; return ;;"
 ],
+"\t\t1) cron_time=\"$random_minute * * * *\" ;;  # 每小时，随机分钟执行": [
+"\t\t1) cron_time=\"$random_minute * * * *\" ;;  # 每小时，随机分钟执行"
+],
+"\t\t2) cron_time=\"$random_minute 0 * * *\" ;;  # 每天，随机分钟执行": [
+"\t\t2) cron_time=\"$random_minute 0 * * *\" ;;  # 每天，随机分钟执行"
+],
+"\t\t3) cron_time=\"$random_minute 0 * * 1\" ;;  # 每周，随机分钟执行": [
+"\t\t3) cron_time=\"$random_minute 0 * * 1\" ;;  # 每周，随机分钟执行"
+],
 "\t\tCFmessage=\" cf模式已开启\"": [
 "\t\tCFmessage=\"cf模式已開啟\""
 ],
@@ -3518,8 +3878,20 @@
 "\t\t[ ! -f \"$archive_path\" ] && { echo \"❌ 文件不存在: $archive_path\"; return 1; }": [
 "\t\t[ ! -f \"$archive_path\" ] && { echo \"❌ 文件不存在:$archive_path\"; return 1; }"
 ],
+"\t\t[ ! -f \"$config_file\" ] && { echo \"未知模式\"; return; }": [
+"\t\t[ ! -f \"$config_file\" ] && { echo \"未知模式\"; return; }"
+],
 "\t\t[ \"$HOME\" != \"/root\" ] && [ -d /root/.openclaw ] && echo \"⚠️ 检测到 root 目录下仍存在 /root/.openclaw，如需清理请手动处理\"": [
 "\t\t[ \"$HOME\" != \"/root\" ] && [ -d /root/.openclaw ] && echo \"⚠️ 偵測到 root 目錄下仍存在 /root/.openclaw，如需清理請手動處理\""
+],
+"\t\t[ \"$confirm\" != \"yes\" ] && { echo \"已取消\"; return 0; }": [
+"\t\t[ \"$confirm\" != \"yes\" ] && { echo \"已取消\"; return 0; }"
+],
+"\t\t[ \"$confirm\" = \"DELETE\" ] || { echo \"已取消\"; return 1; }": [
+"\t\t[ \"$confirm\" = \"DELETE\" ] || { echo \"已取消\"; return 1; }"
+],
+"\t\t[ \"$confirm\" = \"yes\" ] || { echo \"已取消\"; return 1; }": [
+"\t\t[ \"$confirm\" = \"yes\" ] || { echo \"已取消\"; return 1; }"
 ],
 "\t\t[ -O \"$PROJECT_STATE_DIR\" ] || { echo \"状态目录不属于当前用户。\"; exit 1; }": [
 "\t\t[ -O \"$PROJECT_STATE_DIR\" ] || { echo \"狀態目錄不屬於目前使用者。\"; exit 1; }"
@@ -3548,6 +3920,9 @@
 "\t\tarchive_path=$(openclaw_read_import_path \"请输入 OpenClaw 项目备份包路径\")": [
 "\t\tarchive_path=$(openclaw_read_import_path \"請輸入 OpenClaw 專案備份包路徑\")"
 ],
+"\t\tbackup|bf|备份)": [
+"\t\tbackup|bf|备份)"
+],
 "\t\tbr_status=\" br压缩已开启\"": [
 "\t\tbr_status=\"br壓縮已開啟\""
 ],
@@ -3562,6 +3937,15 @@
 ],
 "\t\tcheck_f2b_status=\"${gl_lv}已安装${gl_bai}\"": [
 "\t\tcheck_f2b_status=\"${gl_lv}已安裝${gl_bai}\""
+],
+"\t\tclean|清理)": [
+"\t\tclean|清理)"
+],
+"\t\tdd|重装)": [
+"\t\tdd|重装)"
+],
+"\t\tdisk|硬盘管理)": [
+"\t\tdisk|硬盘管理)"
 ],
 "\t\techo \"  Exec 限制: ${current_sec:-(unset)}\"": [
 "\t\techo \"Exec 限制: ${current_sec:-(unset)}\""
@@ -3695,11 +4079,17 @@
 "\t\techo \"18. 备份与还原\"": [
 "\t\techo \"18. 備份與還原\""
 ],
+"\t\techo \"19. 更新\"": [
+"\t\techo \"19. 更新\""
+],
 "\t\techo \"2.  启动\"": [
 "\t\techo \"2. 啟動\""
 ],
 "\t\techo \"2. 完整模式（含更多状态，敏感风险更高）\"": [
 "\t\techo \"2. 完整模式（含更多狀態，敏感風險較高）\""
+],
+"\t\techo \"2. 查看 ~/.bashrc\"": [
+"\t\techo \"2. 查看 ~/.bashrc\""
 ],
 "\t\techo \"2. 查看指定服务日志\"": [
 "\t\techo \"2. 查看指定服務日誌\""
@@ -3730,6 +4120,9 @@
 ],
 "\t\techo \"3. 执行本地同步到远端         4. 执行远端同步到本地\"": [
 "\t\techo \"3. 執行本地同步到遠端 4. 執行遠端同步到本地\""
+],
+"\t\techo \"3. 查看 ~/.profile\"": [
+"\t\techo \"3. 查看 ~/.profile\""
 ],
 "\t\techo \"3. 查看登录/安全日志\"": [
 "\t\techo \"3. 查看登入/安全日誌\""
@@ -3899,6 +4292,9 @@
 "\t\techo \"✅ qmd 安装完成: $qmd_path\"": [
 "\t\techo \"✅ qmd 安裝完成:$qmd_path\""
 ],
+"\t\techo \"✅ sqlite3 可用: ${ver:-unknown}\"": [
+"\t\techo \"✅ sqlite3 可用: ${ver:-unknown}\""
+],
 "\t\techo \"✅ 发现 $model_count 个模型\"": [
 "\t\techo \"✅ 發現$model_count個模型\""
 ],
@@ -3974,6 +4370,9 @@
 "\t\techo \"修改选项（留空跳过）：\"": [
 "\t\techo \"修改選項（留空跳過）：\""
 ],
+"\t\techo \"停止 OpenClaw...\"": [
+"\t\techo \"停止 OpenClaw...\""
+],
 "\t\techo \"先访问URL触发设备ID，然后回车下一步进行配对。\"": [
 "\t\techo \"先造訪URL觸發設備ID，然後回車下一步進行配對。\""
 ],
@@ -4030,6 +4429,9 @@
 ],
 "\t\techo \"同步失败! 请检查以下内容：\"": [
 "\t\techo \"同步失敗! 請檢查以下內容：\""
+],
+"\t\techo \"同步完成!\"": [
+"\t\techo \"同步完成!\""
 ],
 "\t\techo \"名称不能为空\"; return 1": [
 "\t\techo \"名稱不能為空\"; return 1"
@@ -4109,6 +4511,9 @@
 "\t\techo \"已下载视频列表:\"": [
 "\t\techo \"已下載影片清單:\""
 ],
+"\t\techo \"已取消\"": [
+"\t\techo \"已取消\""
+],
 "\t\techo \"已备份原有 authorized_keys 文件\"": [
 "\t\techo \"已備份原有 authorized_keys 文件\""
 ],
@@ -4142,11 +4547,38 @@
 "\t\techo \"成功添加 ${added} 条新的公钥到 ${authorized_keys}\"": [
 "\t\techo \"成功添加${added}條新的公鑰到${authorized_keys}\""
 ],
+"\t\techo \"拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH\"": [
+"\t\techo \"拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH\""
+],
+"\t\techo \"拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非普通文件主脚本路径: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖非普通文件主脚本路径: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非本项目主脚本: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖非本项目主脚本: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非本项目备份文件: $PROJECT_BACKUP_PATH\"": [
+"\t\techo \"拒绝覆盖非本项目备份文件: $PROJECT_BACKUP_PATH\""
+],
 "\t\techo \"按任意键返回...\"": [
 "\t\techo \"按任意鍵返回...\""
 ],
+"\t\techo \"操作\"": [
+"\t\techo \"操作\""
+],
+"\t\techo \"操作已取消。\"": [
+"\t\techo \"操作已取消。\""
+],
 "\t\techo \"文件: $file\"": [
 "\t\techo \"文件:$file\""
+],
+"\t\techo \"文件管理器\"": [
+"\t\techo \"文件管理器\""
+],
+"\t\techo \"方案: ${OPENCLAW_MEMORY_AUTO_SCHEME:-unknown}\"": [
+"\t\techo \"方案: ${OPENCLAW_MEMORY_AUTO_SCHEME:-unknown}\""
 ],
 "\t\techo \"无效的参数：使用 'on' 或 'off'\"": [
 "\t\techo \"無效的參數：使用 'on' 或 'off'\""
@@ -4165,6 +4597,15 @@
 ],
 "\t\techo \"无法获取文件系统类型！\"": [
 "\t\techo \"無法取得檔案系統類型！\""
+],
+"\t\techo \"无法读取当前脚本，拒绝安装快捷命令。\"": [
+"\t\techo \"无法读取当前脚本，拒绝安装快捷命令。\""
+],
+"\t\techo \"更新 OpenClaw...\"": [
+"\t\techo \"更新 OpenClaw...\""
+],
+"\t\techo \"更新完成\"": [
+"\t\techo \"更新完成\""
 ],
 "\t\techo \"最小需求空间: ${required_gb}G\"": [
 "\t\techo \"最小需求空間:${required_gb}G\""
@@ -4191,7 +4632,7 @@
 "\t\techo \"查看 OpenClaw 狀態日誌\""
 ],
 "\t\techo \"检查并准备 $(printf '%s\\n' \"$agent_lines\" | sed '/^\\s*$/d' | wc -l | tr -d ' ') 个智能体工作区\"": [
-"\t\techo \"檢查並準備 $(printf '%s\\n'\"$agent_lines\"| sed '/^\\s*$/d' | wc -l | tr -d ' ') 個智能體工作區\""
+"\t\techo \"检查并准备 $(printf '%s\\n' \"$agent_lines\" | sed '/^\\s*$/d' | wc -l | tr -d ' ') 个智能体工作区\""
 ],
 "\t\techo \"检查配置文件: ${config_file:-$(openclaw_permission_config_file)}\"": [
 "\t\techo \"檢查設定檔: ${config_file:-$(openclaw_permission_config_file)}\""
@@ -4258,6 +4699,9 @@
 ],
 "\t\techo \"用法：create_user_with_sshkey <用户名>\"": [
 "\t\techo \"用法：create_user_with_sshkey <使用者名稱>\""
+],
+"\t\techo \"目标不存在: $target\"": [
+"\t\techo \"目标不存在: $target\""
 ],
 "\t\techo \"目标方案: $scheme_label\"": [
 "\t\techo \"目標方案:$scheme_label\""
@@ -4384,6 +4828,9 @@
 ],
 "\t\techo \"镜像源探测: huggingface.co=${OPENCLAW_MEMORY_HF_OK:-unknown} hf-mirror.com=${OPENCLAW_MEMORY_MIRROR_OK:-unknown}\"": [
 "\t\techo \"鏡像來源探測: huggingface.co=${OPENCLAW_MEMORY_HF_OK:-unknown} hf-mirror.com=${OPENCLAW_MEMORY_MIRROR_OK:-unknown}\""
+],
+"\t\techo \"需要 curl 或 wget 才能下载脚本。\"": [
+"\t\techo \"需要 curl 或 wget 才能下载脚本。\""
 ],
 "\t\techo \"高级选项: 输入 config 仅写配置（不安装不下载、不索引、不重启）\"": [
 "\t\techo \"進階選項: 輸入 config 僅寫入設定（不安裝不下載、不索引、不重新啟動）\""
@@ -4571,14 +5018,29 @@
 "\t\techo -e \"💡 终端执行 \\033[1;33m${PROJECT_COMMAND} claw\\033[0m 快速进入菜单\"": [
 "\t\techo -e \"💡 終端執行 \\033[1;33m${PROJECT_COMMAND} claw\\033[0m 快速進入選單\""
 ],
+"\t\techo -e \"🦞 OPENCLAW 管理工具 by ${PROJECT_NAME} 🦞\"": [
+"\t\techo -e \"🦞 OPENCLAW 管理工具 by ${PROJECT_NAME} 🦞\""
+],
+"\t\tenable|autostart|开机启动)": [
+"\t\tenable|autostart|开机启动)"
+],
+"\t\tfd|rp|反代)": [
+"\t\tfd|rp|反代)"
+],
 "\t\tgzip_status=\" gzip压缩已开启\"": [
 "\t\tgzip_status=\"gzip壓縮已開啟\""
 ],
 "\t\tif [ \"$confirm_text\" != \"我已知晓高风险并继续还原\" ]; then": [
 "\t\tif [ \"$confirm_text\" != \"我已知高風險並持續還原\" ]; then"
 ],
+"\t\tinstall|add|安装)": [
+"\t\tinstall|add|安装)"
+],
 "\t\tkj_ssh_read_host_user_port \"目标服务器IP: \" \"目标服务器SSH用户名 [默认root]: \" \"目标服务器SSH端口 [默认22]: \" \"root\" \"22\"": [
 "\t\tkj_ssh_read_host_user_port \"目標伺服器IP:\" \"目標伺服器SSH用戶名 [預設root]:\" \"目標伺服器SSH連接埠 [預設22]:\" \"root\" \"22\""
+],
+"\t\tloadbalance|负载均衡)": [
+"\t\tloadbalance|负载均衡)"
 ],
 "\t\tlocal app_name=\"2FAuth自托管二步验证器\"": [
 "\t\tlocal app_name=\"2FAuth自架二步驟驗證器\""
@@ -4747,6 +5209,9 @@
 ],
 "\t\tlocal docker_describe=\"Docker可视化面板系统，提供完善的docker管理功能。\"": [
 "\t\tlocal docker_describe=\"Docker視覺化面板系統，提供完善的docker管理功能。\""
+],
+"\t\tlocal docker_describe=\"LobeChat聚合市面上主流的AI大模型，ChatGPT/Claude/Gemini/Groq/Ollama\"": [
+"\t\tlocal docker_describe=\"LobeChat聚合市面上主流的AI大模型，ChatGPT/Claude/Gemini/Groq/Ollama\""
 ],
 "\t\tlocal docker_describe=\"Lucky 是一个大内网穿透及端口转发管理工具，支持 DDNS、反向代理、WOL 等功能。\"": [
 "\t\tlocal docker_describe=\"Lucky 是一個大內部網路穿透及連接埠轉送管理工具，支援 DDNS、反向代理、WOL 等功能。\""
@@ -5216,6 +5681,9 @@
 "\t\tlocal docker_use=\"echo \\\"前往官网下载远程桌面的客户端: https://rustdesk.com/zh-cn/\\\"\"": [
 "\t\tlocal docker_use=\"echo \\\"前往官網下載遠端桌面的客戶端: https://rustdesk.com/zh-cn/\\\"\""
 ],
+"\t\tlocal docker_use=\"echo \\\"安全入口: /allinssl\\\"\"": [
+"\t\tlocal docker_use=\"echo \\\"安全入口: /allinssl\\\"\""
+],
 "\t\tlocal docker_use=\"echo \\\"手机登录迅雷，再输入邀请码，邀请码: 迅雷牛通\\\"\"": [
 "\t\tlocal docker_use=\"echo \\\"手機登入迅雷，再輸入邀請碼，邀請碼: 迅雷牛通\\\"\""
 ],
@@ -5246,6 +5714,9 @@
 "\t\tlocal docker_use=\"echo \\\"默认账号密码: 666\\\"\"": [
 "\t\tlocal docker_use=\"echo \\\"預設帳號密碼: 666\\\"\""
 ],
+"\t\tlocal panelname=\"AMH面板\"": [
+"\t\tlocal panelname=\"AMH面板\""
+],
 "\t\tlocal panelname=\"AcePanel 原耗子面板\"": [
 "\t\tlocal panelname=\"AcePanel 原耗子麵板\""
 ],
@@ -5254,6 +5725,9 @@
 ],
 "\t\tlocal panelurl=\"官方地址: ${gh_proxy}github.com/acepanel/panel\"": [
 "\t\tlocal panelurl=\"官方地址:${gh_proxy}github.com/acepanel/panel\""
+],
+"\t\tlocal panelurl=\"官方地址: https://amh.sh/index.htm?amh\"": [
+"\t\tlocal panelurl=\"官方地址: https://amh.sh/index.htm?amh\""
 ],
 "\t\tls -1dt ${BACKUP_ROOT}/docker_backup_* 2>/dev/null || echo \"无备份\"": [
 "\t\tls -1dt ${BACKUP_ROOT}/docker_backup_* 2>/dev/null || echo \"無備份\""
@@ -5267,11 +5741,26 @@
 "\t\tmode_info=\" 高性能模式\"": [
 "\t\tmode_info=\"高性能模式\""
 ],
+"\t\tnhyh|内核优化)": [
+"\t\tnhyh|内核优化)"
+],
+"\t\topenclaw config set tools.elevated.enabled true >/dev/null 2>&1 # 允许智能体申请提权": [
+"\t\topenclaw config set tools.elevated.enabled true >/dev/null 2>&1 # 允许智能体申请提权"
+],
+"\t\topenclaw config set tools.exec.strictInlineEval true >/dev/null 2>&1  # 拦截危险的内联代码": [
+"\t\topenclaw config set tools.exec.strictInlineEval true >/dev/null 2>&1  # 拦截危险的内联代码"
+],
+"\t\topenclaw config unset commands.bash >/dev/null 2>&1 # 废弃旧版参数": [
+"\t\topenclaw config unset commands.bash >/dev/null 2>&1 # 废弃旧版参数"
+],
 "\t\topenclaw config validate || echo \"⚠️ 配置校验未通过，请检查上方输出。\"": [
 "\t\topenclaw config validate || echo \"⚠️ 配置校驗未通過，請檢查上方輸出。\""
 ],
 "\t\topenclaw security audit 2>/dev/null || echo \"⚠️ 安全审计命令不可用\"": [
 "\t\topenclaw security audit 2>/dev/null || echo \"⚠️ 安全審計命令不可用\""
+],
+"\t\topenclaw_print_bot_status_line \"微信 (Weixin)\" \"$wx_status\"": [
+"\t\topenclaw_print_bot_status_line \"微信 (Weixin)\" \"$wx_status\""
 ],
 "\t\topenclaw_print_bot_status_line \"飞书(Lark)\" \"$feishu_status\"": [
 "\t\topenclaw_print_bot_status_line \"飛書(Lark)\" \"$feishu_status\""
@@ -5284,6 +5773,9 @@
 ],
 "\t\tprintf \"请输入选项并回车: \"": [
 "\t\tprintf \"請輸入選項並回車:\""
+],
+"\t\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\"": [
+"\t\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\""
 ],
 "\t\tread -e -p  \"请输入 WireGuard 网段 (默认 10.13.13.0): \" NETWORK": [
 "\t\tread -e -p  \"請輸入 WireGuard 網段 (預設 10.13.13.0):\" NETWORK"
@@ -5308,6 +5800,9 @@
 ],
 "\t\tread -e -p \"  新名称: \" new_name": [
 "\t\tread -e -p \"新名稱:\" new_name"
+],
+"\t\tread -e -p \"$(echo -e \"${gl_hong}强烈建议：${gl_bai}先备份全部网站数据，再卸载LDNMP环境。确定删除所有网站数据吗？(Y/N): \")\" choice": [
+"\t\tread -e -p \"$(echo -e \"${gl_hong}强烈建议：${gl_bai}先备份全部网站数据，再卸载LDNMP环境。确定删除所有网站数据吗？(Y/N): \")\" choice"
 ],
 "\t\tread -e -p \"二次确认：输入 DELETE 执行删除: \" confirm_step2": [
 "\t\tread -e -p \"二次確認：輸入 DELETE 執行刪除:\" confirm_step2"
@@ -5462,17 +5957,50 @@
 "\t\tread -rsp \"请输入 API Key (输入不显示): \" api_key": [
 "\t\tread -rsp \"請輸入 API Key (輸入不顯示):\" api_key"
 ],
+"\t\tremove|del|uninstall|卸载)": [
+"\t\tremove|del|uninstall|卸载)"
+],
+"\t\trestart|重启)": [
+"\t\trestart|重启)"
+],
 "\t\trm -rf \"$tmp_unpack\"; echo \"✅ 记忆全量还原完成\"; break_end": [
 "\t\trm -rf \"$tmp_unpack\"; echo \"✅ 記憶全量還原完成\"; break_end"
 ],
+"\t\trsync|远程同步)": [
+"\t\trsync|远程同步)"
+],
+"\t\tssh|远程连接)": [
+"\t\tssh|远程连接)"
+],
+"\t\tstart|启动)": [
+"\t\tstart|启动)"
+],
+"\t\tstatus|状态)": [
+"\t\tstatus|状态)"
+],
+"\t\tstop|停止)": [
+"\t\tstop|停止)"
+],
+"\t\tstream|L4负载均衡)": [
+"\t\tstream|L4负载均衡)"
+],
 "\t\ttar -xzf \"$archive_path\" -C \"$unpack_root\" || { echo \"❌ 备份包解压失败\"; return 1; }": [
 "\t\ttar -xzf \"$archive_path\" -C \"$unpack_root\" || { echo \"❌ 備份包解壓縮失敗\"; return 1; }"
+],
+"\t\ttime|时区)": [
+"\t\ttime|时区)"
 ],
 "\t\ttrash_status=\"${gl_hui}未启用${gl_bai}\"": [
 "\t\ttrash_status=\"${gl_hui}未啟用${gl_bai}\""
 ],
 "\t\ttrash_status=\"${gl_lv}已启用${gl_bai}\"": [
 "\t\ttrash_status=\"${gl_lv}已啟用${gl_bai}\""
+],
+"\t\ttrash|hsz|回收站)": [
+"\t\ttrash|hsz|回收站)"
+],
+"\t\tupdate|更新)": [
+"\t\tupdate|更新)"
 ],
 "\t\twaf_status=\" WAF已开启\"": [
 "\t\twaf_status=\"WAF已開啟\""
@@ -5482,6 +6010,24 @@
 ],
 "\t\t{ [ -z \"$agent_id\" ] || [ -z \"$bind_value\" ]; } && echo \"已取消：参数不能为空。\" && return 1": [
 "\t\t{ [ -z \"$agent_id\" ] || [ -z \"$bind_value\" ]; } && echo \"已取消：參數不能為空​​。\" && return 1"
+],
+"\t\t关闭端口|gbdk)": [
+"\t\t关闭端口|gbdk)"
+],
+"\t\t命令收藏夹|fav)": [
+"\t\t命令收藏夹|fav)"
+],
+"\t\t打开端口|dkdk)": [
+"\t\t打开端口|dkdk)"
+],
+"\t\t放行IP|fxip)": [
+"\t\t放行IP|fxip)"
+],
+"\t\t防火墙|fhq)": [
+"\t\t防火墙|fhq)"
+],
+"\t\t阻止IP|zzip)": [
+"\t\t阻止IP|zzip)"
 ],
 "\t  \t  IS_KEY_ENABLED=\"${gl_hui}未启用${gl_bai}\"": [
 "\t  \t  IS_KEY_ENABLED=\"${gl_hui}未啟用${gl_bai}\""
@@ -5563,6 +6109,9 @@
 ],
 "\t  echo \"redis主机: redis\"": [
 "\t  echo \"redis主機: redis\""
+],
+"\t  echo \"redis地址: redis\"": [
+"\t  echo \"redis地址: redis\""
 ],
 "\t  echo \"redis密码: 默认不填写\"": [
 "\t  echo \"redis密碼: 預設不填寫\""
@@ -5668,6 +6217,9 @@
 ],
 "\t  echo -e \"${gl_huang}提示: ${gl_bai}进入工作区后使用Ctrl+b再单独按d，退出工作区！\"": [
 "\t  echo -e \"${gl_huang}提示:${gl_bai}進入工作區後再使用Ctrl+b再單獨按d，退出工作區！\""
+],
+"\t  echo -e \"${gl_lv}操作完成${gl_bai}\"": [
+"\t  echo -e \"${gl_lv}操作完成${gl_bai}\""
 ],
 "\t  echo -e \"${gl_minglan}0.   ${gl_bai}返回主菜单\"": [
 "\t  echo -e \"${gl_minglan}0.   ${gl_bai}返回主選單\""
@@ -6185,6 +6737,9 @@
 "\t  echo -e \"7. 自动调优：           根据测试数据自动调优内核参数。${gl_huang}★${gl_bai}\"": [
 "\t  echo -e \"7. 自動調優： 依測試資料自動調優核心參數。${gl_huang}★${gl_bai}\""
 ],
+"\t  echo -e \"Docker管理\"": [
+"\t  echo -e \"Docker管理\""
+],
 "\t  echo -e \"[${gl_huang}1/2${gl_bai}] 上传静态源码\"": [
 "\t  echo -e \"[${gl_huang}1/2${gl_bai}] 上傳靜態原始碼\""
 ],
@@ -6242,8 +6797,14 @@
 "\t  echo -e \"系统工具\"": [
 "\t  echo -e \"系統工具\""
 ],
+"\t  local current_mode=$(grep \"^# 模式:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)": [
+"\t  local current_mode=$(grep \"^# 模式:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)"
+],
 "\t  read -e -p  \"回车键还原最新的备份，输入备份文件名还原指定的备份，输入0退出：\" filename": [
 "\t  read -e -p  \"回車鍵還原最新的備份，輸入備份檔案名稱還原指定的備份，輸入0退出：\" filename"
+],
+"\t  read -e -p \"$(echo -e \"输入需要安装的扩展名称，如 ${gl_huang}SourceGuardian imap ftp${gl_bai} 等等。直接回车将跳过安装 ： \")\" php_extensions": [
+"\t  read -e -p \"$(echo -e \"输入需要安装的扩展名称，如 ${gl_huang}SourceGuardian imap ftp${gl_bai} 等等。直接回车将跳过安装 ： \")\" php_extensions"
 ],
 "\t  read -e -p \"1. php最新版 | 2. php7.4 : \" pho_v": [
 "\t  read -e -p \"1. php最新版 | 2. php7.4 :\" pho_v"
@@ -6305,6 +6866,9 @@
 "\t  webname=\"flarum论坛\"": [
 "\t  webname=\"flarum論壇\""
 ],
+"\t  webname=\"反向代理-域名\"": [
+"\t  webname=\"反向代理-域名\""
+],
 "\t  webname=\"可道云桌面\"": [
 "\t  webname=\"可道雲桌面\""
 ],
@@ -6335,6 +6899,12 @@
 "\t# OpenClaw API 协议探测逻辑已移除：不再自动探测/判定 API 类型。": [
 "\t# OpenClaw API 協定偵測邏輯已移除：不再自動偵測/判定 API 類型。"
 ],
+"\t# sudo 免密": [
+"\t# sudo 免密"
+],
+"\t# ── BBR 持久化 ──": [
+"\t# ── BBR 持久化 ──"
+],
 "\t# ── 写入配置文件（持久化） ──": [
 "\t# ── 寫入設定檔（持久化） ──"
 ],
@@ -6346,6 +6916,9 @@
 ],
 "\t# ── 应用配置（逐行，跳过不支持的参数） ──": [
 "\t# ── 應用配置（逐行，跳過不支援的參數） ──"
+],
+"\t# ── 文件描述符限制 ──": [
+"\t# ── 文件描述符限制 ──"
 ],
 "\t# ── 根据内存大小自适应调整 ──": [
 "\t# ── 根據記憶體大小自適應調整 ──"
@@ -6551,6 +7124,9 @@
 "\t# 提示用户输入需要删除的服务名称": [
 "\t# 提示使用者輸入需要刪除的服務名稱"
 ],
+"\t# 插入到 “Happy publishing” 之前": [
+"\t# 插入到 “Happy publishing” 之前"
+],
 "\t# 插入新定义，放在含 \"Happy publishing\" 的行前": [
 "\t# 插入新定義，放在含 \"Happy publishing\" 的行前"
 ],
@@ -6662,6 +7238,9 @@
 "\t# 添加域名（调用你给的函数）": [
 "\t# 新增網域（呼叫你給的函數）"
 ],
+"\t# 清理 BBR 持久化": [
+"\t# 清理 BBR 持久化"
+],
 "\t# 清理 sysctl.conf 里可能残留的 bbr 配置": [
 "\t# 清理 sysctl.conf 裡可能殘留的 bbr 配置"
 ],
@@ -6685,6 +7264,9 @@
 ],
 "\t# 清除放行本地网络 127.0.0.0/8 的规则": [
 "\t# 清除放行本地網路 127.0.0.0/8 的規則"
+],
+"\t# 生成备份文件前缀": [
+"\t# 生成备份文件前缀"
 ],
 "\t# 生成备份文件名": [
 "\t# 產生備份檔名"
@@ -6770,11 +7352,32 @@
 "\t# 首先获取所有端口": [
 "\t# 首先獲取所有連接埠"
 ],
+"\t[ ! -L \"$cache_dir\" ] || { echo \"拒绝使用符号链接缓存目录: $cache_dir\"; return 1; }": [
+"\t[ ! -L \"$cache_dir\" ] || { echo \"拒絕使用符號連結快取目錄:$cache_dir\"; return 1; }"
+],
+"\t[ -O \"$cache_dir\" ] || { echo \"远程脚本缓存目录不属于当前用户: $cache_dir\"; return 1; }": [
+"\t[ -O \"$cache_dir\" ] || { echo \"遠端腳本快取目錄不屬於目前使用者:$cache_dir\"; return 1; }"
+],
+"\t[ -s \"$script_path\" ] || { echo \"下载结果为空。\"; rm -f -- \"$script_path\"; return 1; }": [
+"\t[ -s \"$script_path\" ] || { echo \"下載結果為空。 \"; rm -f -- \"$script_path\"; return 1; }"
+],
+"\t_kernel_optimize_core \"${tiaoyou_moshi:-高性能优化模式}\" \"high\"": [
+"\t_kernel_optimize_core \"${tiaoyou_moshi:-高性能优化模式}\" \"high\""
+],
 "\t_kernel_optimize_core \"均衡优化模式\" \"balanced\"": [
 "\t_kernel_optimize_core \"均衡最佳化模式\" \"balanced\""
 ],
 "\t_kernel_optimize_core \"网站搭建优化模式\" \"web\"": [
 "\t_kernel_optimize_core \"網站建置優化模式\" \"web\""
+],
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火墙规则自动备份失败，继续执行关闭所有端口。${gl_bai}\"": [
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火牆規則自動備份失敗，繼續執行關閉所有連接埠。${gl_bai}\""
+],
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}\"": [
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火牆規則自動備份失敗，繼續執行開放所有連接埠。${gl_bai}\""
+],
+"\tbash -n \"$script_path\" || { echo \"远程脚本未通过 Bash 语法检查: $script_path\"; rm -f -- \"$script_path\"; return 1; }": [
+"\tbash -n \"$script_path\" || { echo \"遠端腳本未通過 Bash 語法檢查:$script_path\"; rm -f -- \"$script_path\"; return 1; }"
 ],
 "\tcheck_frp=\"${gl_hui}未安装${gl_bai}\"": [
 "\tcheck_frp=\"${gl_hui}未安裝${gl_bai}\""
@@ -6929,6 +7532,9 @@
 "\techo \"7. 允许IP+端口访问   8. 阻止IP+端口访问\"": [
 "\techo \"7. 允許IP+連接埠存取 8. 阻止IP+連接埠訪問\""
 ],
+"\techo \"Docker容器列表\"": [
+"\techo \"Docker容器列表\""
+],
 "\techo \"Docker镜像列表\"": [
 "\techo \"Docker映像列表\""
 ],
@@ -6994,6 +7600,9 @@
 ],
 "\techo \"客户端部署时需要用的参数\"": [
 "\techo \"客戶端部署時所需使用的參數\""
+],
+"\techo \"容器操作\"": [
+"\techo \"容器操作\""
 ],
 "\techo \"导入 ELRepo GPG 公钥...\"": [
 "\techo \"導入 ELRepo GPG 公鑰...\""
@@ -7187,6 +7796,9 @@
 "\techo -e \"${gl_huang}9.   ${gl_bai}安装LinkStack共享链接平台         ${gl_huang}20.  ${gl_bai}自定义动态站点\"": [
 "\techo -e \"${gl_huang}9.   ${gl_bai}安裝LinkStack分享連結平台${gl_huang}20.  ${gl_bai}自訂動態站點\""
 ],
+"\techo -e \"${gl_huang}LDNMP建站\"": [
+"\techo -e \"${gl_huang}LDNMP建置站\""
+],
 "\techo -e \"${gl_huang}已申请的证书到期情况${gl_bai}\"": [
 "\techo -e \"${gl_huang}已申請的證書到期情況${gl_bai}\""
 ],
@@ -7195,6 +7807,9 @@
 ],
 "\techo -e \"${gl_huang}证书存放路径${gl_bai}\"": [
 "\techo -e \"${gl_huang}證書存放路徑${gl_bai}\""
+],
+"\techo -e \"${gl_lv}$* 扫描完成，病毒报告存放在${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}\"": [
+"\techo -e \"${gl_lv}$* 扫描完成，病毒报告存放在${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}\""
 ],
 "\techo -e \"${gl_lv}${mode_name} 优化完成！配置已持久化到 ${CONF}${gl_bai}\"": [
 "\techo -e \"${gl_lv}${mode_name}優化完成！配置已持久化到${CONF}${gl_bai}\""
@@ -7343,6 +7958,24 @@
 "\tkj_ssh_read_port \"请输入 SSH 端口 (默认 22): \" \"22\"": [
 "\tkj_ssh_read_port \"請輸入 SSH 連接埠 (預設 22):\" \"22\""
 ],
+"\tlocal direction=\"push\"  # 默认是推送到远端": [
+"\tlocal direction=\"push\"  # 默认是推送到远端"
+],
+"\tlocal ips=($@)  # 将传入的参数转换为数组": [
+"\tlocal ips=($@)  # 将传入的参数转换为数组"
+],
+"\tlocal new_swap=$1  # 获取传入的参数": [
+"\tlocal new_swap=$1  # 获取传入的参数"
+],
+"\tlocal ports=($@)  # 将传入的参数转换为数组": [
+"\tlocal ports=($@)  # 将传入的参数转换为数组"
+],
+"\tlocal prompt=\"${1:-请输入密码: }\"": [
+"\tlocal prompt=\"${1:-请输入密码: }\""
+],
+"\tlocal random_minute=$(shuf -i 0-59 -n 1)  # 生成 0-59 之间的随机分钟数": [
+"\tlocal random_minute=$(shuf -i 0-59 -n 1)  # 生成 0-59 之间的随机分钟数"
+],
 "\tlocal runtime=$(cat /proc/uptime | awk -F. '{run_days=int($1 / 86400);run_hours=int(($1 % 86400) / 3600);run_minutes=int(($1 % 3600) / 60); if (run_days > 0) printf(\"%d天 \", run_days); if (run_hours > 0) printf(\"%d时 \", run_hours); printf(\"%d分\\n\", run_minutes)}')": [
 "\tlocal runtime=$(cat /proc/uptime | awk -F. '{run_days=int($1 / 86400);run_hours=int(($1 % 86400) / 3600);run_minutes=int(($1% 3600) / 60); if (run_days > 0) printf(\"%d天 \", run_days); if (run_hours > 0) printf(\"%d時 \", run_hours); printf(\"%d分\\n\", run_minutes)}')"
 ],
@@ -7354,6 +7987,15 @@
 ],
 "\tprintf \"%-25s %-18s %-25s %-20s\\n\" \"服务名\" \"通信类型\" \"本机地址\" \"后端地址\"": [
 "\tprintf \"%-25s %-18s %-25s %-20s\\n\" \"服務名\" \"通訊類型\" \"本機地址\" \"後端地址\""
+],
+"\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\"": [
+"\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\""
+],
+"\tprintf '防火墙规则已自动备份到: %s\\n' \"$backup_dir\"": [
+"\tprintf '防火墙规则已自动备份到: %s\\n' \"$backup_dir\""
+],
+"\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}现在重启服务器吗？(Y/N): \")\" rboot": [
+"\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}现在重启服务器吗？(Y/N): \")\" rboot"
 ],
 "\tread -e -p \"封禁时长 bantime (秒/分钟/小时，如 3600 或 1h) [默认 1h]: \" bantime": [
 "\tread -e -p \"封禁時長 bantime (秒/分鐘/小時，如 3600 或 1h) [預設 1h]:\" bantime"
@@ -7481,6 +8123,9 @@
 "\tread -erp \"请输入序号 [1-2]: \" proto_choice": [
 "\tread -erp \"請輸入序號 [1-2]:\" proto_choice"
 ],
+"\tread -erp \"请输入本机监听端口 (如 3306): \" listen_port": [
+"\tread -erp \"请输入本机监听端口 (如 3306): \" listen_port"
+],
 "\tread -erp \"请输入要切换协议的 API 名称(provider): \" provider_name": [
 "\tread -erp \"請輸入要切換協定的 API 名稱(provider):\" provider_name"
 ],
@@ -7493,6 +8138,9 @@
 "\tsed -i \"s/# 动态添加/$upstream_servers/g\" /home/web/stream.d/$proxy_name.conf": [
 "\tsed -i \"s/# 動態添加/$upstream_servers/g\" /home/web/stream.d/$proxy_name.conf"
 ],
+"\tshift  # 去掉第一个参数，剩下的全是国家代码": [
+"\tshift  # 去掉第一个参数，剩下的全是国家代码"
+],
 "\twebname=\"Stream四层代理-负载均衡\"": [
 "\twebname=\"Stream四層代理-負載平衡\""
 ],
@@ -7501,6 +8149,15 @@
 ],
 "\twebname=\"反向代理-负载均衡\"": [
 "\twebname=\"反向代理-負載平衡\""
+],
+"\tzhushi=1  # 0 表示执行，1 表示不执行": [
+"\tzhushi=1  # 0 表示执行，1 表示不执行"
+],
+"                    latency_raw = '不可用'": [
+"                    latency_raw = '不可用'"
+],
+"                latency_raw = '不可用'": [
+"                latency_raw = '不可用'"
 ],
 "                summary.append(f'✅ {name}: 用户已确认删除该 provider 及全部相关模型引用')": [
 "                summary.append(f'✅ {name}: 使用者已確認刪除該 provider 及全部相關模型引用')"
@@ -7537,6 +8194,9 @@
 ],
 "        fatal_errors.append(f'❌ {name} 同步后无可用模型，无法保障默认模型/回退模型兜底')": [
 "        fatal_errors.append(f'❌ {name} 同步後無可用模型，無法保障預設模型/回退模型兜底')"
+],
+"        latency_raw = '不可用'": [
+"        latency_raw = '不可用'"
 ],
 "        latency_raw = '未检测'": [
 "        latency_raw = '未檢測'"
@@ -7583,6 +8243,9 @@
 "        print(f'🔁 {fk} 已兜底替换: {val} -> {first_ref}')": [
 "        print(f'🔁 {fk} 已兜底替換: {val} -> {first_ref}')"
 ],
+"        return '不可用', 'unavailable'": [
+"        return '不可用', 'unavailable'"
+],
 "        return '未检测', 'unchecked'": [
 "        return '未檢測', 'unchecked'"
 ],
@@ -7600,6 +8263,9 @@
 ],
 "        summary.append(f'⚠️ 跳过 {name}: 本地 models 无有效模板模型')": [
 "        summary.append(f'⚠️ 跳過 {name}: 本地 models 無有效模板模型')"
+],
+"        summary.append(f'➕ 新增模型({len(added_ids)}):')": [
+"        summary.append(f'➕ 新增模型({len(added_ids)}):')"
 ],
 "        summary.append(f'➖ 删除模型({len(removed_ids)}):')": [
 "        summary.append(f'➖ 刪除模型({len(removed_ids)}):')"
@@ -7621,6 +8287,12 @@
 ],
 "        vec_str = \"未启用\"": [
 "        vec_str = \"未啟用\""
+],
+"    dirty_str = \"是\" if dirty else \"否\"": [
+"    dirty_str = \"是\" if dirty else \"否\""
+],
+"    if latency == '不可用':": [
+"    if latency == '不可用':"
 ],
 "    if latency == '未检测':": [
 "    if latency == '未檢測':"
@@ -7736,11 +8408,23 @@
 "    print(f'❌ {target}: /models 返回结构不可识别')": [
 "    print(f'❌ {target}: /models 回傳結構不可識別')"
 ],
+"    print(f'❌ {target}: 上游 /models 为空，已中止同步')": [
+"    print(f'❌ {target}: 上游 /models 为空，已中止同步')"
+],
 "    print(f'❌ {target}: 同步后无可用模型，已中止写入')": [
 "    print(f'❌ {target}: 同步後無可用模型，已中止寫入')"
 ],
 "    print(f'❌ {target}: 本地 models 无有效模板模型，无法补全新增模型')": [
 "    print(f'❌ {target}: 本地 models 無有效模板模型，無法補全新增模型')"
+],
+"    print(f'❌ 未找到 provider: {name}')": [
+"    print(f'❌ 未找到 provider: {name}')"
+],
+"    print(f'❌ 未找到 provider: {target}')": [
+"    print(f'❌ 未找到 provider: {target}')"
+],
+"    print(f'➕ 新增模型({len(added_ids)}):')": [
+"    print(f'➕ 新增模型({len(added_ids)}):')"
 ],
 "    print(f'➖ 删除模型({len(removed_ids)}):')": [
 "    print(f'➖ 刪除模型({len(removed_ids)}):')"
@@ -7796,6 +8480,9 @@
 "  echo \"当前系统语言: $LANG\"": [
 "  echo \"當前系統語言:$LANG\""
 ],
+"  echo \"更新${ldnmp_pods}完成\"": [
+"  echo \"更新${ldnmp_pods}完成\""
+],
 "  echo \"用户名: $dbuse\"": [
 "  echo \"使用者名稱:$dbuse\""
 ],
@@ -7804,6 +8491,27 @@
 ],
 "  echo \"缓存清除请求已发送完毕。\"": [
 "  echo \"快取清除請求已發送完畢。\""
+],
+"  local DEBUG=\"${1:-false}\"           # 第一个参数，默认false": [
+"  local DEBUG=\"${1:-false}\"           # 第一个参数，默认false"
+],
+"  local DEBUG_DISPLAY=\"${2:-false}\"   # 第二个参数，默认false": [
+"  local DEBUG_DISPLAY=\"${2:-false}\"   # 第二个参数，默认false"
+],
+"  local DEBUG_LOG=\"${3:-false}\"       # 第三个参数，默认false": [
+"  local DEBUG_LOG=\"${3:-false}\"       # 第三个参数，默认false"
+],
+"  local MAX_MEMORY_LIMIT=\"${2:-256M}\"  # 第二个参数，默认256M": [
+"  local MAX_MEMORY_LIMIT=\"${2:-256M}\"  # 第二个参数，默认256M"
+],
+"  local MEMORY_LIMIT=\"${1:-256M}\"      # 第一个参数，默认256M": [
+"  local MEMORY_LIMIT=\"${1:-256M}\"      # 第一个参数，默认256M"
+],
+"  local TARGET_DIR=\"/home/web/html\"    # 路径写死": [
+"  local TARGET_DIR=\"/home/web/html\"    # 路径写死"
+],
+"  local TARGET_DIR=\"/home/web/html\"   # 路径写死": [
+"  local TARGET_DIR=\"/home/web/html\"   # 路径写死"
 ],
 "  read -e -p \"输入你的选择: \" choice": [
 "  read -e -p \"輸入你的選擇:\" choice"
@@ -7847,6 +8555,9 @@
 "# ── 安全防护 ──": [
 "# ── 安全防護 ──"
 ],
+"# ── 文件描述符 ──": [
+"# ── 文件描述符 ──"
+],
 "# ── 端口与内存 ──": [
 "# ── 埠與記憶體 ──"
 ],
@@ -7865,6 +8576,9 @@
 "# 主菜单": [
 "# 主選單"
 ],
+"# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。": [
+"# 以項目標記管理 cron 任務，避免以寬泛的 grep 過濾誤刪無關任務。"
+],
 "# 任务管理主菜单": [
 "# 工作管理員主選單"
 ],
@@ -7873,6 +8587,9 @@
 ],
 "# 使用连接": [
 "# 使用連接"
+],
+"# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。": [
+"# 保持原有的開箱即用指令安裝行為；安全檢查失敗時不阻斷主功能。"
 ],
 "# 修复dpkg中断问题": [
 "# 修復dpkg中斷問題"
@@ -7884,7 +8601,7 @@
 "# 關閉DDoS防禦"
 ],
 "# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')": [
-"# 記憶體: ${MEM_MB}MB | 產生時間: $(date '+%Y-%m-%d %H:%M:%S')"
+"# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')"
 ],
 "# 列出可用的硬盘分区": [
 "# 列出可用的硬碟分割區"
@@ -7967,6 +8684,9 @@
 "# 查看服务状态": [
 "# 查看服務狀態"
 ],
+"# 标记形如 \"# ming-sh:<名称>\"：安装先按标记去重再追加，卸载按标记精确删除。": [
+"# 標記形如 \"# ming-sh:<名稱>\"：安裝先按標記去重再追加，卸載按標記精確刪除。"
+],
 "# 格式化分区": [
 "# 格式化分割區"
 ],
@@ -8027,11 +8747,20 @@
 "# 重启服务": [
 "# 重啟服務"
 ],
+"$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# numa_balancing 不支持\")": [
+"$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# numa_balancing 不支持\")"
+],
 "[ \"$EUID\" -ne 0 ] && echo -e \"${gl_huang}提示: ${gl_bai}该功能需要root用户才能运行！\" && break_end && return_to_main_menu": [
 "[ \"$EUID\" -ne 0 ] && echo -e \"${gl_huang}提示:${gl_bai}該功能需要root用戶才能運作！\" && break_end && return_to_main_menu"
 ],
 "echo \"# conntrack 未启用\"": [
 "echo \"# conntrack 未啟用\""
+],
+"echo \"LDNMP站点管理       ${PROJECT_COMMAND} web\"": [
+"echo \"LDNMP站台管理${PROJECT_COMMAND} web\""
+],
+"echo \"LDNMP缓存清理       ${PROJECT_COMMAND} web cache\"": [
+"echo \"LDNMP快取清理${PROJECT_COMMAND} web cache\""
 ],
 "echo \"ROOT密钥管理        ${PROJECT_COMMAND} sshkey\"": [
 "echo \"ROOT金鑰管理 ${PROJECT_COMMAND} sshkey\""
@@ -8045,11 +8774,17 @@
 "echo \"bbr3控制面板        ${PROJECT_COMMAND} bbr3 | ${PROJECT_COMMAND} bbrv3\"": [
 "echo \"bbr3控制面板 ${PROJECT_COMMAND} bbr3 | ${PROJECT_COMMAND} bbrv3\""
 ],
+"echo \"docker容器管理      ${PROJECT_COMMAND} docker ps |${PROJECT_COMMAND} docker 容器\"": [
+"echo \"docker容器管理${PROJECT_COMMAND} docker ps |${PROJECT_COMMAND}docker 容器\""
+],
 "echo \"docker环境安装      ${PROJECT_COMMAND} docker install |${PROJECT_COMMAND} docker 安装\"": [
 "echo \"docker環境安裝 ${PROJECT_COMMAND} docker install |${PROJECT_COMMAND} docker 安裝\""
 ],
 "echo \"docker管理平面      ${PROJECT_COMMAND} docker\"": [
 "echo \"docker管理平面 ${PROJECT_COMMAND} docker\""
+],
+"echo \"docker镜像管理      ${PROJECT_COMMAND} docker img |${PROJECT_COMMAND} docker 镜像\"": [
+"echo \"docker映像管理${PROJECT_COMMAND} docker img |${PROJECT_COMMAND}docker 映像\""
 ],
 "echo \"fail2ban管理        ${PROJECT_COMMAND} fail2ban | ${PROJECT_COMMAND} f2b\"": [
 "echo \"fail2ban管理 ${PROJECT_COMMAND} fail2ban | ${PROJECT_COMMAND} f2b\""
@@ -8087,6 +8822,9 @@
 "echo \"命令收藏夹          ${PROJECT_COMMAND} fav | ${PROJECT_COMMAND} 命令收藏夹\"": [
 "echo \"命令收藏 ${PROJECT_COMMAND} fav | ${PROJECT_COMMAND} 指令收藏夾\""
 ],
+"echo \"域名证书到期查询    ${PROJECT_COMMAND} ssl ps\"": [
+"echo \"網域憑證到期查詢${PROJECT_COMMAND} ssl ps\""
+],
 "echo \"域名证书申请        ${PROJECT_COMMAND} ssl\"": [
 "echo \"網域憑證申請 ${PROJECT_COMMAND} ssl\""
 ],
@@ -8114,6 +8852,9 @@
 "echo \"应用编号快捷管理    ${PROJECT_COMMAND} app 26 | ${PROJECT_COMMAND} app 1panel | ${PROJECT_COMMAND} app npm\"": [
 "echo \"應用編號快捷管理 ${PROJECT_COMMAND} app 26 | ${PROJECT_COMMAND} app 1panel | ${PROJECT_COMMAND} app npm\""
 ],
+"echo \"开放端口            ${PROJECT_COMMAND} dkdk 8080 |${PROJECT_COMMAND} 打开端口 8080\"": [
+"echo \"開放埠${PROJECT_COMMAND} dkdk 8080 |${PROJECT_COMMAND}開啟連接埠 8080\""
+],
 "echo \"放行IP              ${PROJECT_COMMAND} fxip 127.0.0.0/8 |${PROJECT_COMMAND} 放行IP 127.0.0.0/8\"": [
 "echo \"放行IP ${PROJECT_COMMAND} fxip 127.0.0.0/8 |${PROJECT_COMMAND} 放行IP 127.0.0.0/8\""
 ],
@@ -8125,6 +8866,12 @@
 ],
 "echo \"清理系统垃圾        ${PROJECT_COMMAND} clean | ${PROJECT_COMMAND} 清理\"": [
 "echo \"清理系統垃圾 ${PROJECT_COMMAND} clean | ${PROJECT_COMMAND} 清理\""
+],
+"echo \"硬盘管理工具        ${PROJECT_COMMAND} disk | ${PROJECT_COMMAND} 硬盘管理\"": [
+"echo \"硬碟管理工具${PROJECT_COMMAND} disk | ${PROJECT_COMMAND}硬碟管理\""
+],
+"echo \"系统回收站          ${PROJECT_COMMAND} trash | ${PROJECT_COMMAND} hsz | ${PROJECT_COMMAND} 回收站\"": [
+"echo \"系统回收站          ${PROJECT_COMMAND} trash | ${PROJECT_COMMAND} hsz | ${PROJECT_COMMAND}回收站\""
 ],
 "echo \"系统备份功能        ${PROJECT_COMMAND} backup | ${PROJECT_COMMAND} bf | ${PROJECT_COMMAND} 备份\"": [
 "echo \"系統備份功能 ${PROJECT_COMMAND} backup | ${PROJECT_COMMAND} bf | ${PROJECT_COMMAND} 備份\""
@@ -8140,6 +8887,9 @@
 ],
 "echo \"访问地址:\"": [
 "echo \"訪問地址:\""
+],
+"echo \"软件停止            ${PROJECT_COMMAND} stop sshd | ${PROJECT_COMMAND} 停止 sshd \"": [
+"echo \"軟體停止${PROJECT_COMMAND} stop sshd | ${PROJECT_COMMAND} 停止 sshd \""
 ],
 "echo \"软件启动            ${PROJECT_COMMAND} start sshd | ${PROJECT_COMMAND} 启动 sshd \"": [
 "echo \"軟體啟動 ${PROJECT_COMMAND} start sshd | ${PROJECT_COMMAND} 啟動 sshd\""
@@ -8161,6 +8911,9 @@
 ],
 "echo \"阻止IP              ${PROJECT_COMMAND} zzip 177.5.25.36 |${PROJECT_COMMAND} 阻止IP 177.5.25.36\"": [
 "echo \"阻止IP ${PROJECT_COMMAND} zzip 177.5.25.36 |${PROJECT_COMMAND} 阻止IP 177.5.25.36\""
+],
+"echo -e \"${gl_huang}10.  ${gl_bai}LDNMP建站\"": [
+"echo -e \"${gl_huang}10.  ${gl_bai}LDNMP建置站\""
 ],
 "echo -e \"${gl_huang}LDNMP环境未安装，开始安装LDNMP环境...${gl_bai}\"": [
 "echo -e \"${gl_huang}LDNMP環境未安裝，開始安裝LDNMP環境...${gl_bai}\""
@@ -8203,6 +8956,15 @@
 ],
 "echo -e \"${gl_minglan}4.   ${gl_bai}基础工具\"": [
 "echo -e \"${gl_minglan}4.   ${gl_bai}基礎工具\""
+],
+"echo -e \"${gl_minglan}5.   ${gl_bai}BBR管理\"": [
+"echo -e \"${gl_minglan}5.   ${gl_bai}BBR管理\""
+],
+"echo -e \"${gl_minglan}6.   ${gl_bai}Docker管理\"": [
+"echo -e \"${gl_minglan}6.   ${gl_bai}Docker管理\""
+],
+"echo -e \"${gl_minglan}7.   ${gl_bai}WARP管理\"": [
+"echo -e \"${gl_minglan}7.   ${gl_bai}WARP管理\""
 ],
 "echo -e \"${gl_minglan}8.   ${gl_bai}测试脚本合集\"": [
 "echo -e \"${gl_minglan}8.   ${gl_bai}測試腳本合集\""

@@ -178,18 +178,31 @@ remote_script_sha256() {
 	fi
 }
 
-run_reviewed_remote_script() {
+# Download a remote script over HTTPS, syntax-check it, and print its
+# digest. With --install DEST the validated copy replaces DEST (0755); with
+# --run (or neither flag) it runs with any extra arguments and is removed.
+download_reviewed_remote_script() {
+	local mode="run"
+	if [ "${1:-}" = "--install" ]; then
+		mode="install"
+		shift
+	fi
 	local script_url="$1"
 	shift
+	local install_dest=""
+	if [ "$mode" = "install" ]; then
+		install_dest="$1"
+		shift
+	fi
 	local cache_dir script_path digest exit_status
 	case "$script_url" in
 		https://*) ;;
 		*) echo "拒绝下载非 HTTPS 脚本: $script_url"; return 1 ;;
 	esac
 	cache_dir="${PROJECT_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/${PROJECT_ID:-ming-sh}}/remote-scripts"
-	[ ! -L "$cache_dir" ] || { echo "拒绝使用符号链接缓存目录: $cache_dir"; return 1; }
+	[ ! -L "$cache_dir" ] || { echo "拒絕使用符號連結快取目錄:$cache_dir"; return 1; }
 	mkdir -p -- "$cache_dir" || return 1
-	[ -O "$cache_dir" ] || { echo "远程脚本缓存目录不属于当前用户: $cache_dir"; return 1; }
+	[ -O "$cache_dir" ] || { echo "遠端腳本快取目錄不屬於目前使用者:$cache_dir"; return 1; }
 	chmod 0700 "$cache_dir" || return 1
 	script_path=$(mktemp "$cache_dir/review.XXXXXX.sh") || return 1
 	chmod 0600 "$script_path"
@@ -209,15 +222,26 @@ run_reviewed_remote_script() {
 		rm -f -- "$script_path"
 		return 1
 	fi
-	[ -s "$script_path" ] || { echo "下载结果为空。"; rm -f -- "$script_path"; return 1; }
-	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; rm -f -- "$script_path"; return 1; }
+	[ -s "$script_path" ] || { echo "下載結果為空。 "; rm -f -- "$script_path"; return 1; }
+	bash -n "$script_path" || { echo "遠端腳本未通過 Bash 語法檢查:$script_path"; rm -f -- "$script_path"; return 1; }
 	digest=$(remote_script_sha256 "$script_path" 2>/dev/null) || digest="unavailable"
+
+	if [ "$mode" = "install" ]; then
+		printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+		mv -f -- "$script_path" "$install_dest" || { rm -f -- "$script_path"; return 1; }
+		chmod 0755 "$install_dest"
+		return 0
+	fi
 
 	printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
 	bash "$script_path" "$@"
 	exit_status=$?
 	rm -f -- "$script_path"
 	return "$exit_status"
+}
+
+run_reviewed_remote_script() {
+	download_reviewed_remote_script "$@"
 }
 # --- end ming-sh shared lib: remote_script ---
 
@@ -338,7 +362,7 @@ UserLicenseAgreement() {
 migrate_legacy_license_acceptance || true
 CheckFirstRun_false
 
-# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。
+# 保持原有的開箱即用指令安裝行為；安全檢查失敗時不阻斷主功能。
 if [ -r "${BASH_SOURCE[0]}" ]; then
 	install_project_entrypoint >/dev/null 2>&1 || true
 fi
@@ -931,8 +955,8 @@ install_crontab() {
 }
 
 
-# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。
-# 标记形如 "# ming-sh:<名称>"：安装先按标记去重再追加，卸载按标记精确删除。
+# 以項目標記管理 cron 任務，避免以寬泛的 grep 過濾誤刪無關任務。
+# 標記形如 "# ming-sh:<名稱>"：安裝先按標記去重再追加，卸載按標記精確刪除。
 cron_install_tagged() {
 	local tag="# ${PROJECT_CRON_TAG}:$1"
 	local job="$2 ${tag}"
@@ -1057,7 +1081,7 @@ backup_iptables_rules() {
 
 iptables_open() {
 	install iptables
-	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}"
+	backup_iptables_rules || echo -e "${gl_huang}警告：防火牆規則自動備份失敗，繼續執行開放所有連接埠。${gl_bai}"
 	iptables -P INPUT ACCEPT
 	iptables -P FORWARD ACCEPT
 	iptables -P OUTPUT ACCEPT
@@ -1077,7 +1101,7 @@ iptables_open() {
 iptables_close_all() {
 	local current_port
 	install iptables
-	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行关闭所有端口。${gl_bai}"
+	backup_iptables_rules || echo -e "${gl_huang}警告：防火牆規則自動備份失敗，繼續執行關閉所有連接埠。${gl_bai}"
 	if command -v sshd >/dev/null 2>&1; then
 		current_port=$(sshd -T 2>/dev/null | awk '$1 == "port" { print $2; exit }')
 	fi
@@ -1654,8 +1678,7 @@ install_ldnmp() {
 install_certbot() {
 
 	cd ~
-	curl -sS -O ${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh
-	chmod +x auto_cert_renewal.sh
+	download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh" ~/auto_cert_renewal.sh
 
 	check_crontab_installed
 	cron_install_tagged cert-renew '0 0 * * * ~/auto_cert_renewal.sh'
@@ -2469,8 +2492,7 @@ web_security() {
 					  cd ~
 					  install jq bc
 					  check_crontab_installed
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh
-					  chmod +x CF-Under-Attack.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh" ~/CF-Under-Attack.sh
 					  sed -i "s/AAAA/$cfuser/g" ~/CF-Under-Attack.sh
 					  sed -i "s/BBBB/$cftoken/g" ~/CF-Under-Attack.sh
 					  sed -i "s/CCCC/$cfzonID/g" ~/CF-Under-Attack.sh
@@ -6266,7 +6288,7 @@ net.ipv4.tcp_slow_start_after_idle = 0"
 	cat > "$CONF" << SYSCTL
 # ${PROJECT_NAME} 核心調優配置
 # 模式: $mode_name | 場景: $scene
-# 記憶體: ${MEM_MB}MB | 產生時間: $(date '+%Y-%m-%d %H:%M:%S')
+# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')
 
 # ── TCP 擁塞控制 ──
 net.core.default_qdisc = $QDISC
@@ -9046,7 +9068,7 @@ linux_ldnmp() {
   while true; do
 
 	clear
-	echo -e "${gl_huang}LDNMP建站"
+	echo -e "${gl_huang}LDNMP建置站"
 	ldnmp_tato
 	echo -e "${gl_huang}------------------------"
 	echo -e "${gl_huang}1.   ${gl_bai}安裝LDNMP環境${gl_huang}★${gl_bai}                   ${gl_huang}2.   ${gl_bai}安裝WordPress${gl_huang}★${gl_bai}"
@@ -9291,9 +9313,7 @@ linux_ldnmp() {
 	  mkdir $yuming
 	  cd $yuming
 
-	  docker exec php sh -c "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\""
-	  docker exec php sh -c "php composer-setup.php"
-	  docker exec php sh -c "php -r \"unlink('composer-setup.php');\""
+	  docker exec php sh -c "curl -fsSL -o composer-setup.php https://getcomposer.org/installer && curl -fsSL -o composer-setup.sig https://composer.github.io/installer.sig && php -r \"exit(hash_file('sha384', 'composer-setup.php') === trim(file_get_contents('composer-setup.sig')) ? 0 : 1);\" && php composer-setup.php --quiet && rm -f composer-setup.php composer-setup.sig"
 	  docker exec php sh -c "mv composer.phar /usr/local/bin/composer"
 
 	  docker exec php composer create-project flarum/flarum /var/www/html/$yuming
@@ -11749,7 +11769,7 @@ PYTHON_EOF
 				gum style --faint "↑↓ 選擇 / Enter 測試 / Esc 退出"
 				echo ""
 
-				selected_model=$(echo "$models_list" | gum filter 					--placeholder "搜尋模型（如 cli-api/gpt-5.2）" 					--prompt "選擇模型 >" 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
+				selected_model=$(echo "$models_list" | gum filter 					--placeholder "搜索模型（如 cli-api/gpt-5.2）" 					--prompt "选择模型 > " 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
 
 				if [ -z "$selected_model" ] || echo "$selected_model" | head -n 1 | grep -iqE '^(error|usage|gum:)'; then
 					echo "操作已取消，正在退出..."
@@ -13256,7 +13276,7 @@ EOF
 		local count=0
 		local agent_lines agent_id workspace
 		agent_lines=$(openclaw_memory_list_agents)
-		echo "檢查並準備 $(printf '%s\n'"$agent_lines"| sed '/^\s*$/d' | wc -l | tr -d ' ') 個智能體工作區"
+		echo "检查并准备 $(printf '%s\n' "$agent_lines" | sed '/^\s*$/d' | wc -l | tr -d ' ') 个智能体工作区"
 		while IFS=$'\t' read -r agent_id workspace; do
 			[ -z "$agent_id" ] && continue
 			openclaw_memory_prepare_workspace "$agent_id"
@@ -20671,8 +20691,7 @@ EOF
 					[ "$cz_day" -ge 1 ] && [ "$cz_day" -le 31 ] || cz_day=1
 
 					cd ~
-					curl -Ss -o ~/Limiting_Shut_down.sh ${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh
-					chmod +x ~/Limiting_Shut_down.sh
+					download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh" ~/Limiting_Shut_down.sh
 					sed -i "s/^rx_threshold_gb=110$/rx_threshold_gb=$rx_threshold_gb/" ~/Limiting_Shut_down.sh
 					sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/" ~/Limiting_Shut_down.sh
 					check_crontab_installed
@@ -20720,18 +20739,16 @@ EOF
 					  chmod +x ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  else
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh
-					  chmod +x ~/TG-check-notify.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh" ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  fi
 				  tmux kill-session -t TG-check-notify > /dev/null 2>&1
 				  tmux new -d -s TG-check-notify "~/TG-check-notify.sh"
 				  cron_install_tagged tg-monitor "@reboot tmux new -d -s TG-check-notify '~/TG-check-notify.sh'" > /dev/null 2>&1
 
-				  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh > /dev/null 2>&1
+				  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh" ~/TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "3i$(grep '^TELEGRAM_BOT_TOKEN=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "4i$(grep '^CHAT_ID=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh
-				  chmod +x ~/TG-SSH-check-notify.sh
 
 				  # 加入 ~/.profile 檔案中
 				  if ! grep -q 'bash ~/TG-SSH-check-notify.sh' ~/.profile > /dev/null 2>&1; then
@@ -21238,7 +21255,7 @@ while true; do
 			  local server_port=${server_port:-22}
 			  read -e -p "伺服器使用者名稱（root）:" server_username
 			  local server_username=${server_username:-root}
-			  echo -e "${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}"
+			  echo -e "${gl_hui}留空密碼將使用 SSH 金鑰認證（預設金鑰或 ssh-agent）${gl_bai}"
 			  read -e -s -p "伺服器用戶密碼:" server_password
 			  echo
 			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
@@ -21432,7 +21449,7 @@ echo -e "${gl_minglan}6.   ${gl_bai}Docker管理"
 echo -e "${gl_minglan}7.   ${gl_bai}WARP管理"
 echo -e "${gl_minglan}8.   ${gl_bai}測試腳本合集"
 echo -e "${gl_minglan}9.   ${gl_bai}甲骨文雲腳本合集"
-echo -e "${gl_huang}10.  ${gl_bai}LDNMP建站"
+echo -e "${gl_huang}10.  ${gl_bai}LDNMP建置站"
 echo -e "${gl_minglan}11.  ${gl_bai}應用市場"
 echo -e "${gl_minglan}12.  ${gl_bai}後台工作區"
 echo -e "${gl_minglan}13.  ${gl_bai}系統工具"
@@ -21488,32 +21505,32 @@ echo "bbr3控制面板 ${PROJECT_COMMAND} bbr3 | ${PROJECT_COMMAND} bbrv3"
 echo "核心調優面板 ${PROJECT_COMMAND} nhyh | ${PROJECT_COMMAND} 核心最佳化"
 echo "設定虛擬記憶體 ${PROJECT_COMMAND} swap 2048"
 echo "設定虛擬時區 ${PROJECT_COMMAND} time Asia/Shanghai | ${PROJECT_COMMAND} 時區 Asia/Shanghai"
-echo "系统回收站          ${PROJECT_COMMAND} trash | ${PROJECT_COMMAND} hsz | ${PROJECT_COMMAND} 回收站"
+echo "系统回收站          ${PROJECT_COMMAND} trash | ${PROJECT_COMMAND} hsz | ${PROJECT_COMMAND}回收站"
 echo "系統備份功能 ${PROJECT_COMMAND} backup | ${PROJECT_COMMAND} bf | ${PROJECT_COMMAND} 備份"
 echo "ssh遠端連線工具 ${PROJECT_COMMAND} ssh | ${PROJECT_COMMAND} 遠端連線"
 echo "rsync遠端同步工具 ${PROJECT_COMMAND} rsync | ${PROJECT_COMMAND} 遠端同步"
-echo "硬盘管理工具        ${PROJECT_COMMAND} disk | ${PROJECT_COMMAND} 硬盘管理"
+echo "硬碟管理工具${PROJECT_COMMAND} disk | ${PROJECT_COMMAND}硬碟管理"
 echo "內網穿透（服務端） ${PROJECT_COMMAND} frps"
 echo "內網穿透（客戶端） ${PROJECT_COMMAND} frpc"
 echo "軟體啟動 ${PROJECT_COMMAND} start sshd | ${PROJECT_COMMAND} 啟動 sshd"
-echo "软件停止            ${PROJECT_COMMAND} stop sshd | ${PROJECT_COMMAND} 停止 sshd "
+echo "軟體停止${PROJECT_COMMAND} stop sshd | ${PROJECT_COMMAND} 停止 sshd "
 echo "軟體重啟 ${PROJECT_COMMAND} restart sshd | ${PROJECT_COMMAND} 重啟 sshd"
 echo "軟體狀態檢視 ${PROJECT_COMMAND} status sshd | ${PROJECT_COMMAND} 狀態 sshd"
 echo "軟體開機啟動 ${PROJECT_COMMAND} enable docker | ${PROJECT_COMMAND} autostart docke | ${PROJECT_COMMAND} 開機啟動 docker"
 echo "網域憑證申請 ${PROJECT_COMMAND} ssl"
-echo "域名证书到期查询    ${PROJECT_COMMAND} ssl ps"
+echo "網域憑證到期查詢${PROJECT_COMMAND} ssl ps"
 echo "docker管理平面 ${PROJECT_COMMAND} docker"
 echo "docker環境安裝 ${PROJECT_COMMAND} docker install |${PROJECT_COMMAND} docker 安裝"
-echo "docker容器管理      ${PROJECT_COMMAND} docker ps |${PROJECT_COMMAND} docker 容器"
-echo "docker镜像管理      ${PROJECT_COMMAND} docker img |${PROJECT_COMMAND} docker 镜像"
-echo "LDNMP站点管理       ${PROJECT_COMMAND} web"
-echo "LDNMP缓存清理       ${PROJECT_COMMAND} web cache"
+echo "docker容器管理${PROJECT_COMMAND} docker ps |${PROJECT_COMMAND}docker 容器"
+echo "docker映像管理${PROJECT_COMMAND} docker img |${PROJECT_COMMAND}docker 映像"
+echo "LDNMP站台管理${PROJECT_COMMAND} web"
+echo "LDNMP快取清理${PROJECT_COMMAND} web cache"
 echo "安裝WordPress ${PROJECT_COMMAND} wp |${PROJECT_COMMAND} wordpress |${PROJECT_COMMAND} wp xxx.com"
 echo "安裝反向代理 ${PROJECT_COMMAND} fd |${PROJECT_COMMAND} rp |${PROJECT_COMMAND} 反代 |${PROJECT_COMMAND} fd xxx.com"
 echo "安裝負載平衡 ${PROJECT_COMMAND} loadbalance |${PROJECT_COMMAND} 負載平衡"
 echo "安裝L4負載平衡 ${PROJECT_COMMAND} stream |${PROJECT_COMMAND} L4負載平衡"
 echo "防火牆面板 ${PROJECT_COMMAND} fhq |${PROJECT_COMMAND} 防火牆"
-echo "开放端口            ${PROJECT_COMMAND} dkdk 8080 |${PROJECT_COMMAND} 打开端口 8080"
+echo "開放埠${PROJECT_COMMAND} dkdk 8080 |${PROJECT_COMMAND}開啟連接埠 8080"
 echo "關閉連接埠 ${PROJECT_COMMAND} gbdk 7800 |${PROJECT_COMMAND} 關閉連接埠 7800"
 echo "放行IP ${PROJECT_COMMAND} fxip 127.0.0.0/8 |${PROJECT_COMMAND} 放行IP 127.0.0.0/8"
 echo "阻止IP ${PROJECT_COMMAND} zzip 177.5.25.36 |${PROJECT_COMMAND} 阻止IP 177.5.25.36"

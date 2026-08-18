@@ -178,9 +178,22 @@ remote_script_sha256() {
 	fi
 }
 
-run_reviewed_remote_script() {
+# Download a remote script over HTTPS, syntax-check it, and print its
+# digest. With --install DEST the validated copy replaces DEST (0755); with
+# --run (or neither flag) it runs with any extra arguments and is removed.
+download_reviewed_remote_script() {
+	local mode="run"
+	if [ "${1:-}" = "--install" ]; then
+		mode="install"
+		shift
+	fi
 	local script_url="$1"
 	shift
+	local install_dest=""
+	if [ "$mode" = "install" ]; then
+		install_dest="$1"
+		shift
+	fi
 	local cache_dir script_path digest exit_status
 	case "$script_url" in
 		https://*) ;;
@@ -213,11 +226,22 @@ run_reviewed_remote_script() {
 	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; rm -f -- "$script_path"; return 1; }
 	digest=$(remote_script_sha256 "$script_path" 2>/dev/null) || digest="unavailable"
 
+	if [ "$mode" = "install" ]; then
+		printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+		mv -f -- "$script_path" "$install_dest" || { rm -f -- "$script_path"; return 1; }
+		chmod 0755 "$install_dest"
+		return 0
+	fi
+
 	printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
 	bash "$script_path" "$@"
 	exit_status=$?
 	rm -f -- "$script_path"
 	return "$exit_status"
+}
+
+run_reviewed_remote_script() {
+	download_reviewed_remote_script "$@"
 }
 # --- end ming-sh shared lib: remote_script ---
 
@@ -1654,8 +1678,7 @@ install_ldnmp() {
 install_certbot() {
 
 	cd ~
-	curl -sS -O ${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh
-	chmod +x auto_cert_renewal.sh
+	download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh" ~/auto_cert_renewal.sh
 
 	check_crontab_installed
 	cron_install_tagged cert-renew '0 0 * * * ~/auto_cert_renewal.sh'
@@ -2469,8 +2492,7 @@ web_security() {
 					  cd ~
 					  install jq bc
 					  check_crontab_installed
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh
-					  chmod +x CF-Under-Attack.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh" ~/CF-Under-Attack.sh
 					  sed -i "s/AAAA/$cfuser/g" ~/CF-Under-Attack.sh
 					  sed -i "s/BBBB/$cftoken/g" ~/CF-Under-Attack.sh
 					  sed -i "s/CCCC/$cfzonID/g" ~/CF-Under-Attack.sh
@@ -9291,9 +9313,7 @@ linux_ldnmp() {
 	  mkdir $yuming
 	  cd $yuming
 
-	  docker exec php sh -c "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\""
-	  docker exec php sh -c "php composer-setup.php"
-	  docker exec php sh -c "php -r \"unlink('composer-setup.php');\""
+	  docker exec php sh -c "curl -fsSL -o composer-setup.php https://getcomposer.org/installer && curl -fsSL -o composer-setup.sig https://composer.github.io/installer.sig && php -r \"exit(hash_file('sha384', 'composer-setup.php') === trim(file_get_contents('composer-setup.sig')) ? 0 : 1);\" && php composer-setup.php --quiet && rm -f composer-setup.php composer-setup.sig"
 	  docker exec php sh -c "mv composer.phar /usr/local/bin/composer"
 
 	  docker exec php composer create-project flarum/flarum /var/www/html/$yuming
@@ -20671,8 +20691,7 @@ EOF
 					[ "$cz_day" -ge 1 ] && [ "$cz_day" -le 31 ] || cz_day=1
 
 					cd ~
-					curl -Ss -o ~/Limiting_Shut_down.sh ${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh
-					chmod +x ~/Limiting_Shut_down.sh
+					download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh" ~/Limiting_Shut_down.sh
 					sed -i "s/^rx_threshold_gb=110$/rx_threshold_gb=$rx_threshold_gb/" ~/Limiting_Shut_down.sh
 					sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/" ~/Limiting_Shut_down.sh
 					check_crontab_installed
@@ -20720,18 +20739,16 @@ EOF
 					  chmod +x ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  else
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh
-					  chmod +x ~/TG-check-notify.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh" ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  fi
 				  tmux kill-session -t TG-check-notify > /dev/null 2>&1
 				  tmux new -d -s TG-check-notify "~/TG-check-notify.sh"
 				  cron_install_tagged tg-monitor "@reboot tmux new -d -s TG-check-notify '~/TG-check-notify.sh'" > /dev/null 2>&1
 
-				  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh > /dev/null 2>&1
+				  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh" ~/TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "3i$(grep '^TELEGRAM_BOT_TOKEN=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "4i$(grep '^CHAT_ID=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh
-				  chmod +x ~/TG-SSH-check-notify.sh
 
 				  # 添加到 ~/.profile 文件中
 				  if ! grep -q 'bash ~/TG-SSH-check-notify.sh' ~/.profile > /dev/null 2>&1; then

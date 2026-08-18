@@ -1,4 +1,7 @@
 {
+"\t\t\t\t\t\t\t\t  break  # 跳出": [
+"\t\t\t\t\t\t\t\t  break  # 跳出"
+],
 "\t\t\t\t\t\t\t\t  read -e -p \"输入每小时的第几分钟执行任务？（分钟，0-60）: \" minute": [
 "\t\t\t\t\t\t\t\t  read -e -p \"タスクを実行する時間を入力してください。 (分、0 ～ 60):\" minute"
 ],
@@ -20,6 +23,9 @@
 "\t\t\t\t\t\t\t  echo -e \"${gl_hong}拒绝覆盖现有命令: $shortcut_path${gl_bai}\"": [
 "\t\t\t\t\t\t\t  echo -e \"${gl_hong}既存のコマンドは上書きしません: $shortcut_path${gl_bai}\""
 ],
+"\t\t\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t\t\t  echo \"1. 每月任务                 2. 每周任务\"": [
 "\t\t\t\t\t\t  echo \"1. 月次タスク 2. 週次タスク\""
 ],
@@ -31,6 +37,9 @@
 ],
 "\t\t\t\t\t\t  echo \"高负载自动开盾脚本已添加\"": [
 "\t\t\t\t\t\t  echo \"高負荷自動シールド開放スクリプトを追加しました\""
+],
+"\t\t\t\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有未使用的卷吗？(Y/N): \")\" choice": [
+"\t\t\t\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有未使用的卷吗？(Y/N): \")\" choice"
 ],
 "\t\t\t\t\t\t  read -e -p \"加入网络名: \" dockernetwork": [
 "\t\t\t\t\t\t  read -e -p \"ネットワーク名を追加します:\" dockernetwork"
@@ -155,11 +164,17 @@
 "\t\t\t\t\t  # 其他系统，如 Debian, Ubuntu, CentOS 等": [
 "\t\t\t\t\t  # Debian、Ubuntu、CentOS などのその他のシステム"
 ],
+"\t\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t\t  echo \"Fail2Ban防御程序已卸载\"": [
 "\t\t\t\t\t  echo \"Fail2Ban 防御プログラムがアンインストールされました\""
 ],
 "\t\t\t\t\t  echo \"到cf后台右上角我的个人资料，选择左侧API令牌，获取Global API Key\"": [
 "\t\t\t\t\t  echo \"cf バックエンドの右上隅にある私のプロフィールに移動し、左側で API トークンを選択し、グローバル API キーを取得します。\""
+],
+"\t\t\t\t\t  echo \"密码编码失败。\"": [
+"\t\t\t\t\t  echo \"密码编码失败。\""
 ],
 "\t\t\t\t\t  echo \"已配置cloudflare模式，可在cf后台，站点-安全性-事件中查看拦截记录\"": [
 "\t\t\t\t\t  echo \"Cloudflare モードが設定されており、傍受記録は cf バックグラウンド、site-security-events で表示できます。\""
@@ -214,6 +229,9 @@
 ],
 "\t\t\t\t\t[ -z \"$pattern\" ] && { echo \"不能为空\"; break_end; continue; }": [
 "\t\t\t\t\t[ -z \"$pattern\" ] && { echo \"空にすることはできません\"; break_end; continue; }"
+],
+"\t\t\t\t\tbreak  # 结束循环": [
+"\t\t\t\t\tbreak  # 结束循环"
 ],
 "\t\t\t\t\techo \"  ${PROJECT_COMMAND} sshkey                  进入交互菜单\"": [
 "\t\t\t\t\techo \"${PROJECT_COMMAND} sshkey は対話型メニューに入ります\""
@@ -569,6 +587,9 @@
 "\t\t\t\t  # 运行Docker容器": [
 "\t\t\t\t  # Dockerコンテナを実行する"
 ],
+"\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t  echo \"0. 返回上一级选单\"": [
 "\t\t\t\t  echo \"0. 前のメニューに戻る\""
 ],
@@ -800,6 +821,9 @@
 "\t\t\t\t  sed -i '/# 自动进入 tmux 会话/,+4d' ~/.bashrc": [
 "\t\t\t\t  sed -i '/# 自動的に tmux セッションに入ります/,+4d' ~/.bashrc"
 ],
+"\t\t\t\t  sleep 2  # 添加等待时间": [
+"\t\t\t\t  sleep 2  # 添加等待时间"
+],
 "\t\t\t\t\"其他备份文件\") has_other=1 ;;": [
 "\t\t\t\t\"その他のバックアップファイル\") has_other=1 ;;"
 ],
@@ -829,6 +853,12 @@
 ],
 "\t\t\t\t# 官方已彻底移除对 jammy, focal, bullseye 等老系统的 apt 支持": [
 "\t\t\t\t# 公式には、jammy、focal、bulseye、その他の古いシステムの apt サポートは完全に削除されました。"
+],
+"\t\t\t\t# 密钥认证：使用指定的身份文件": [
+"\t\t\t\t# 密钥认证：使用指定的身份文件"
+],
+"\t\t\t\t# 密钥认证：使用默认密钥或 ssh-agent，条目不保存任何密码": [
+"\t\t\t\t# 密钥认证：使用默认密钥或 ssh-agent，条目不保存任何密码"
 ],
 "\t\t\t\t# 打印当前的 SSH 端口号": [
 "\t\t\t\t# 現在の SSH ポート番号を出力する"
@@ -919,6 +949,9 @@
 ],
 "\t\t\t\t[[ -z \"$original_path\" ]] && read -e -p  \"未找到原始路径，请输入还原目录路径: \" original_path": [
 "\t\t\t\t[[ -z \"$original_path\" ]] && read -e -p  \"元のパスが見つかりません。復元ディレクトリのパスを入力してください:\" original_path"
+],
+"\t\t\t\tbreak  # 跳出循环，退出菜单": [
+"\t\t\t\tbreak  # 跳出循环，退出菜单"
 ],
 "\t\t\t\tcd \"$dirname\" 2>/dev/null || echo \"无法进入目录\"": [
 "\t\t\t\tcd \"$dirname\" 2>/dev/null || echo \"ディレクトリに入れません\""
@@ -1349,6 +1382,15 @@
 "\t\t\t\tgum style --foreground \"$orange\" --bold \"模型管理\"": [
 "\t\t\t\tgum style --foreground \"$orange\" --bold \"モデル管理\""
 ],
+"\t\t\t\tif [[ $new_port =~ ^[0-9]+$ ]]; then  # 检查输入是否为数字": [
+"\t\t\t\tif [[ $new_port =~ ^[0-9]+$ ]]; then  # 检查输入是否为数字"
+],
+"\t\t\t\timg|镜像)": [
+"\t\t\t\timg|镜像)"
+],
+"\t\t\t\tinstall|安装)": [
+"\t\t\t\tinstall|安装)"
+],
 "\t\t\t\tkj_ssh_read_host_port \"请输入远端服务器IP:  \" \"目标服务器SSH端口 [默认22]: \" \"22\"": [
 "\t\t\t\tkj_ssh_read_host_port \"リモートサーバーのIPを入力してください:\" \"ターゲット サーバーの SSH ポート [デフォルト 22]:\" \"22\""
 ],
@@ -1379,14 +1421,23 @@
 "\t\t\t\tprintf \"%-24s %-34s %-20s %-10s\\n\" \"用户名\" \"用户权限\" \"用户组\" \"sudo权限\"": [
 "\t\t\t\tprintf \"%-24s %-34s %-20s %-10s\\n\" \"ユーザー名\" \"ユーザー権限\" \"ユーザーグループ\" \"sudo 権限\""
 ],
+"\t\t\t\tprintf \"%b最小检测结果：%s%b": [
+"\t\t\t\tprintf \"%b最小检测结果：%s%b"
+],
 "\t\t\t\tprintf '%b\\n' \"[$idx] ${name} | API: ${base_url} | 协议: ${api_type} | 模型数量: ${gl_huang}${model_count}${gl_bai} | 延迟/状态: ${latency_color}${latency_txt}${gl_bai}\"": [
 "\t\t\t\tprintf '%b\\n' \"[$idx] ${name} | API: ${base_url}|合意：${api_type}|モデル数:${gl_huang}${model_count}${gl_bai}|遅延/ステータス:${latency_color}${latency_txt}${gl_bai}\""
 ],
 "\t\t\t\tprintf '\\n# 还原容器: %q\\n' \"$c\" >> \"$RESTORE_SCRIPT\"": [
 "\t\t\t\tprintf '\\n# コンテナを復元: %q\\n' \"$c\" >> \"$RESTORE_SCRIPT\""
 ],
+"\t\t\t\tps|容器)": [
+"\t\t\t\tps|容器)"
+],
 "\t\t\t\tread -e -p  \"确认还原 Compose 项目 [$project_name] 到路径 [$original_path] ? (y/n): \" confirm": [
 "\t\t\t\tread -e -p  \"Compose プロジェクトの復元を確認します [$project_name] からパス [$original_path] ? (y/n): \" confirm"
+],
+"\t\t\t\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}长时间不更新环境的用户，请慎重更新LDNMP环境，会有数据库更新失败的风险。确定更新LDNMP环境吗？(Y/N): \")\" choice": [
+"\t\t\t\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}长时间不更新环境的用户，请慎重更新LDNMP环境，会有数据库更新失败的风险。确定更新LDNMP环境吗？(Y/N): \")\" choice"
 ],
 "\t\t\t\tread -e -p \"下载完成，按任意键继续...\" ;;": [
 "\t\t\t\tread -e -p \"ダウンロードが完了しました。続行するには任意のキーを押してください...\" ;;"
@@ -1560,7 +1611,10 @@
 "\t\t\t\tsafe_remove_path \"$dirname\" && echo \"ディレクトリが削除されました\" || echo \"削除に失敗しました\""
 ],
 "\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"搜索模型（如 cli-api/gpt-5.2）\" \t\t\t\t\t--prompt \"选择模型 > \" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)": [
-"\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"モデルの検索 (cli-api/gpt-5.2 など)\" \t\t\t\t\t--prompt \"モデルを選択 >\" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)"
+"\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"搜索模型（如 cli-api/gpt-5.2）\" \t\t\t\t\t--prompt \"选择模型 > \" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)"
+],
+"\t\t\t\tsleep 2  # 等待时间": [
+"\t\t\t\tsleep 2  # 等待时间"
 ],
 "\t\t\t\ttar -czvf \"$name.tar.gz\" \"$name\" && echo \"已压缩为 $name.tar.gz\" || echo \"压缩失败\"": [
 "\t\t\t\ttar -czvf \"$name.tar.gz\" \"$name\" && echo \"に圧縮$name.tar.gz\" || echo \"圧縮に失敗しました\""
@@ -1597,6 +1651,12 @@
 ],
 "\t\t\t  _kernel_optimize_core \"直播优化模式\" \"stream\"": [
 "\t\t\t  _kernel_optimize_core \"ライブブロードキャスト最適化モード\" \"stream\""
+],
+"\t\t\t  break  # 跳出": [
+"\t\t\t  break  # 跳出"
+],
+"\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t  break  # 跳出循环，退出菜单"
 ],
 "\t\t\t  echo \"0. 返回上一级选单\"": [
 "\t\t\t  echo \"0. 前のメニューに戻る\""
@@ -1648,6 +1708,9 @@
 ],
 "\t\t\t  echo \"9. 卸载防御程序\"": [
 "\t\t\t  echo \"9. 防御プログラムをアンインストールする\""
+],
+"\t\t\t  echo \"BBR管理\"": [
+"\t\t\t  echo \"BBR管理\""
 ],
 "\t\t\t  echo \"Docker版本\"": [
 "\t\t\t  echo \"Docker のバージョン\""
@@ -1793,6 +1856,9 @@
 "\t\t\t  echo -e \"${gl_hui}-关于流量，重启服务器将重新计算-${gl_bai}\"": [
 "\t\t\t  echo -e \"${gl_hui}- 通信量についてはサーバーを再起動すると再計算されます -${gl_bai}\""
 ],
+"\t\t\t  echo -e \"${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}\"": [
+"\t\t\t  echo -e \"${gl_hui}パスワードを空白のままにすると、SSH キー認証 (デフォルトのキーまたは ssh-agent) が使用されます。${gl_bai}\""
+],
 "\t\t\t  echo -e \"${gl_lv}端口 $port 当前可用${gl_bai}\"": [
 "\t\t\t  echo -e \"${gl_lv}ポート$port現在利用可能${gl_bai}\""
 ],
@@ -1858,6 +1924,12 @@
 ],
 "\t\t\t  local tiaoyou_moshi=\"高性能优化模式\"": [
 "\t\t\t  local tiaoyou_moshi=\"高性能最適化モード\""
+],
+"\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定卸载docker环境吗？(Y/N): \")\" choice": [
+"\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定卸载docker环境吗？(Y/N): \")\" choice"
+],
+"\t\t\t  read -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}将清理无用的镜像容器网络，包括停止的容器，确定清理吗？(Y/N): \")\" choice": [
+"\t\t\t  read -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}将清理无用的镜像容器网络，包括停止的容器，确定清理吗？(Y/N): \")\" choice"
 ],
 "\t\t\t  read -e -p \"也可以输入下载链接，远程下载备份数据，直接回车将跳过远程下载： \" url_download_db": [
 "\t\t\t  read -e -p \"ダウンロード リンクを入力してバックアップ データをリモートでダウンロードすることもできます。 Enter を直接押して、リモート ダウンロードをスキップします。\" url_download_db"
@@ -1933,6 +2005,21 @@
 ],
 "\t\t\t  read -e -s -p \"服务器用户密码: \" server_password": [
 "\t\t\t  read -e -s -p \"サーバーユーザーのパスワード:\" server_password"
+],
+"\t\t\t  sleep 2  # 添加等待时间": [
+"\t\t\t  sleep 2  # 添加等待时间"
+],
+"\t\t\t 25) # 传送文件至远端服务器": [
+"\t\t\t 25) # 传送文件至远端服务器"
+],
+"\t\t\t\"/etc\"              # 配置文件和软件包配置": [
+"\t\t\t\"/etc\"              # 配置文件和软件包配置"
+],
+"\t\t\t\"/home\"             # 用户数据": [
+"\t\t\t\"/home\"             # 用户数据"
+],
+"\t\t\t\"/usr\"              # 已安装的软件文件": [
+"\t\t\t\"/usr\"              # 已安装的软件文件"
 ],
 "\t\t\t# 1. 输入证书 (ECC 和 RSA 证书开头都是 BEGIN CERTIFICATE)": [
 "\t\t\t# 1. 証明書を入力します (ECC 証明書と RSA 証明書はどちらも BEGIN CERTIFICATE で始まります)"
@@ -2018,11 +2105,59 @@
 "\t\t\t# 高性能/直播/游戏：激进参数": [
 "\t\t\t# 高性能/ライブブロードキャスト/ゲーム: ラジカルパラメータ"
 ],
+"\t\t\t*)  # 处理无效输入": [
+"\t\t\t*)  # 处理无效输入"
+],
 "\t\t\t*) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型文件不存在或不可用\") ;;": [
 "\t\t\t*) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"ローカル モデル ファイルが存在しないか、使用できません\") ;;"
 ],
 "\t\t\t*) echo \"无效的选择，请重试。\" ;;": [
 "\t\t\t*) echo \"選択が無効です。もう一度お試しください。\" ;;"
+],
+"\t\t\t0)  # 返回上一级选单": [
+"\t\t\t0)  # 返回上一级选单"
+],
+"\t\t\t1)  # 进入目录": [
+"\t\t\t1)  # 进入目录"
+],
+"\t\t\t11) # 创建文件": [
+"\t\t\t11) # 创建文件"
+],
+"\t\t\t12) # 编辑文件": [
+"\t\t\t12) # 编辑文件"
+],
+"\t\t\t13) # 修改文件权限": [
+"\t\t\t13) # 修改文件权限"
+],
+"\t\t\t14) # 重命名文件": [
+"\t\t\t14) # 重命名文件"
+],
+"\t\t\t15) # 删除文件": [
+"\t\t\t15) # 删除文件"
+],
+"\t\t\t2)  # 创建目录": [
+"\t\t\t2)  # 创建目录"
+],
+"\t\t\t21) # 压缩文件/目录": [
+"\t\t\t21) # 压缩文件/目录"
+],
+"\t\t\t22) # 解压文件/目录": [
+"\t\t\t22) # 解压文件/目录"
+],
+"\t\t\t23) # 移动文件或目录": [
+"\t\t\t23) # 移动文件或目录"
+],
+"\t\t\t3)  # 修改目录权限": [
+"\t\t\t3)  # 修改目录权限"
+],
+"\t\t\t4)  # 重命名目录": [
+"\t\t\t4)  # 重命名目录"
+],
+"\t\t\t5)  # 删除目录": [
+"\t\t\t5)  # 删除目录"
+],
+"\t\t\t6)  # 返回上一级选单目录": [
+"\t\t\t6)  # 返回上一级选单目录"
 ],
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"QMD 可用\")": [
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"QMDが利用可能です\")"
@@ -2065,6 +2200,9 @@
 ],
 "\t\t\t[[ -z \"$IMAGE\" || \"$IMAGE\" == \"null\" ]] && { echo -e \"${gl_hong}未找到镜像信息，跳过: $container${gl_bai}\"; continue; }": [
 "\t\t\t[[ -z \"$IMAGE\" || \"$IMAGE\" == \"null\" ]] && { echo -e \"${gl_hong}ミラー情報が見つかりません。スキップしてください:$container${gl_bai}\"; continue; }"
+],
+"\t\t\tbreak  # 跳出循环，退出菜单": [
+"\t\t\tbreak  # 跳出循环，退出菜单"
 ],
 "\t\t\tcurrent_mode=\"\\033[1;31m完全开放模式\\033[0m\"": [
 "\t\t\tcurrent_mode=\"\\033[1;31m全開モード\\033[0m\""
@@ -2363,6 +2501,9 @@
 "\t\t\techo \"Local: 本地向量检索，依赖 embedding 模型文件\"": [
 "\t\t\techo \"ローカル: 埋め込みモデル ファイルに依存するローカル ベクトル取得\""
 ],
+"\t\t\techo \"OpenClaw API 管理\"": [
+"\t\t\techo \"OpenClaw API 管理\""
+],
 "\t\t\techo \"OpenClaw 备份与还原\"": [
 "\t\t\techo \"OpenClaw のバックアップと復元\""
 ],
@@ -2527,6 +2668,9 @@
 ],
 "\t\t\techo \"✅ 当前 API 协议类型: $DETECTED_API\"": [
 "\t\t\techo \"✅ 現在の API プロトコルの種類:$DETECTED_API\""
+],
+"\t\t\techo \"✅ 成功:$success_list\"": [
+"\t\t\techo \"✅ 成功:$success_list\""
 ],
 "\t\t\techo \"✅ 成功添加 $model_count 个模型到 $provider_name\"": [
 "\t\t\techo \"✅ 正常に追加されました$model_countモデルが到着$provider_name\""
@@ -2794,6 +2938,15 @@
 ],
 "\t\t\techo \"当前白名单：\"": [
 "\t\t\techo \"現在のホワイトリスト:\""
+],
+"\t\t\techo \"拒绝删除关键系统路径: $target_real\"": [
+"\t\t\techo \"拒绝删除关键系统路径: $target_real\""
+],
+"\t\t\techo \"拒绝覆盖指向其他目标的命令链接: $PROJECT_INSTALL_PATH\"": [
+"\t\t\techo \"拒绝覆盖指向其他目标的命令链接: $PROJECT_INSTALL_PATH\""
+],
+"\t\t\techo \"拒绝覆盖现有非本项目命令: $PROJECT_INSTALL_PATH\"": [
+"\t\t\techo \"拒绝覆盖现有非本项目命令: $PROJECT_INSTALL_PATH\""
 ],
 "\t\t\techo \"推荐版本:  3.12    3.11    3.10    3.9    3.8    2.7\"": [
 "\t\t\techo \"推奨バージョン: 3.12 3.11 3.10 3.9 3.8 2.7\""
@@ -3095,6 +3248,9 @@
 "\t\t\tok) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型文件存在\") ;;": [
 "\t\t\tok) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"ローカルモデルファイルが存在します\") ;;"
 ],
+"\t\t\tprintf \"%-15s %-10s %-18s %-20s\\n\" \"$nic\" \"$state\" \"${ipaddr:-无}\" \"$mac\"": [
+"\t\t\tprintf \"%-15s %-10s %-18s %-20s\\n\" \"$nic\" \"$state\" \"${ipaddr:-无}\" \"$mac\""
+],
 "\t\t\tprintf \"%-25s %-25s %-25s\\n\" \"容器名称\" \"网络名称\" \"IP地址\"": [
 "\t\t\tprintf \"%-25s %-25s %-25s\\n\" \"コンテナ名\" \"ネットワーク名\" \"IPアドレス\""
 ],
@@ -3106,6 +3262,12 @@
 ],
 "\t\t\tread -e -p  \"请选择: \" choice": [
 "\t\t\tread -e -p  \"選択してください:\" choice"
+],
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有容器吗？(Y/N): \")\" choice": [
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有容器吗？(Y/N): \")\" choice"
+],
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有镜像吗？(Y/N): \")\" choice": [
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有镜像吗？(Y/N): \")\" choice"
 ],
 "\t\t\tread -e -p \"是否恢复为 true 并重建索引？(Y/n): \" fix_choice": [
 "\t\t\tread -e -p \"true に戻してインデックスを再構築しますか? (はい/いいえ):\" fix_choice"
@@ -3251,11 +3413,23 @@
 "\t\t\tupdate_status=\"${gl_huang}发现新版本!${gl_bai}\"": [
 "\t\t\tupdate_status=\"${gl_huang}新しいバージョンが見つかりました!${gl_bai}\""
 ],
+"\t\t\t已连接) echo -e \"${gl_lv}${status}${gl_bai}\" ;;": [
+"\t\t\t已连接) echo -e \"${gl_lv}${status}${gl_bai}\" ;;"
+],
+"\t\t\t已配置) echo -e \"${gl_huang}${status}${gl_bai}\" ;;": [
+"\t\t\t已配置) echo -e \"${gl_huang}${status}${gl_bai}\" ;;"
+],
+"\t\t\t异常) echo -e \"${gl_hong}${status}${gl_bai}\" ;;": [
+"\t\t\t异常) echo -e \"${gl_hong}${status}${gl_bai}\" ;;"
+],
 "\t\t  \t  echo -e \"10. 设置网络为${gl_huang}ipv4优先${gl_bai}\"": [
 "\t\t  \t  echo -e \"10. ネットワークを次のように設定します。${gl_huang}IPv4優先度${gl_bai}\""
 ],
 "\t\t  \techo \"请再次尝试部署 $webname\"": [
 "\t\t  \techo \"もう一度デプロイしてみてください$webname\""
+],
+"\t\t   24) # 复制文件目录": [
+"\t\t   24) # 复制文件目录"
 ],
 "\t\t   local YTDLP_STATUS=\"${gl_hui}未安装${gl_bai}\"": [
 "\t\t   local YTDLP_STATUS=\"${gl_hui}インストールされていません${gl_bai}\""
@@ -3662,8 +3836,17 @@
 "\t\t# 默认本地 IP": [
 "\t\t# デフォルトのローカルIP"
 ],
+"\t\t''|/|.|..) echo \"拒绝删除含糊路径: $target\"; return 1 ;;": [
+"\t\t''|/|.|..) echo \"拒绝删除含糊路径: $target\"; return 1 ;;"
+],
+"\t\t''|/|//*) echo \"拒绝删除空路径、根路径或含糊的双斜杠路径: $target\"; return 1 ;;": [
+"\t\t''|/|//*) echo \"拒绝删除空路径、根路径或含糊的双斜杠路径: $target\"; return 1 ;;"
+],
 "\t\t) || { echo \"❌ sha256 校验失败，拒绝还原\"; return 1; }": [
 "\t\t) || { echo \"❌ sha256 検証が失敗し、復元が拒否されました\"; return 1; }"
+],
+"\t\t*) echo \"拒绝下载非 HTTPS 脚本: $script_url\"; return 1 ;;": [
+"\t\t*) echo \"拒绝下载非 HTTPS 脚本: $script_url\"; return 1 ;;"
 ],
 "\t\t*) echo \"无效的选择！\"; return ;;": [
 "\t\t*) echo \"無効な選択です!\"; return ;;"
@@ -3671,8 +3854,20 @@
 "\t\t*) echo \"无效选择\"; return 1 ;;": [
 "\t\t*) echo \"無効な選択\"; return 1 ;;"
 ],
+"\t\t*) echo \"无效选择，使用默认 -avz\"; options=\"-avz\" ;;": [
+"\t\t*) echo \"无效选择，使用默认 -avz\"; options=\"-avz\" ;;"
+],
 "\t\t*) echo \"错误: 请输入有效的选项！\" ; return ;;": [
 "\t\t*) echo \"エラー: 有効なオプションを入力してください。\" ; return ;;"
+],
+"\t\t1) cron_time=\"$random_minute * * * *\" ;;  # 每小时，随机分钟执行": [
+"\t\t1) cron_time=\"$random_minute * * * *\" ;;  # 每小时，随机分钟执行"
+],
+"\t\t2) cron_time=\"$random_minute 0 * * *\" ;;  # 每天，随机分钟执行": [
+"\t\t2) cron_time=\"$random_minute 0 * * *\" ;;  # 每天，随机分钟执行"
+],
+"\t\t3) cron_time=\"$random_minute 0 * * 1\" ;;  # 每周，随机分钟执行": [
+"\t\t3) cron_time=\"$random_minute 0 * * 1\" ;;  # 每周，随机分钟执行"
 ],
 "\t\tCFmessage=\" cf模式已开启\"": [
 "\t\tCFmessage=\"cfモードがオンになっています\""
@@ -3725,6 +3920,9 @@
 "\t\tarchive_path=$(openclaw_read_import_path \"请输入 OpenClaw 项目备份包路径\")": [
 "\t\tarchive_path=$(openclaw_read_import_path \"OpenClaw プロジェクトのバックアップ パッケージのパスを入力してください\")"
 ],
+"\t\tbackup|bf|备份)": [
+"\t\tbackup|bf|备份)"
+],
 "\t\tbr_status=\" br压缩已开启\"": [
 "\t\tbr_status=\"br圧縮がオンになっています\""
 ],
@@ -3739,6 +3937,15 @@
 ],
 "\t\tcheck_f2b_status=\"${gl_lv}已安装${gl_bai}\"": [
 "\t\tcheck_f2b_status=\"${gl_lv}インストール済み${gl_bai}\""
+],
+"\t\tclean|清理)": [
+"\t\tclean|清理)"
+],
+"\t\tdd|重装)": [
+"\t\tdd|重装)"
+],
+"\t\tdisk|硬盘管理)": [
+"\t\tdisk|硬盘管理)"
 ],
 "\t\techo \"  Exec 限制: ${current_sec:-(unset)}\"": [
 "\t\techo \"実行制限: ${current_sec:-(未設定)}\""
@@ -4340,6 +4547,21 @@
 "\t\techo \"成功添加 ${added} 条新的公钥到 ${authorized_keys}\"": [
 "\t\techo \"正常に追加されました${added}新しい公開鍵が到着する${authorized_keys}\""
 ],
+"\t\techo \"拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH\"": [
+"\t\techo \"拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH\""
+],
+"\t\techo \"拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非普通文件主脚本路径: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖非普通文件主脚本路径: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非本项目主脚本: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖非本项目主脚本: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非本项目备份文件: $PROJECT_BACKUP_PATH\"": [
+"\t\techo \"拒绝覆盖非本项目备份文件: $PROJECT_BACKUP_PATH\""
+],
 "\t\techo \"按任意键返回...\"": [
 "\t\techo \"戻るには任意のキーを押してください...\""
 ],
@@ -4376,6 +4598,9 @@
 "\t\techo \"无法获取文件系统类型！\"": [
 "\t\techo \"ファイル システム タイプを取得できません!\""
 ],
+"\t\techo \"无法读取当前脚本，拒绝安装快捷命令。\"": [
+"\t\techo \"无法读取当前脚本，拒绝安装快捷命令。\""
+],
 "\t\techo \"更新 OpenClaw...\"": [
 "\t\techo \"OpenClaw を更新...\""
 ],
@@ -4407,7 +4632,7 @@
 "\t\techo \"OpenClaw ステータス ログを表示する\""
 ],
 "\t\techo \"检查并准备 $(printf '%s\\n' \"$agent_lines\" | sed '/^\\s*$/d' | wc -l | tr -d ' ') 个智能体工作区\"": [
-"\t\techo \"確認して準備します $(printf '%s\\n'\"$agent_lines\"| sed '/^\\s*$/d' |トイレ -l | tr -d ' ') エージェントワークスペース\""
+"\t\techo \"检查并准备 $(printf '%s\\n' \"$agent_lines\" | sed '/^\\s*$/d' | wc -l | tr -d ' ') 个智能体工作区\""
 ],
 "\t\techo \"检查配置文件: ${config_file:-$(openclaw_permission_config_file)}\"": [
 "\t\techo \"設定ファイルを確認します: ${config_file:-$(openclaw_permission_config_file)}\""
@@ -4474,6 +4699,9 @@
 ],
 "\t\techo \"用法：create_user_with_sshkey <用户名>\"": [
 "\t\techo \"使用法: create_user_with_sshkey <ユーザー名>\""
+],
+"\t\techo \"目标不存在: $target\"": [
+"\t\techo \"目标不存在: $target\""
 ],
 "\t\techo \"目标方案: $scheme_label\"": [
 "\t\techo \"対象プラン：$scheme_label\""
@@ -4600,6 +4828,9 @@
 ],
 "\t\techo \"镜像源探测: huggingface.co=${OPENCLAW_MEMORY_HF_OK:-unknown} hf-mirror.com=${OPENCLAW_MEMORY_MIRROR_OK:-unknown}\"": [
 "\t\techo \"ミラーソース検出:huggingface.co=${OPENCLAW_MEMORY_HF_OK:-unknown} hf-mirror.com=${OPENCLAW_MEMORY_MIRROR_OK:-unknown}\""
+],
+"\t\techo \"需要 curl 或 wget 才能下载脚本。\"": [
+"\t\techo \"需要 curl 或 wget 才能下载脚本。\""
 ],
 "\t\techo \"高级选项: 输入 config 仅写配置（不安装不下载、不索引、不重启）\"": [
 "\t\techo \"詳細オプション: config を入力して構成のみを書き込みます (インストールなし、ダウンロードなし、インデックス作成なし、再起動なし)。\""
@@ -4790,14 +5021,26 @@
 "\t\techo -e \"🦞 OPENCLAW 管理工具 by ${PROJECT_NAME} 🦞\"": [
 "\t\techo -e \"🦞 ${PROJECT_NAME} による OPENCLAW 管理ツール 🦞\""
 ],
+"\t\tenable|autostart|开机启动)": [
+"\t\tenable|autostart|开机启动)"
+],
+"\t\tfd|rp|反代)": [
+"\t\tfd|rp|反代)"
+],
 "\t\tgzip_status=\" gzip压缩已开启\"": [
 "\t\tgzip_status=\"gzip圧縮がオンになっています\""
 ],
 "\t\tif [ \"$confirm_text\" != \"我已知晓高风险并继续还原\" ]; then": [
 "\t\tif [ \"$confirm_text\" != \"高いリスクを認識しており、復旧を続けています\" ]; then"
 ],
+"\t\tinstall|add|安装)": [
+"\t\tinstall|add|安装)"
+],
 "\t\tkj_ssh_read_host_user_port \"目标服务器IP: \" \"目标服务器SSH用户名 [默认root]: \" \"目标服务器SSH端口 [默认22]: \" \"root\" \"22\"": [
 "\t\tkj_ssh_read_host_user_port \"ターゲットサーバーIP:\" \"ターゲットサーバーの SSH ユーザー名 [デフォルトのルート]:\" \"ターゲット サーバーの SSH ポート [デフォルト 22]:\" \"root\" \"22\""
+],
+"\t\tloadbalance|负载均衡)": [
+"\t\tloadbalance|负载均衡)"
 ],
 "\t\tlocal app_name=\"2FAuth自托管二步验证器\"": [
 "\t\tlocal app_name=\"2FAuth セルフホスト型 2 段階認証システム\""
@@ -5498,6 +5741,18 @@
 "\t\tmode_info=\" 高性能模式\"": [
 "\t\tmode_info=\"ハイパフォーマンスモード\""
 ],
+"\t\tnhyh|内核优化)": [
+"\t\tnhyh|内核优化)"
+],
+"\t\topenclaw config set tools.elevated.enabled true >/dev/null 2>&1 # 允许智能体申请提权": [
+"\t\topenclaw config set tools.elevated.enabled true >/dev/null 2>&1 # 允许智能体申请提权"
+],
+"\t\topenclaw config set tools.exec.strictInlineEval true >/dev/null 2>&1  # 拦截危险的内联代码": [
+"\t\topenclaw config set tools.exec.strictInlineEval true >/dev/null 2>&1  # 拦截危险的内联代码"
+],
+"\t\topenclaw config unset commands.bash >/dev/null 2>&1 # 废弃旧版参数": [
+"\t\topenclaw config unset commands.bash >/dev/null 2>&1 # 废弃旧版参数"
+],
 "\t\topenclaw config validate || echo \"⚠️ 配置校验未通过，请检查上方输出。\"": [
 "\t\topenclaw config validate || echo \"⚠️ 構成の検証に失敗しました。上記の出力を確認してください。\""
 ],
@@ -5518,6 +5773,9 @@
 ],
 "\t\tprintf \"请输入选项并回车: \"": [
 "\t\tprintf \"オプションを入力して Enter を押してください:\""
+],
+"\t\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\"": [
+"\t\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\""
 ],
 "\t\tread -e -p  \"请输入 WireGuard 网段 (默认 10.13.13.0): \" NETWORK": [
 "\t\tread -e -p  \"WireGuard ネットワーク セグメントを入力してください (デフォルトは 10.13.13.0)。\" NETWORK"
@@ -5542,6 +5800,9 @@
 ],
 "\t\tread -e -p \"  新名称: \" new_name": [
 "\t\tread -e -p \"新しい名前:\" new_name"
+],
+"\t\tread -e -p \"$(echo -e \"${gl_hong}强烈建议：${gl_bai}先备份全部网站数据，再卸载LDNMP环境。确定删除所有网站数据吗？(Y/N): \")\" choice": [
+"\t\tread -e -p \"$(echo -e \"${gl_hong}强烈建议：${gl_bai}先备份全部网站数据，再卸载LDNMP环境。确定删除所有网站数据吗？(Y/N): \")\" choice"
 ],
 "\t\tread -e -p \"二次确认：输入 DELETE 执行删除: \" confirm_step2": [
 "\t\tread -e -p \"2 番目の確認: 「DELETE」と入力して削除します。\" confirm_step2"
@@ -5696,17 +5957,50 @@
 "\t\tread -rsp \"请输入 API Key (输入不显示): \" api_key": [
 "\t\tread -rsp \"API キーを入力してください (入力は表示されません):\" api_key"
 ],
+"\t\tremove|del|uninstall|卸载)": [
+"\t\tremove|del|uninstall|卸载)"
+],
+"\t\trestart|重启)": [
+"\t\trestart|重启)"
+],
 "\t\trm -rf \"$tmp_unpack\"; echo \"✅ 记忆全量还原完成\"; break_end": [
 "\t\trm -rf \"$tmp_unpack\"; echo \"✅ 完全なメモリ復元が完了しました\"; break_end"
 ],
+"\t\trsync|远程同步)": [
+"\t\trsync|远程同步)"
+],
+"\t\tssh|远程连接)": [
+"\t\tssh|远程连接)"
+],
+"\t\tstart|启动)": [
+"\t\tstart|启动)"
+],
+"\t\tstatus|状态)": [
+"\t\tstatus|状态)"
+],
+"\t\tstop|停止)": [
+"\t\tstop|停止)"
+],
+"\t\tstream|L4负载均衡)": [
+"\t\tstream|L4负载均衡)"
+],
 "\t\ttar -xzf \"$archive_path\" -C \"$unpack_root\" || { echo \"❌ 备份包解压失败\"; return 1; }": [
 "\t\ttar -xzf \"$archive_path\" -C \"$unpack_root\" || { echo \"❌ バックアップパッケージの解凍に失敗しました\"; return 1; }"
+],
+"\t\ttime|时区)": [
+"\t\ttime|时区)"
 ],
 "\t\ttrash_status=\"${gl_hui}未启用${gl_bai}\"": [
 "\t\ttrash_status=\"${gl_hui}有効になっていません${gl_bai}\""
 ],
 "\t\ttrash_status=\"${gl_lv}已启用${gl_bai}\"": [
 "\t\ttrash_status=\"${gl_lv}有効${gl_bai}\""
+],
+"\t\ttrash|hsz|回收站)": [
+"\t\ttrash|hsz|回收站)"
+],
+"\t\tupdate|更新)": [
+"\t\tupdate|更新)"
 ],
 "\t\twaf_status=\" WAF已开启\"": [
 "\t\twaf_status=\"WAFがオンになっている\""
@@ -5716,6 +6010,24 @@
 ],
 "\t\t{ [ -z \"$agent_id\" ] || [ -z \"$bind_value\" ]; } && echo \"已取消：参数不能为空。\" && return 1": [
 "\t\t{ [ -z \"$agent_id\" ] || [ -z \"$bind_value\" ]; } && echo \"キャンセル: パラメータを空にすることはできません。\" && return 1"
+],
+"\t\t关闭端口|gbdk)": [
+"\t\t关闭端口|gbdk)"
+],
+"\t\t命令收藏夹|fav)": [
+"\t\t命令收藏夹|fav)"
+],
+"\t\t打开端口|dkdk)": [
+"\t\t打开端口|dkdk)"
+],
+"\t\t放行IP|fxip)": [
+"\t\t放行IP|fxip)"
+],
+"\t\t防火墙|fhq)": [
+"\t\t防火墙|fhq)"
+],
+"\t\t阻止IP|zzip)": [
+"\t\t阻止IP|zzip)"
 ],
 "\t  \t  IS_KEY_ENABLED=\"${gl_hui}未启用${gl_bai}\"": [
 "\t  \t  IS_KEY_ENABLED=\"${gl_hui}有効になっていません${gl_bai}\""
@@ -6425,6 +6737,9 @@
 "\t  echo -e \"7. 自动调优：           根据测试数据自动调优内核参数。${gl_huang}★${gl_bai}\"": [
 "\t  echo -e \"7. 自動チューニング: テストデータに基づいてカーネルパラメータを自動的にチューニングします。${gl_huang}★${gl_bai}\""
 ],
+"\t  echo -e \"Docker管理\"": [
+"\t  echo -e \"Docker管理\""
+],
 "\t  echo -e \"[${gl_huang}1/2${gl_bai}] 上传静态源码\"": [
 "\t  echo -e \"[${gl_huang}1/2${gl_bai}] 静的ソースコードをアップロードする\""
 ],
@@ -6483,10 +6798,13 @@
 "\t  echo -e \"システムツール\""
 ],
 "\t  local current_mode=$(grep \"^# 模式:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)": [
-"\t  local current_mode=$(grep \"^# モード:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# モード: //' | awk -F'|' '{print $1}' | xargs)"
+"\t  local current_mode=$(grep \"^# 模式:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)"
 ],
 "\t  read -e -p  \"回车键还原最新的备份，输入备份文件名还原指定的备份，输入0退出：\" filename": [
 "\t  read -e -p  \"Enter キーを押して最新のバックアップを復元し、バックアップ ファイル名を入力して指定したバックアップを復元し、0 を入力して終了します。\" filename"
+],
+"\t  read -e -p \"$(echo -e \"输入需要安装的扩展名称，如 ${gl_huang}SourceGuardian imap ftp${gl_bai} 等等。直接回车将跳过安装 ： \")\" php_extensions": [
+"\t  read -e -p \"$(echo -e \"输入需要安装的扩展名称，如 ${gl_huang}SourceGuardian imap ftp${gl_bai} 等等。直接回车将跳过安装 ： \")\" php_extensions"
 ],
 "\t  read -e -p \"1. php最新版 | 2. php7.4 : \" pho_v": [
 "\t  read -e -p \"1.php最新バージョン | 2.php7.4:\" pho_v"
@@ -7034,11 +7352,32 @@
 "\t# 首先获取所有端口": [
 "\t# まずすべてのポートを取得します"
 ],
+"\t[ ! -L \"$cache_dir\" ] || { echo \"拒绝使用符号链接缓存目录: $cache_dir\"; return 1; }": [
+"\t[ ! -L \"$cache_dir\" ] || { echo \"拒绝使用符号链接缓存目录: $cache_dir\"; return 1; }"
+],
+"\t[ -O \"$cache_dir\" ] || { echo \"远程脚本缓存目录不属于当前用户: $cache_dir\"; return 1; }": [
+"\t[ -O \"$cache_dir\" ] || { echo \"远程脚本缓存目录不属于当前用户: $cache_dir\"; return 1; }"
+],
+"\t[ -s \"$script_path\" ] || { echo \"下载结果为空。\"; rm -f -- \"$script_path\"; return 1; }": [
+"\t[ -s \"$script_path\" ] || { echo \"ダウンロード結果は空です。 \"; rm -f -- \"$script_path\"; return 1; }"
+],
+"\t_kernel_optimize_core \"${tiaoyou_moshi:-高性能优化模式}\" \"high\"": [
+"\t_kernel_optimize_core \"${tiaoyou_moshi:-高性能优化模式}\" \"high\""
+],
 "\t_kernel_optimize_core \"均衡优化模式\" \"balanced\"": [
 "\t_kernel_optimize_core \"バランスのとれた最適化モード\" \"balanced\""
 ],
 "\t_kernel_optimize_core \"网站搭建优化模式\" \"web\"": [
 "\t_kernel_optimize_core \"ウェブサイト構築最適化モード\" \"web\""
+],
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火墙规则自动备份失败，继续执行关闭所有端口。${gl_bai}\"": [
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告: ファイアウォール ルールの自動バックアップに失敗しました。引き続きすべてのポートを閉じます。${gl_bai}\""
+],
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}\"": [
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告: ファイアウォール ルールの自動バックアップに失敗しました。引き続きすべてのポートを開いてください。${gl_bai}\""
+],
+"\tbash -n \"$script_path\" || { echo \"远程脚本未通过 Bash 语法检查: $script_path\"; rm -f -- \"$script_path\"; return 1; }": [
+"\tbash -n \"$script_path\" || { echo \"リモート スクリプトは Bash 構文チェックに失敗しました:$script_path\"; rm -f -- \"$script_path\"; return 1; }"
 ],
 "\tcheck_frp=\"${gl_hui}未安装${gl_bai}\"": [
 "\tcheck_frp=\"${gl_hui}インストールされていません${gl_bai}\""
@@ -7469,6 +7808,9 @@
 "\techo -e \"${gl_huang}证书存放路径${gl_bai}\"": [
 "\techo -e \"${gl_huang}証明書の保存パス${gl_bai}\""
 ],
+"\techo -e \"${gl_lv}$* 扫描完成，病毒报告存放在${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}\"": [
+"\techo -e \"${gl_lv}$* 扫描完成，病毒报告存放在${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}\""
+],
 "\techo -e \"${gl_lv}${mode_name} 优化完成！配置已持久化到 ${CONF}${gl_bai}\"": [
 "\techo -e \"${gl_lv}${mode_name}最適化が完了しました！構成は永続化されています${CONF}${gl_bai}\""
 ],
@@ -7616,6 +7958,24 @@
 "\tkj_ssh_read_port \"请输入 SSH 端口 (默认 22): \" \"22\"": [
 "\tkj_ssh_read_port \"SSH ポート (デフォルトは 22) を入力してください:\" \"22\""
 ],
+"\tlocal direction=\"push\"  # 默认是推送到远端": [
+"\tlocal direction=\"push\"  # 默认是推送到远端"
+],
+"\tlocal ips=($@)  # 将传入的参数转换为数组": [
+"\tlocal ips=($@)  # 将传入的参数转换为数组"
+],
+"\tlocal new_swap=$1  # 获取传入的参数": [
+"\tlocal new_swap=$1  # 获取传入的参数"
+],
+"\tlocal ports=($@)  # 将传入的参数转换为数组": [
+"\tlocal ports=($@)  # 将传入的参数转换为数组"
+],
+"\tlocal prompt=\"${1:-请输入密码: }\"": [
+"\tlocal prompt=\"${1:-请输入密码: }\""
+],
+"\tlocal random_minute=$(shuf -i 0-59 -n 1)  # 生成 0-59 之间的随机分钟数": [
+"\tlocal random_minute=$(shuf -i 0-59 -n 1)  # 生成 0-59 之间的随机分钟数"
+],
 "\tlocal runtime=$(cat /proc/uptime | awk -F. '{run_days=int($1 / 86400);run_hours=int(($1 % 86400) / 3600);run_minutes=int(($1 % 3600) / 60); if (run_days > 0) printf(\"%d天 \", run_days); if (run_hours > 0) printf(\"%d时 \", run_hours); printf(\"%d分\\n\", run_minutes)}')": [
 "\tlocal runtime=$(cat /proc/uptime | awk -F. '{run_days=int($1 / 86400);run_hours=int(($1 % 86400) / 3600);run_minutes=int(($1% 3600) / 60); if (run_days > 0) printf(\"%d day \", run_days); if (run_hours > 0) printf(\"%d 時間 \", run_hours); printf(\"%d 分\\n\", run_ minutes)}')"
 ],
@@ -7627,6 +7987,15 @@
 ],
 "\tprintf \"%-25s %-18s %-25s %-20s\\n\" \"服务名\" \"通信类型\" \"本机地址\" \"后端地址\"": [
 "\tprintf \"%-25s %-18s %-25s %-20s\\n\" \"サービス名\" \"通信タイプ\" \"ローカルアドレス\" \"バックエンドアドレス\""
+],
+"\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\"": [
+"\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\""
+],
+"\tprintf '防火墙规则已自动备份到: %s\\n' \"$backup_dir\"": [
+"\tprintf '防火墙规则已自动备份到: %s\\n' \"$backup_dir\""
+],
+"\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}现在重启服务器吗？(Y/N): \")\" rboot": [
+"\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}现在重启服务器吗？(Y/N): \")\" rboot"
 ],
 "\tread -e -p \"封禁时长 bantime (秒/分钟/小时，如 3600 或 1h) [默认 1h]: \" bantime": [
 "\tread -e -p \"Bantime 禁止時間 (秒/分/時間、3600 または 1 時間など) [デフォルトは 1 時間]:\" bantime"
@@ -7769,6 +8138,9 @@
 "\tsed -i \"s/# 动态添加/$upstream_servers/g\" /home/web/stream.d/$proxy_name.conf": [
 "\tsed -i \"s/# 動的に追加/$upstream_servers/g\" /home/web/stream.d/$proxy_name.conf"
 ],
+"\tshift  # 去掉第一个参数，剩下的全是国家代码": [
+"\tshift  # 去掉第一个参数，剩下的全是国家代码"
+],
 "\twebname=\"Stream四层代理-负载均衡\"": [
 "\twebname=\"ストリーム 4 層プロキシ負荷分散\""
 ],
@@ -7777,6 +8149,9 @@
 ],
 "\twebname=\"反向代理-负载均衡\"": [
 "\twebname=\"リバースプロキシ負荷分散\""
+],
+"\tzhushi=1  # 0 表示执行，1 表示不执行": [
+"\tzhushi=1  # 0 表示执行，1 表示不执行"
 ],
 "                    latency_raw = '不可用'": [
 "                    latency_raw = '利用不可'"
@@ -7825,6 +8200,9 @@
 ],
 "        latency_raw = '未检测'": [
 "        latency_raw = '検出されませんでした'"
+],
+"        print(\"  (审批文件不存在，使用系统内置安全兜底)\")": [
+"        print(\"  (审批文件不存在，使用系统内置安全兜底)\")"
 ],
 "        print(\"  (空，未配置任何白名单规则)\")": [
 "        print(\"(空、ホワイトリスト ルールが設定されていません)\")"
@@ -7960,6 +8338,9 @@
 ],
 "    print(\"  索引库: %s\" % db)": [
 "    print(\"インデックス ライブラリ: %s\" % db)"
+],
+"    print(\"  自动放行技能 (autoAllowSkills): \" + (\"on\" if auto else \"off\"))": [
+"    print(\"  自动放行技能 (autoAllowSkills): \" + (\"on\" if auto else \"off\"))"
 ],
 "    print(\"⚠️ 未发现已配置智能体。\")": [
 "    print(\"⚠️ 設定されたエージェントが見つかりません。\")"
@@ -8111,6 +8492,27 @@
 "  echo \"缓存清除请求已发送完毕。\"": [
 "  echo \"キャッシュクリアリクエストが送信されました。\""
 ],
+"  local DEBUG=\"${1:-false}\"           # 第一个参数，默认false": [
+"  local DEBUG=\"${1:-false}\"           # 第一个参数，默认false"
+],
+"  local DEBUG_DISPLAY=\"${2:-false}\"   # 第二个参数，默认false": [
+"  local DEBUG_DISPLAY=\"${2:-false}\"   # 第二个参数，默认false"
+],
+"  local DEBUG_LOG=\"${3:-false}\"       # 第三个参数，默认false": [
+"  local DEBUG_LOG=\"${3:-false}\"       # 第三个参数，默认false"
+],
+"  local MAX_MEMORY_LIMIT=\"${2:-256M}\"  # 第二个参数，默认256M": [
+"  local MAX_MEMORY_LIMIT=\"${2:-256M}\"  # 第二个参数，默认256M"
+],
+"  local MEMORY_LIMIT=\"${1:-256M}\"      # 第一个参数，默认256M": [
+"  local MEMORY_LIMIT=\"${1:-256M}\"      # 第一个参数，默认256M"
+],
+"  local TARGET_DIR=\"/home/web/html\"    # 路径写死": [
+"  local TARGET_DIR=\"/home/web/html\"    # 路径写死"
+],
+"  local TARGET_DIR=\"/home/web/html\"   # 路径写死": [
+"  local TARGET_DIR=\"/home/web/html\"   # 路径写死"
+],
 "  read -e -p \"输入你的选择: \" choice": [
 "  read -e -p \"選択内容を入力してください:\" choice"
 ],
@@ -8174,6 +8576,9 @@
 "# 主菜单": [
 "# メインメニュー"
 ],
+"# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。": [
+"# 幅広い grep フィルターを使用して無関係なタスクを誤って削除しないように、プロジェクト タグを使用して cron タスクを管理します。"
+],
 "# 任务管理主菜单": [
 "# タスク管理メインメニュー"
 ],
@@ -8182,6 +8587,9 @@
 ],
 "# 使用连接": [
 "# 接続を使用する"
+],
+"# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。": [
+"# 元のすぐに使えるコマンドのインストール動作を維持します。セキュリティチェックが失敗した場合でも main 機能をブロックしないでください。"
 ],
 "# 修复dpkg中断问题": [
 "# dpkgの中断問題を修正"
@@ -8193,7 +8601,7 @@
 "# DDoS 防御をオフにする"
 ],
 "# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')": [
-"# メモリ: ${MEM_MB}MB |生成時間: $(日付 '+%Y-%m-%d %H:%M:%S')"
+"# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')"
 ],
 "# 列出可用的硬盘分区": [
 "# 利用可能なハードディスクのパーティションをリストする"
@@ -8276,6 +8684,9 @@
 "# 查看服务状态": [
 "# サービスステータスを確認する"
 ],
+"# 标记形如 \"# ming-sh:<名称>\"：安装先按标记去重再追加，卸载按标记精确删除。": [
+"# 标记形如 \"# ming-sh:<名称>\"：安装先按标记去重再追加，卸载按标记精确删除。"
+],
 "# 格式化分区": [
 "# パーティションをフォーマットする"
 ],
@@ -8337,7 +8748,7 @@
 "# サービスを再起動する"
 ],
 "$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# numa_balancing 不支持\")": [
-"$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# uma_balancing はサポートされていません\")"
+"$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# numa_balancing 不支持\")"
 ],
 "[ \"$EUID\" -ne 0 ] && echo -e \"${gl_huang}提示: ${gl_bai}该功能需要root用户才能运行！\" && break_end && return_to_main_menu": [
 "[ \"$EUID\" -ne 0 ] && echo -e \"${gl_huang}ヒント：${gl_bai}この機能を実行するには root ユーザーが必要です。\" && break_end && return_to_main_menu"
@@ -8545,6 +8956,12 @@
 ],
 "echo -e \"${gl_minglan}4.   ${gl_bai}基础工具\"": [
 "echo -e \"${gl_minglan}4.   ${gl_bai}基本的なツール\""
+],
+"echo -e \"${gl_minglan}5.   ${gl_bai}BBR管理\"": [
+"echo -e \"${gl_minglan}5.   ${gl_bai}BBR管理\""
+],
+"echo -e \"${gl_minglan}6.   ${gl_bai}Docker管理\"": [
+"echo -e \"${gl_minglan}6.   ${gl_bai}Docker管理\""
 ],
 "echo -e \"${gl_minglan}7.   ${gl_bai}WARP管理\"": [
 "echo -e \"${gl_minglan}7.   ${gl_bai}ワープ管理\""

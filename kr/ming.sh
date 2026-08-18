@@ -117,7 +117,7 @@ if [ "$canshu" = "CN" ]; then
 elif [ "$canshu" = "V6" ]; then
 	zhushi=1
 else
-	zhushi=1  # 0 表示执行，1 表示不执行
+	zhushi=1  # 0은 실행, 1은 실행 안 함을 의미
 fi
 
 if [ -n "$GITHUB_PROXY_BASE" ]; then
@@ -178,18 +178,31 @@ remote_script_sha256() {
 	fi
 }
 
-run_reviewed_remote_script() {
+# Download a remote script over HTTPS, syntax-check it, and print its
+# digest. With --install DEST the validated copy replaces DEST (0755); with
+# --run (or neither flag) it runs with any extra arguments and is removed.
+download_reviewed_remote_script() {
+	local mode="run"
+	if [ "${1:-}" = "--install" ]; then
+		mode="install"
+		shift
+	fi
 	local script_url="$1"
 	shift
+	local install_dest=""
+	if [ "$mode" = "install" ]; then
+		install_dest="$1"
+		shift
+	fi
 	local cache_dir script_path digest exit_status
 	case "$script_url" in
 		https://*) ;;
-		*) echo "拒绝下载非 HTTPS 脚本: $script_url"; return 1 ;;
+		*) echo "HTTPS가 아닌 스크립트 다운로드 거부: $script_url"; return 1 ;;
 	esac
 	cache_dir="${PROJECT_CACHE_DIR:-${XDG_CACHE_HOME:-${HOME}/.cache}/${PROJECT_ID:-ming-sh}}/remote-scripts"
-	[ ! -L "$cache_dir" ] || { echo "拒绝使用符号链接缓存目录: $cache_dir"; return 1; }
+	[ ! -L "$cache_dir" ] || { echo "심볼릭 링크 캐시 디렉터리 사용을 거부합니다.$cache_dir"; return 1; }
 	mkdir -p -- "$cache_dir" || return 1
-	[ -O "$cache_dir" ] || { echo "远程脚本缓存目录不属于当前用户: $cache_dir"; return 1; }
+	[ -O "$cache_dir" ] || { echo "원격 스크립트 캐시 디렉터리가 현재 사용자 소유가 아님: $cache_dir"; return 1; }
 	chmod 0700 "$cache_dir" || return 1
 	script_path=$(mktemp "$cache_dir/review.XXXXXX.sh") || return 1
 	chmod 0600 "$script_path"
@@ -209,15 +222,26 @@ run_reviewed_remote_script() {
 		rm -f -- "$script_path"
 		return 1
 	fi
-	[ -s "$script_path" ] || { echo "下载结果为空。"; rm -f -- "$script_path"; return 1; }
-	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; rm -f -- "$script_path"; return 1; }
+	[ -s "$script_path" ] || { echo "다운로드 결과가 비어 있습니다."; rm -f -- "$script_path"; return 1; }
+	bash -n "$script_path" || { echo "원격 스크립트가 Bash 구문 검사에 실패했습니다:$script_path"; rm -f -- "$script_path"; return 1; }
 	digest=$(remote_script_sha256 "$script_path" 2>/dev/null) || digest="unavailable"
 
-	printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+	if [ "$mode" = "install" ]; then
+		printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+		mv -f -- "$script_path" "$install_dest" || { rm -f -- "$script_path"; return 1; }
+		chmod 0755 "$install_dest"
+		return 0
+	fi
+
+	printf '원격 스크립트가 HTTPS 다운로드 및 Bash 구문 검사를 통과했으며 자동으로 실행됩니다.\n출처: %s\nSHA-256: %s\n' "$script_url" "$digest"
 	bash "$script_path" "$@"
 	exit_status=$?
 	rm -f -- "$script_path"
 	return "$exit_status"
+}
+
+run_reviewed_remote_script() {
+	download_reviewed_remote_script "$@"
 }
 # --- end ming-sh shared lib: remote_script ---
 
@@ -251,7 +275,7 @@ install_project_entrypoint() {
 		return 1
 	fi
 	if [ -f "$PROJECT_HOME_PATH" ] && [ "$source_real" != "$home_real" ] && ! project_entrypoint_is_managed_file "$PROJECT_HOME_PATH"; then
-		echo "拒绝覆盖非本项目主脚本: $PROJECT_HOME_PATH"
+		echo "프로젝트가 아닌 기본 스크립트 덮어쓰기 거부: $PROJECT_HOME_PATH"
 		return 1
 	fi
 	if [ -L "$PROJECT_BACKUP_PATH" ]; then
@@ -338,7 +362,7 @@ UserLicenseAgreement() {
 migrate_legacy_license_acceptance || true
 CheckFirstRun_false
 
-# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。
+# 원래의 기본 명령 설치 동작을 유지합니다. 보안 검사에 실패하더라도 주요 기능을 차단하지 마십시오.
 if [ -r "${BASH_SOURCE[0]}" ]; then
 	install_project_entrypoint >/dev/null 2>&1 || true
 fi
@@ -931,8 +955,8 @@ install_crontab() {
 }
 
 
-# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。
-# 标记形如 "# ming-sh:<名称>"：安装先按标记去重再追加，卸载按标记精确删除。
+# 광범위한 grep 필터를 사용하여 관련 없는 작업을 실수로 삭제하는 것을 방지하기 위해 프로젝트 태그로 cron 작업을 관리합니다.
+# 표시는 "# ming-sh:<이름>" 형식으로 되어있습니다. 설치시 표시를 누르면 중복 제거 후 추가되고, 제거시에는 표시를 누르면 정확하게 삭제됩니다.
 cron_install_tagged() {
 	local tag="# ${PROJECT_CRON_TAG}:$1"
 	local job="$2 ${tag}"
@@ -1057,7 +1081,7 @@ backup_iptables_rules() {
 
 iptables_open() {
 	install iptables
-	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}"
+	backup_iptables_rules || echo -e "${gl_huang}경고: 방화벽 규칙의 자동 백업이 실패했습니다. 계속해서 모든 포트를 여십시오.${gl_bai}"
 	iptables -P INPUT ACCEPT
 	iptables -P FORWARD ACCEPT
 	iptables -P OUTPUT ACCEPT
@@ -1077,7 +1101,7 @@ iptables_open() {
 iptables_close_all() {
 	local current_port
 	install iptables
-	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行关闭所有端口。${gl_bai}"
+	backup_iptables_rules || echo -e "${gl_huang}경고: 방화벽 규칙의 자동 백업이 실패했습니다. 계속해서 모든 포트를 닫습니다.${gl_bai}"
 	if command -v sshd >/dev/null 2>&1; then
 		current_port=$(sshd -T 2>/dev/null | awk '$1 == "port" { print $2; exit }')
 	fi
@@ -1654,8 +1678,7 @@ install_ldnmp() {
 install_certbot() {
 
 	cd ~
-	curl -sS -O ${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh
-	chmod +x auto_cert_renewal.sh
+	download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh" ~/auto_cert_renewal.sh
 
 	check_crontab_installed
 	cron_install_tagged cert-renew '0 0 * * * ~/auto_cert_renewal.sh'
@@ -2469,8 +2492,7 @@ web_security() {
 					  cd ~
 					  install jq bc
 					  check_crontab_installed
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh
-					  chmod +x CF-Under-Attack.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh" ~/CF-Under-Attack.sh
 					  sed -i "s/AAAA/$cfuser/g" ~/CF-Under-Attack.sh
 					  sed -i "s/BBBB/$cftoken/g" ~/CF-Under-Attack.sh
 					  sed -i "s/CCCC/$cfzonID/g" ~/CF-Under-Attack.sh
@@ -5307,7 +5329,7 @@ sshkey_panel() {
 			break_end
 			  ;;
 		  *)
-			  break  # 跳出循环，退出菜单
+			  break  # 루프를 빠져나가 메뉴 종료
 			  ;;
 	  esac
   done
@@ -6034,7 +6056,7 @@ clamav_scan() {
 		clamav/clamav-debian:latest \
 		clamscan -r --log=/var/log/clamav/scan.log $SCAN_PARAMS
 
-	echo -e "${gl_lv}$* 扫描完成，病毒报告存放在${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}"
+	echo -e "${gl_lv}$* 스캔 완료, 바이러스 보고서는 ${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}에 있습니다"
 	echo -e "${gl_lv}바이러스 있으면 제발${gl_huang}scan.log${gl_lv}파일에서 FOUND 키워드를 검색하여 바이러스 위치를 확인하세요.${gl_bai}"
 
 }
@@ -6266,7 +6288,7 @@ net.ipv4.tcp_slow_start_after_idle = 0"
 	cat > "$CONF" << SYSCTL
 # 케질리온 커널 튜닝 구성
 # 모드: $mode_name | 장면: $장면
-# 메모리: ${MEM_MB}MB | 생성 시간: $(날짜 '+%Y-%m-%d %H:%M:%S')
+# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')
 
 # ──TCP 혼잡 제어──
 net.core.default_qdisc = $QDISC
@@ -6316,7 +6338,7 @@ vm.vfs_cache_pressure = $VFS_PRESSURE
 
 # ──CPU/커널 스케줄링──
 kernel.sched_autogroup_enabled = $SCHED_AUTOGROUP
-$([ -f /proc/sys/kernel/numa_balancing ] && echo "kernel.numa_balancing = $NUMA" || echo "# numa_balancing은 지원되지 않습니다")
+$([ -f /proc/sys/kernel/numa_balancing ] && echo "kernel.numa_balancing = $NUMA" || echo "# numa_balancing 不支持")
 
 # ──안전 보호──
 net.ipv4.conf.all.rp_filter = 1
@@ -6442,7 +6464,7 @@ Kernel_optimize() {
 	root_use
 	while true; do
 	  clear
-	  local current_mode=$(grep "^# 모드:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 모드: //' | awk -F'|' '{print $1}' | xargs)
+	  local current_mode=$(grep "^# 模式:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)
 	  [ -z "$current_mode" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode="자동 튜닝 모드"
 	  echo "Linux 시스템 커널 매개변수 최적화"
 	  if [ -n "$current_mode" ]; then
@@ -7065,7 +7087,7 @@ add_connection() {
 	fi
 
 	echo "$name|$KJ_SSH_HOST|$KJ_SSH_USER|$KJ_SSH_PORT|$KJ_SSH_AUTH_SECRET" >> "$CONFIG_FILE"
-	echo "连接已保存!"
+	echo "연결이 저장되었습니다!"
 }
 
 
@@ -8930,11 +8952,11 @@ linux_Oracle() {
 				case "$sys_choice" in
 				  1)
 					local xitong="-d 12"
-					break  # 结束循环
+					break  # 루프 종료
 					;;
 				  2)
 					local xitong="-u 20.04"
-					break  # 结束循环
+					break  # 루프 종료
 					;;
 				  *)
 					echo "선택이 잘못되었습니다. 다시 입력해 주세요."
@@ -9291,9 +9313,7 @@ linux_ldnmp() {
 	  mkdir $yuming
 	  cd $yuming
 
-	  docker exec php sh -c "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\""
-	  docker exec php sh -c "php composer-setup.php"
-	  docker exec php sh -c "php -r \"unlink('composer-setup.php');\""
+	  docker exec php sh -c "curl -fsSL -o composer-setup.php https://getcomposer.org/installer && curl -fsSL -o composer-setup.sig https://composer.github.io/installer.sig && php -r \"exit(hash_file('sha384', 'composer-setup.php') === trim(file_get_contents('composer-setup.sig')) ? 0 : 1);\" && php composer-setup.php --quiet && rm -f composer-setup.php composer-setup.sig"
 	  docker exec php sh -c "mv composer.phar /usr/local/bin/composer"
 
 	  docker exec php composer create-project flarum/flarum /var/www/html/$yuming
@@ -11749,7 +11769,7 @@ PYTHON_EOF
 				gum style --faint "↑↓ 테스트하려면 선택 / Enter / 종료하려면 Esc"
 				echo ""
 
-				selected_model=$(echo "$models_list" | gum filter 					--placeholder "검색 모델(예: cli-api/gpt-5.2)" 					--prompt "모델 선택 >" 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
+				selected_model=$(echo "$models_list" | gum filter 					--placeholder "搜索模型（如 cli-api/gpt-5.2）" 					--prompt "选择模型 > " 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
 
 				if [ -z "$selected_model" ] || echo "$selected_model" | head -n 1 | grep -iqE '^(error|usage|gum:)'; then
 					echo "작업이 취소되었습니다. 종료하는 중..."
@@ -13256,7 +13276,7 @@ EOF
 		local count=0
 		local agent_lines agent_id workspace
 		agent_lines=$(openclaw_memory_list_agents)
-		echo "$(printf '%s\n' 확인하고 준비하세요."$agent_lines"| sed '/^\s*$/d' | 화장실 -l | tr -d ' ') 에이전트 작업공간"
+		echo "检查并准备 $(printf '%s\n' "$agent_lines" | sed '/^\s*$/d' | wc -l | tr -d ' ') 个智能体工作区"
 		while IFS=$'\t' read -r agent_id workspace; do
 			[ -z "$agent_id" ] && continue
 			openclaw_memory_prepare_workspace "$agent_id"
@@ -13406,7 +13426,7 @@ PY
 			OPENCLAW_MEMORY_RECOMMEND_REASON+=("로컬 모델 경로가 구성되지 않았습니다.")
 		fi
 		case "$model_status" in
-			ok) OPENCLAW_MEMORY_RECOMMEND_REASON+=("本地模型文件存在") ;;
+			ok) OPENCLAW_MEMORY_RECOMMEND_REASON+=("로컬 모델 파일이 존재함") ;;
 			hf) OPENCLAW_MEMORY_RECOMMEND_REASON+=("모델은 HF 다운로드 소스에서 제공됩니다(중국에서는 느리거나 실패할 수 있음).") ;;
 			*) OPENCLAW_MEMORY_RECOMMEND_REASON+=("로컬 모델 파일이 존재하지 않거나 사용할 수 없습니다.") ;;
 		esac
@@ -15483,7 +15503,7 @@ while true; do
 	  echo -e "${gl_minglan}-------------------------"
 	  echo -e "${gl_minglan}111. ${color111}다중 형식 파일 변환 도구${gl_minglan}112. ${color112}행운의 대형 인트라넷 침투 도구"
 	  echo -e "${gl_minglan}113. ${color113}파이어폭스 브라우저${gl_minglan}114. ${color114}OpenClaw机器人管理工具${gl_huang}★${gl_bai}"
-	  echo -e "${gl_minglan}115. ${color115}Hermes机器人管理工具${gl_huang}★${gl_bai}"
+	  echo -e "${gl_minglan}115. ${color115}헤르메스 로봇 관리 도구${gl_huang}★${gl_bai}"
 	  echo -e "${gl_minglan}-------------------------"
 	  echo -e "${gl_minglan}타사 애플리케이션 목록"
 	  echo -e "${gl_minglan}귀하의 앱이 여기에 표시되기를 원하십니까? 개발자 가이드를 확인하세요.${gl_huang}${ACTIVE_APPS_REPO_URL}${gl_bai}"
@@ -16751,7 +16771,7 @@ while true; do
 
 		local app_id="41"
 		local lujing="[ -d "/www/server/panel" ]"
-		local panelname="AcePanel 原耗子面板"
+		local panelname="AcePanel (구 Haozi 패널)"
 		local panelurl="공식 주소:${gh_proxy}github.com/acepanel/panel"
 
 		panel_app_install() {
@@ -19180,7 +19200,7 @@ discourse,yunsou,ahhhhfs,nsgame,gying" \
 				local latest_tar=$(ls -t /app*.tar.gz | head -1)
 				if [ -n "$latest_tar" ]; then
 				  ssh-keygen -f "/root/.ssh/known_hosts" -R "$remote_ip"
-				  sleep 2  # 添加等待时间
+				  sleep 2  # 대기 시간 추가
 				  scp -P "$TARGET_PORT" -o StrictHostKeyChecking="$SSH_STRICT_HOST_KEY_CHECKING" "$latest_tar" "root@$remote_ip:/"
 				  echo "원격 서버/루트 디렉터리로 파일이 전송되었습니다."
 				else
@@ -19620,7 +19640,7 @@ log_menu() {
 	show_log_overview() {
 		echo "============= 시스템 로그 개요 ============="
 		echo "호스트 이름: $(호스트 이름)"
-		echo "系统时间: $(date)"
+		echo "시스템 시간: $(date)"
 		echo
 		echo "[/var/log 디렉토리 직업]"
 		du -sh /var/log 2>/dev/null
@@ -20671,8 +20691,7 @@ EOF
 					[ "$cz_day" -ge 1 ] && [ "$cz_day" -le 31 ] || cz_day=1
 
 					cd ~
-					curl -Ss -o ~/Limiting_Shut_down.sh ${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh
-					chmod +x ~/Limiting_Shut_down.sh
+					download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh" ~/Limiting_Shut_down.sh
 					sed -i "s/^rx_threshold_gb=110$/rx_threshold_gb=$rx_threshold_gb/" ~/Limiting_Shut_down.sh
 					sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/" ~/Limiting_Shut_down.sh
 					check_crontab_installed
@@ -20720,18 +20739,16 @@ EOF
 					  chmod +x ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  else
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh
-					  chmod +x ~/TG-check-notify.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh" ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  fi
 				  tmux kill-session -t TG-check-notify > /dev/null 2>&1
 				  tmux new -d -s TG-check-notify "~/TG-check-notify.sh"
 				  cron_install_tagged tg-monitor "@reboot tmux new -d -s TG-check-notify '~/TG-check-notify.sh'" > /dev/null 2>&1
 
-				  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh > /dev/null 2>&1
+				  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh" ~/TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "3i$(grep '^TELEGRAM_BOT_TOKEN=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "4i$(grep '^CHAT_ID=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh
-				  chmod +x ~/TG-SSH-check-notify.sh
 
 				  # ~/.profile 파일에 추가
 				  if ! grep -q 'bash ~/TG-SSH-check-notify.sh' ~/.profile > /dev/null 2>&1; then
@@ -21084,7 +21101,7 @@ linux_file() {
 				;;
 
 
-		   24) # 复制文件目录
+		   24) # 파일 디렉터리 복사
 				read -e -p "복사할 파일 또는 디렉터리 경로를 입력하세요." src_path
 				if [ ! -e "$src_path" ]; then
 					echo "오류: 파일 또는 디렉터리가 존재하지 않습니다."
@@ -21238,7 +21255,7 @@ while true; do
 			  local server_port=${server_port:-22}
 			  read -e -p "서버 사용자 이름(루트):" server_username
 			  local server_username=${server_username:-root}
-			  echo -e "${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}"
+			  echo -e "${gl_hui}비밀번호를 비워두면 SSH 키 인증(기본 키 또는 ssh-agent)이 사용됩니다.${gl_bai}"
 			  read -e -s -p "서버 사용자 비밀번호:" server_password
 			  echo
 			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||

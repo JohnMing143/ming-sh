@@ -88,9 +88,10 @@ hand-edited or regeneration was skipped.
    `cron_install_tagged`/`cron_remove_tagged` and migrated the co-located
    project-managed writers (logrotate, certificate renewal, TG monitor),
    removing their broad `grep -v` filters. The remove-only FRP and OpenClaw
-   gateway broad filters are intentionally left in place until their add sites
-   are identified (still tracked under CMD-012); `tests/tests_cron_tagging.sh`
-   guards the migrated writers.
+   gateway broad filters were later found to have no add site anywhere and
+   were removed on 2026-07-19 (commit 30cd66b), closing that part of CMD-012;
+   `tests/tests_cron_tagging.sh` guards the migrated writers and forbids the
+   removed filters from returning.
 5. **One sysctl path convention — done 2026-07-19.** `network-optimize.sh`
    now writes `/etc/sysctl.d/99-ming-sh-network.conf` with a
    `# ming-sh-network-optimize` marker, auto-migrates the legacy
@@ -118,16 +119,17 @@ allowlist).
 
 ## Milestone 4: remaining security backlog (on the smaller surface) — done 2026-07-19
 
-8. **Integrity pinning (CMD-002/CMD-013) — reassessed 2026-07-19.** A review
-   of the whole remote-script surface (19 URLs) found script-level pinning
-   does not apply: 14 target third-party moving refs (`latest`/branch heads)
-   and 5 interpolate the proxy-dependent project base, so there is no stable
-   digest to pin — building a pin registry here would be machinery for a case
-   that does not exist. The NodeSource `dnf` exception was re-affirmed as a
-   documented, allowlisted convenience. The applicable integrity work is
-   pinning container **images** and application **releases** to digests (a
-   separate mechanism from the script validator); that is the remaining
-   CMD-013 item. Transport (TLS), syntax check, and digest display stay as-is.
+8. **Integrity pinning (CMD-002/CMD-013) — closed 2026-07-19.** A review
+   of the whole remote-script surface (50 distinct URL expressions across 94
+   `run_reviewed_remote_script` call sites) found script-level pinning does
+   not apply: 14 target third-party moving refs (`latest`/branch heads),
+   5 interpolate the proxy-dependent project base, and the remaining 31 are
+   likewise mutable third-party refs, so there is no stable digest to pin —
+   building a pin registry here would be machinery for a case that does not
+   exist. The NodeSource `dnf` exception was re-affirmed as a documented,
+   allowlisted convenience. Image and release pinning was assessed the same
+   day and closed for the same reason (rolling tags / `releases/latest` by
+   design). Transport (TLS), syntax check, and digest display stay as-is.
 9. **Cluster authentication (CMD-010) — done 2026-07-19.** The cluster
    feature now supports SSH-key auth: a blank add-server password stores the
    credential `key` (or a hand-set `key:/path`), and `run_commands_on_servers`
@@ -194,3 +196,14 @@ signed or digest-pinned update design. Updates stay disabled until then.
   be parameterized at deployment. (The remove-only FRP/gateway crontab filters
   were found to have no add site and removed on 2026-07-19, closing that part
   of CMD-012.)
+- 2026-08-18 acceptance-review fixes: `palworld.sh` interactive values no
+  longer reach sed replacements unescaped; project-owned cron scripts
+  (auto_cert_renewal, CF-Under-Attack, Limiting_Shut_down1, TG notify pair)
+  are installed through `download_reviewed_remote_script --install` instead
+  of raw curl; the Flarum Composer installer is verified against the
+  published `installer.sig` digest; the two smoke tests that leaked
+  `.openclaw-*-test.*` directories now clean up under a trap; and
+  `tests/tests_readme_crosslinks.sh` guards the README language-selector
+  policy. Self-update remains disabled by the `project_update` stub plus its
+  static test guard (the `ENABLE_SELF_UPDATE` flag is documentation of
+  intent; the stub is the enforcement).

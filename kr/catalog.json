@@ -1,4 +1,7 @@
 {
+"\t\t\t\t\t\t\t\t  break  # 跳出": [
+"\t\t\t\t\t\t\t\t  break  # 跳出"
+],
 "\t\t\t\t\t\t\t\t  read -e -p \"输入每小时的第几分钟执行任务？（分钟，0-60）: \" minute": [
 "\t\t\t\t\t\t\t\t  read -e -p \"작업을 실행해야 하는 시간을 입력하세요. (분, 0-60):\" minute"
 ],
@@ -20,6 +23,9 @@
 "\t\t\t\t\t\t\t  echo -e \"${gl_hong}拒绝覆盖现有命令: $shortcut_path${gl_bai}\"": [
 "\t\t\t\t\t\t\t  echo -e \"${gl_hong}기존 명령을 덮어쓰지 않습니다: $shortcut_path${gl_bai}\""
 ],
+"\t\t\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t\t\t  echo \"1. 每月任务                 2. 每周任务\"": [
 "\t\t\t\t\t\t  echo \"1. 월간 작업 2. 주간 작업\""
 ],
@@ -31,6 +37,9 @@
 ],
 "\t\t\t\t\t\t  echo \"高负载自动开盾脚本已添加\"": [
 "\t\t\t\t\t\t  echo \"고부하 자동 쉴드 오픈 스크립트가 추가되었습니다.\""
+],
+"\t\t\t\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有未使用的卷吗？(Y/N): \")\" choice": [
+"\t\t\t\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有未使用的卷吗？(Y/N): \")\" choice"
 ],
 "\t\t\t\t\t\t  read -e -p \"加入网络名: \" dockernetwork": [
 "\t\t\t\t\t\t  read -e -p \"네트워크 이름 추가:\" dockernetwork"
@@ -155,11 +164,17 @@
 "\t\t\t\t\t  # 其他系统，如 Debian, Ubuntu, CentOS 等": [
 "\t\t\t\t\t  # Debian, Ubuntu, CentOS 등과 같은 기타 시스템"
 ],
+"\t\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t\t  echo \"Fail2Ban防御程序已卸载\"": [
 "\t\t\t\t\t  echo \"Fail2Ban 방어 프로그램이 제거되었습니다.\""
 ],
 "\t\t\t\t\t  echo \"到cf后台右上角我的个人资料，选择左侧API令牌，获取Global API Key\"": [
 "\t\t\t\t\t  echo \"cf 백엔드 오른쪽 상단에 있는 내 프로필로 이동하여 왼쪽에 있는 API 토큰을 선택하고 글로벌 API 키를 받으세요.\""
+],
+"\t\t\t\t\t  echo \"密码编码失败。\"": [
+"\t\t\t\t\t  echo \"密码编码失败。\""
 ],
 "\t\t\t\t\t  echo \"已配置cloudflare模式，可在cf后台，站点-安全性-事件中查看拦截记录\"": [
 "\t\t\t\t\t  echo \"Cloudflare 모드가 구성되었으며, 차단 기록은 cf 백그라운드, site-security-events에서 볼 수 있습니다.\""
@@ -214,6 +229,9 @@
 ],
 "\t\t\t\t\t[ -z \"$pattern\" ] && { echo \"不能为空\"; break_end; continue; }": [
 "\t\t\t\t\t[ -z \"$pattern\" ] && { echo \"비워둘 수 없습니다.\"; break_end; continue; }"
+],
+"\t\t\t\t\tbreak  # 结束循环": [
+"\t\t\t\t\tbreak  # 루프 종료"
 ],
 "\t\t\t\t\techo \"  ${PROJECT_COMMAND} sshkey                  进入交互菜单\"": [
 "\t\t\t\t\techo \"${PROJECT_COMMAND} sshkey가 대화형 메뉴로 들어갑니다.\""
@@ -569,6 +587,9 @@
 "\t\t\t\t  # 运行Docker容器": [
 "\t\t\t\t  # Docker 컨테이너 실행"
 ],
+"\t\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t\t  break  # 跳出循环，退出菜单"
+],
 "\t\t\t\t  echo \"0. 返回上一级选单\"": [
 "\t\t\t\t  echo \"0. 이전 메뉴로 돌아가기\""
 ],
@@ -800,6 +821,9 @@
 "\t\t\t\t  sed -i '/# 自动进入 tmux 会话/,+4d' ~/.bashrc": [
 "\t\t\t\t  sed -i '/# 자동으로 tmux 세션을 입력합니다/,+4d' ~/.bashrc"
 ],
+"\t\t\t\t  sleep 2  # 添加等待时间": [
+"\t\t\t\t  sleep 2  # 대기 시간 추가"
+],
 "\t\t\t\t\"其他备份文件\") has_other=1 ;;": [
 "\t\t\t\t\"기타 백업 파일\") has_other=1 ;;"
 ],
@@ -829,6 +853,12 @@
 ],
 "\t\t\t\t# 官方已彻底移除对 jammy, focal, bullseye 等老系统的 apt 支持": [
 "\t\t\t\t# 공식적으로 jammy, focus, Bullseye 및 기타 기존 시스템에 대한 적절한 지원이 완전히 제거되었습니다."
+],
+"\t\t\t\t# 密钥认证：使用指定的身份文件": [
+"\t\t\t\t# 密钥认证：使用指定的身份文件"
+],
+"\t\t\t\t# 密钥认证：使用默认密钥或 ssh-agent，条目不保存任何密码": [
+"\t\t\t\t# 密钥认证：使用默认密钥或 ssh-agent，条目不保存任何密码"
 ],
 "\t\t\t\t# 打印当前的 SSH 端口号": [
 "\t\t\t\t# 현재 SSH 포트 번호 인쇄"
@@ -920,6 +950,9 @@
 "\t\t\t\t[[ -z \"$original_path\" ]] && read -e -p  \"未找到原始路径，请输入还原目录路径: \" original_path": [
 "\t\t\t\t[[ -z \"$original_path\" ]] && read -e -p  \"원래 경로를 찾을 수 없습니다. 복원 디렉터리 경로를 입력하십시오:\" original_path"
 ],
+"\t\t\t\tbreak  # 跳出循环，退出菜单": [
+"\t\t\t\tbreak  # 跳出循环，退出菜单"
+],
 "\t\t\t\tcd \"$dirname\" 2>/dev/null || echo \"无法进入目录\"": [
 "\t\t\t\tcd \"$dirname\" 2>/dev/null || echo \"디렉토리에 들어갈 수 없습니다\""
 ],
@@ -946,6 +979,9 @@
 ],
 "\t\t\t\techo \"0. 返回上一级选单\"": [
 "\t\t\t\techo \"0. 이전 메뉴로 돌아가기\""
+],
+"\t\t\t\techo \"1) 保留最近 7 天\"": [
+"\t\t\t\techo \"1) 保留最近 7 天\""
 ],
 "\t\t\t\techo \"1) 系统日志\"": [
 "\t\t\t\techo \"1) 시스템 로그\""
@@ -974,6 +1010,12 @@
 "\t\t\t\techo \"15. 荷兰尤特赖赫特时间       16. 西班牙马德里时间\"": [
 "\t\t\t\techo \"15. 네덜란드 위트라흐트 시간 16. 스페인 마드리드 시간\""
 ],
+"\t\t\t\techo \"2) 保留最近 3 天\"": [
+"\t\t\t\techo \"2) 保留最近 3 天\""
+],
+"\t\t\t\techo \"2) 指定服务日志\"": [
+"\t\t\t\techo \"2) 指定服务日志\""
+],
 "\t\t\t\techo \"2. 查看SSH拦截记录\"": [
 "\t\t\t\techo \"2. SSH 차단 기록 보기\""
 ],
@@ -985,6 +1027,9 @@
 ],
 "\t\t\t\techo \"25. 巴西时间                 26. 阿根廷时间\"": [
 "\t\t\t\techo \"25. 브라질 시간 26. 아르헨티나 시간\""
+],
+"\t\t\t\techo \"3) 限制日志最大 500M\"": [
+"\t\t\t\techo \"3) 限制日志最大 500M\""
 ],
 "\t\t\t\techo \"3.  日本东京时间             4.  韩国首尔时间\"": [
 "\t\t\t\techo \"3. 일본 도쿄 시간 4. 한국 서울 시간\""
@@ -1052,6 +1097,9 @@
 "\t\t\t\techo \"⚠️ qmd 命令存在但模块损坏，重新安装...\"": [
 "\t\t\t\techo \"⚠️ qmd 명령이 존재하지만 모듈이 손상되었습니다. 다시 설치하세요...\""
 ],
+"\t\t\t\techo \"⚠️ 清理 journal 日志（安全方式）\"": [
+"\t\t\t\techo \"⚠️ 清理 journal 日志（安全方式）\""
+],
 "\t\t\t\techo \"✅ [$agent_id] 已备份索引: $backup_file\"": [
 "\t\t\t\techo \"✅ [$agent_id] 백업된 인덱스:$backup_file\""
 ],
@@ -1066,6 +1114,9 @@
 ],
 "\t\t\t\techo \"✅ 已恢复 includeDefaultMemory=true\"": [
 "\t\t\t\techo \"✅ 복원된 includeDefaultMemory=true\""
+],
+"\t\t\t\techo \"✔ journal 日志清理完成\"": [
+"\t\t\t\techo \"✔ journal 日志清理完成\""
 ],
 "\t\t\t\techo \"❌ 删除失败：provider 不存在\"": [
 "\t\t\t\techo \"❌ 삭제 실패: 공급자가 존재하지 않습니다.\""
@@ -1331,6 +1382,15 @@
 "\t\t\t\tgum style --foreground \"$orange\" --bold \"模型管理\"": [
 "\t\t\t\tgum style --foreground \"$orange\" --bold \"모델 관리\""
 ],
+"\t\t\t\tif [[ $new_port =~ ^[0-9]+$ ]]; then  # 检查输入是否为数字": [
+"\t\t\t\tif [[ $new_port =~ ^[0-9]+$ ]]; then  # 检查输入是否为数字"
+],
+"\t\t\t\timg|镜像)": [
+"\t\t\t\timg|镜像)"
+],
+"\t\t\t\tinstall|安装)": [
+"\t\t\t\tinstall|安装)"
+],
 "\t\t\t\tkj_ssh_read_host_port \"请输入远端服务器IP:  \" \"目标服务器SSH端口 [默认22]: \" \"22\"": [
 "\t\t\t\tkj_ssh_read_host_port \"원격 서버 IP를 입력하세요:\" \"대상 서버 SSH 포트 [기본값 22]:\" \"22\""
 ],
@@ -1361,14 +1421,23 @@
 "\t\t\t\tprintf \"%-24s %-34s %-20s %-10s\\n\" \"用户名\" \"用户权限\" \"用户组\" \"sudo权限\"": [
 "\t\t\t\tprintf \"%-24s %-34s %-20s %-10s\\n\" \"사용자 이름\" \"사용자 권한\" \"사용자 그룹\" \"sudo 권한\""
 ],
+"\t\t\t\tprintf \"%b最小检测结果：%s%b": [
+"\t\t\t\tprintf \"%b最小检测结果：%s%b"
+],
 "\t\t\t\tprintf '%b\\n' \"[$idx] ${name} | API: ${base_url} | 协议: ${api_type} | 模型数量: ${gl_huang}${model_count}${gl_bai} | 延迟/状态: ${latency_color}${latency_txt}${gl_bai}\"": [
 "\t\t\t\tprintf '%b\\n' \"[$idx] ${name} | API: ${base_url}| 합의:${api_type}| 모델 수:${gl_huang}${model_count}${gl_bai}| 지연/상태:${latency_color}${latency_txt}${gl_bai}\""
 ],
 "\t\t\t\tprintf '\\n# 还原容器: %q\\n' \"$c\" >> \"$RESTORE_SCRIPT\"": [
 "\t\t\t\tprintf '\\n# 복원 컨테이너: %q\\n' \"$c\" >> \"$RESTORE_SCRIPT\""
 ],
+"\t\t\t\tps|容器)": [
+"\t\t\t\tps|容器)"
+],
 "\t\t\t\tread -e -p  \"确认还原 Compose 项目 [$project_name] 到路径 [$original_path] ? (y/n): \" confirm": [
 "\t\t\t\tread -e -p  \"Compose 프로젝트 복원 확인 [$project_name] 경로 [$original_path] ? (y/n): \" confirm"
+],
+"\t\t\t\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}长时间不更新环境的用户，请慎重更新LDNMP环境，会有数据库更新失败的风险。确定更新LDNMP环境吗？(Y/N): \")\" choice": [
+"\t\t\t\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}长时间不更新环境的用户，请慎重更新LDNMP环境，会有数据库更新失败的风险。确定更新LDNMP环境吗？(Y/N): \")\" choice"
 ],
 "\t\t\t\tread -e -p \"下载完成，按任意键继续...\" ;;": [
 "\t\t\t\tread -e -p \"다운로드가 완료되었습니다. 계속하려면 아무 키나 누르세요...\" ;;"
@@ -1517,8 +1586,14 @@
 "\t\t\t\tread -erp \"请输入服务名（如 sshd、nginx）: \" svc": [
 "\t\t\t\tread -erp \"서비스 이름(예: sshd, nginx)을 입력하세요.\" svc"
 ],
+"\t\t\t\tread -erp \"请输入要启用的网卡名: \" nic": [
+"\t\t\t\tread -erp \"请输入要启用的网卡名: \" nic"
+],
 "\t\t\t\tread -erp \"请输入要查看的网卡名: \" nic": [
 "\t\t\t\tread -erp \"보려는 네트워크 카드의 이름을 입력하십시오:\" nic"
+],
+"\t\t\t\tread -erp \"请输入要禁用的网卡名: \" nic": [
+"\t\t\t\tread -erp \"请输入要禁用的网卡名: \" nic"
 ],
 "\t\t\t\tread -erp \"请选择清理方式: \" c": [
 "\t\t\t\tread -erp \"청소 방법을 선택하세요:\" c"
@@ -1536,7 +1611,10 @@
 "\t\t\t\tsafe_remove_path \"$dirname\" && echo \"디렉터리가 삭제되었습니다.\" || echo \"삭제 실패\""
 ],
 "\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"搜索模型（如 cli-api/gpt-5.2）\" \t\t\t\t\t--prompt \"选择模型 > \" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)": [
-"\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"검색 모델(예: cli-api/gpt-5.2)\" \t\t\t\t\t--prompt \"모델 선택 >\" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)"
+"\t\t\t\tselected_model=$(echo \"$models_list\" | gum filter \t\t\t\t\t--placeholder \"搜索模型（如 cli-api/gpt-5.2）\" \t\t\t\t\t--prompt \"选择模型 > \" \t\t\t\t\t--indicator \"➜ \" \t\t\t\t\t--prompt.foreground \"$orange\" \t\t\t\t\t--indicator.foreground \"$orange\" \t\t\t\t\t--cursor-text.foreground \"$orange\" \t\t\t\t\t--match.foreground \"$orange\" \t\t\t\t\t--header \"\" \t\t\t\t\t--height 35)"
+],
+"\t\t\t\tsleep 2  # 等待时间": [
+"\t\t\t\tsleep 2  # 等待时间"
 ],
 "\t\t\t\ttar -czvf \"$name.tar.gz\" \"$name\" && echo \"已压缩为 $name.tar.gz\" || echo \"压缩失败\"": [
 "\t\t\t\ttar -czvf \"$name.tar.gz\" \"$name\" && echo \"압축$name.tar.gz\" || echo \"압축 실패\""
@@ -1573,6 +1651,12 @@
 ],
 "\t\t\t  _kernel_optimize_core \"直播优化模式\" \"stream\"": [
 "\t\t\t  _kernel_optimize_core \"라이브 방송 최적화 모드\" \"stream\""
+],
+"\t\t\t  break  # 跳出": [
+"\t\t\t  break  # 跳出"
+],
+"\t\t\t  break  # 跳出循环，退出菜单": [
+"\t\t\t  break  # 루프를 빠져나가 메뉴 종료"
 ],
 "\t\t\t  echo \"0. 返回上一级选单\"": [
 "\t\t\t  echo \"0. 이전 메뉴로 돌아가기\""
@@ -1772,6 +1856,9 @@
 "\t\t\t  echo -e \"${gl_hui}-关于流量，重启服务器将重新计算-${gl_bai}\"": [
 "\t\t\t  echo -e \"${gl_hui}- 트래픽에 관해서는 서버를 다시 시작하면 다시 계산됩니다 -${gl_bai}\""
 ],
+"\t\t\t  echo -e \"${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}\"": [
+"\t\t\t  echo -e \"${gl_hui}비밀번호를 비워두면 SSH 키 인증(기본 키 또는 ssh-agent)이 사용됩니다.${gl_bai}\""
+],
 "\t\t\t  echo -e \"${gl_lv}端口 $port 当前可用${gl_bai}\"": [
 "\t\t\t  echo -e \"${gl_lv}포트$port현재 사용 가능${gl_bai}\""
 ],
@@ -1837,6 +1924,12 @@
 ],
 "\t\t\t  local tiaoyou_moshi=\"高性能优化模式\"": [
 "\t\t\t  local tiaoyou_moshi=\"고성능 최적화 모드\""
+],
+"\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定卸载docker环境吗？(Y/N): \")\" choice": [
+"\t\t\t  read -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定卸载docker环境吗？(Y/N): \")\" choice"
+],
+"\t\t\t  read -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}将清理无用的镜像容器网络，包括停止的容器，确定清理吗？(Y/N): \")\" choice": [
+"\t\t\t  read -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}将清理无用的镜像容器网络，包括停止的容器，确定清理吗？(Y/N): \")\" choice"
 ],
 "\t\t\t  read -e -p \"也可以输入下载链接，远程下载备份数据，直接回车将跳过远程下载： \" url_download_db": [
 "\t\t\t  read -e -p \"다운로드 링크를 입력하여 원격으로 백업 데이터를 다운로드할 수도 있습니다. 원격 다운로드를 건너뛰려면 Enter를 직접 누르세요.\" url_download_db"
@@ -1912,6 +2005,21 @@
 ],
 "\t\t\t  read -e -s -p \"服务器用户密码: \" server_password": [
 "\t\t\t  read -e -s -p \"서버 사용자 비밀번호:\" server_password"
+],
+"\t\t\t  sleep 2  # 添加等待时间": [
+"\t\t\t  sleep 2  # 添加等待时间"
+],
+"\t\t\t 25) # 传送文件至远端服务器": [
+"\t\t\t 25) # 传送文件至远端服务器"
+],
+"\t\t\t\"/etc\"              # 配置文件和软件包配置": [
+"\t\t\t\"/etc\"              # 配置文件和软件包配置"
+],
+"\t\t\t\"/home\"             # 用户数据": [
+"\t\t\t\"/home\"             # 用户数据"
+],
+"\t\t\t\"/usr\"              # 已安装的软件文件": [
+"\t\t\t\"/usr\"              # 已安装的软件文件"
 ],
 "\t\t\t# 1. 输入证书 (ECC 和 RSA 证书开头都是 BEGIN CERTIFICATE)": [
 "\t\t\t# 1. 인증서를 입력합니다(ECC 및 RSA 인증서 모두 BEGIN CERTIFICATE로 시작함)."
@@ -1997,17 +2105,74 @@
 "\t\t\t# 高性能/直播/游戏：激进参数": [
 "\t\t\t# 고성능/생방송/게임: 급진적인 매개변수"
 ],
+"\t\t\t*)  # 处理无效输入": [
+"\t\t\t*)  # 处理无效输入"
+],
 "\t\t\t*) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型文件不存在或不可用\") ;;": [
 "\t\t\t*) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"로컬 모델 파일이 존재하지 않거나 사용할 수 없습니다.\") ;;"
 ],
 "\t\t\t*) echo \"无效的选择，请重试。\" ;;": [
 "\t\t\t*) echo \"선택이 잘못되었습니다. 다시 시도해 주세요.\" ;;"
 ],
+"\t\t\t0)  # 返回上一级选单": [
+"\t\t\t0)  # 返回上一级选单"
+],
+"\t\t\t1)  # 进入目录": [
+"\t\t\t1)  # 进入目录"
+],
+"\t\t\t11) # 创建文件": [
+"\t\t\t11) # 创建文件"
+],
+"\t\t\t12) # 编辑文件": [
+"\t\t\t12) # 编辑文件"
+],
+"\t\t\t13) # 修改文件权限": [
+"\t\t\t13) # 修改文件权限"
+],
+"\t\t\t14) # 重命名文件": [
+"\t\t\t14) # 重命名文件"
+],
+"\t\t\t15) # 删除文件": [
+"\t\t\t15) # 删除文件"
+],
+"\t\t\t2)  # 创建目录": [
+"\t\t\t2)  # 创建目录"
+],
+"\t\t\t21) # 压缩文件/目录": [
+"\t\t\t21) # 压缩文件/目录"
+],
+"\t\t\t22) # 解压文件/目录": [
+"\t\t\t22) # 解压文件/目录"
+],
+"\t\t\t23) # 移动文件或目录": [
+"\t\t\t23) # 移动文件或目录"
+],
+"\t\t\t3)  # 修改目录权限": [
+"\t\t\t3)  # 修改目录权限"
+],
+"\t\t\t4)  # 重命名目录": [
+"\t\t\t4)  # 重命名目录"
+],
+"\t\t\t5)  # 删除目录": [
+"\t\t\t5)  # 删除目录"
+],
+"\t\t\t6)  # 返回上一级选单目录": [
+"\t\t\t6)  # 返回上一级选单目录"
+],
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"QMD 可用\")": [
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"QMD 사용 가능\")"
 ],
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"hf-mirror.com 可访问\")": [
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"hf-mirror.com 可访问\")"
+],
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"huggingface.co / hf-mirror.com 可能不可达（疑似国内/受限网络）\")": [
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"Huggingface.co / hf-mirror.com에 연결할 수 없을 수 있습니다(국내/제한된 네트워크로 의심됨).\")"
+],
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"huggingface.co 可访问\")": [
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"huggingface.co 可访问\")"
+],
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"未检测到 QMD\")": [
+"\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"未检测到 QMD\")"
 ],
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"未配置本地模型路径\")": [
 "\t\t\tOPENCLAW_MEMORY_RECOMMEND_REASON+=(\"로컬 모델 경로가 구성되지 않았습니다.\")"
@@ -2035,6 +2200,9 @@
 ],
 "\t\t\t[[ -z \"$IMAGE\" || \"$IMAGE\" == \"null\" ]] && { echo -e \"${gl_hong}未找到镜像信息，跳过: $container${gl_bai}\"; continue; }": [
 "\t\t\t[[ -z \"$IMAGE\" || \"$IMAGE\" == \"null\" ]] && { echo -e \"${gl_hong}미러 정보를 찾을 수 없습니다. 건너뛰세요:$container${gl_bai}\"; continue; }"
+],
+"\t\t\tbreak  # 跳出循环，退出菜单": [
+"\t\t\tbreak  # 跳出循环，退出菜单"
 ],
 "\t\t\tcurrent_mode=\"\\033[1;31m完全开放模式\\033[0m\"": [
 "\t\t\tcurrent_mode=\"\\033[1;31m완전 개방 모드\\033[0m\""
@@ -2324,6 +2492,9 @@
 "\t\t\techo \"========== 查看文件：$file ==========\"": [
 "\t\t\techo \"========== 파일 보기:$file ==========\""
 ],
+"\t\t\techo \">>> 来源文件：$file\"": [
+"\t\t\techo \">>> 来源文件：$file\""
+],
 "\t\t\techo \"Auto : 自动推荐（基于可用性 + 网络探测）\"": [
 "\t\t\techo \"자동: 자동 추천(가용성 + 네트워크 감지 기준)\""
 ],
@@ -2446,6 +2617,9 @@
 ],
 "\t\t\techo \"✅ OpenClaw 项目备份完成 (${mode_label}): $out_file\"": [
 "\t\t\techo \"✅ OpenClaw 프로젝트 백업 완료 (${mode_label}): $out_file\""
+],
+"\t\t\techo \"✅ bun 安装完成\"": [
+"\t\t\techo \"✅ bun 安装完成\""
 ],
 "\t\t\techo \"✅ bun 已存在\"": [
 "\t\t\techo \"✅ 롤빵이 이미 존재합니다\""
@@ -2606,6 +2780,9 @@
 "\t\t\techo \"❌ 未找到配置文件: $config_file\"": [
 "\t\t\techo \"❌ 구성 파일을 찾을 수 없습니다:$config_file\""
 ],
+"\t\t\techo \"❌ 未检测到 curl 或 wget，无法安装 bun。\"": [
+"\t\t\techo \"❌ 未检测到 curl 或 wget，无法安装 bun。\""
+],
 "\t\t\techo \"❌ 未检测到 openclaw 命令，请先安装或初始化 OpenClaw。\"": [
 "\t\t\techo \"❌ openclaw 명령이 감지되지 않습니다. 먼저 OpenClaw를 설치하거나 초기화하세요.\""
 ],
@@ -2761,6 +2938,15 @@
 ],
 "\t\t\techo \"当前白名单：\"": [
 "\t\t\techo \"현재 허용 목록:\""
+],
+"\t\t\techo \"拒绝删除关键系统路径: $target_real\"": [
+"\t\t\techo \"拒绝删除关键系统路径: $target_real\""
+],
+"\t\t\techo \"拒绝覆盖指向其他目标的命令链接: $PROJECT_INSTALL_PATH\"": [
+"\t\t\techo \"拒绝覆盖指向其他目标的命令链接: $PROJECT_INSTALL_PATH\""
+],
+"\t\t\techo \"拒绝覆盖现有非本项目命令: $PROJECT_INSTALL_PATH\"": [
+"\t\t\techo \"拒绝覆盖现有非本项目命令: $PROJECT_INSTALL_PATH\""
 ],
 "\t\t\techo \"推荐版本:  3.12    3.11    3.10    3.9    3.8    2.7\"": [
 "\t\t\techo \"권장 버전: 3.12 3.11 3.10 3.9 3.8 2.7\""
@@ -3059,6 +3245,12 @@
 "\t\t\tkj_ssh_read_host_port \"请输入远端服务器IP:  \" \"目标服务器SSH端口 [默认22]: \" \"22\"": [
 "\t\t\tkj_ssh_read_host_port \"원격 서버 IP를 입력하세요:\" \"대상 서버 SSH 포트 [기본값 22]:\" \"22\""
 ],
+"\t\t\tok) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"本地模型文件存在\") ;;": [
+"\t\t\tok) OPENCLAW_MEMORY_RECOMMEND_REASON+=(\"로컬 모델 파일이 존재함\") ;;"
+],
+"\t\t\tprintf \"%-15s %-10s %-18s %-20s\\n\" \"$nic\" \"$state\" \"${ipaddr:-无}\" \"$mac\"": [
+"\t\t\tprintf \"%-15s %-10s %-18s %-20s\\n\" \"$nic\" \"$state\" \"${ipaddr:-无}\" \"$mac\""
+],
 "\t\t\tprintf \"%-25s %-25s %-25s\\n\" \"容器名称\" \"网络名称\" \"IP地址\"": [
 "\t\t\tprintf \"%-25s %-25s %-25s\\n\" \"컨테이너 이름\" \"네트워크 이름\" \"IP 주소\""
 ],
@@ -3070,6 +3262,12 @@
 ],
 "\t\t\tread -e -p  \"请选择: \" choice": [
 "\t\t\tread -e -p  \"선택하세요:\" choice"
+],
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有容器吗？(Y/N): \")\" choice": [
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有容器吗？(Y/N): \")\" choice"
+],
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有镜像吗？(Y/N): \")\" choice": [
+"\t\t\tread -e -p \"$(echo -e \"${gl_hong}注意: ${gl_bai}确定删除所有镜像吗？(Y/N): \")\" choice"
 ],
 "\t\t\tread -e -p \"是否恢复为 true 并重建索引？(Y/n): \" fix_choice": [
 "\t\t\tread -e -p \"true로 되돌리고 인덱스를 다시 작성하시겠습니까? (예/아니요):\" fix_choice"
@@ -3215,11 +3413,23 @@
 "\t\t\tupdate_status=\"${gl_huang}发现新版本!${gl_bai}\"": [
 "\t\t\tupdate_status=\"${gl_huang}새 버전이 발견되었습니다!${gl_bai}\""
 ],
+"\t\t\t已连接) echo -e \"${gl_lv}${status}${gl_bai}\" ;;": [
+"\t\t\t已连接) echo -e \"${gl_lv}${status}${gl_bai}\" ;;"
+],
+"\t\t\t已配置) echo -e \"${gl_huang}${status}${gl_bai}\" ;;": [
+"\t\t\t已配置) echo -e \"${gl_huang}${status}${gl_bai}\" ;;"
+],
+"\t\t\t异常) echo -e \"${gl_hong}${status}${gl_bai}\" ;;": [
+"\t\t\t异常) echo -e \"${gl_hong}${status}${gl_bai}\" ;;"
+],
 "\t\t  \t  echo -e \"10. 设置网络为${gl_huang}ipv4优先${gl_bai}\"": [
 "\t\t  \t  echo -e \"10. 네트워크를 다음으로 설정합니다.${gl_huang}IPv4 우선순위${gl_bai}\""
 ],
 "\t\t  \techo \"请再次尝试部署 $webname\"": [
 "\t\t  \techo \"다시 배포해 보세요.$webname\""
+],
+"\t\t   24) # 复制文件目录": [
+"\t\t   24) # 파일 디렉터리 복사"
 ],
 "\t\t   local YTDLP_STATUS=\"${gl_hui}未安装${gl_bai}\"": [
 "\t\t   local YTDLP_STATUS=\"${gl_hui}설치되지 않음${gl_bai}\""
@@ -3626,8 +3836,17 @@
 "\t\t# 默认本地 IP": [
 "\t\t# 기본 로컬 IP"
 ],
+"\t\t''|/|.|..) echo \"拒绝删除含糊路径: $target\"; return 1 ;;": [
+"\t\t''|/|.|..) echo \"拒绝删除含糊路径: $target\"; return 1 ;;"
+],
+"\t\t''|/|//*) echo \"拒绝删除空路径、根路径或含糊的双斜杠路径: $target\"; return 1 ;;": [
+"\t\t''|/|//*) echo \"拒绝删除空路径、根路径或含糊的双斜杠路径: $target\"; return 1 ;;"
+],
 "\t\t) || { echo \"❌ sha256 校验失败，拒绝还原\"; return 1; }": [
 "\t\t) || { echo \"❌ sha256 확인이 실패하고 복원이 거부되었습니다.\"; return 1; }"
+],
+"\t\t*) echo \"拒绝下载非 HTTPS 脚本: $script_url\"; return 1 ;;": [
+"\t\t*) echo \"HTTPS가 아닌 스크립트 다운로드 거부: $script_url\"; return 1 ;;"
 ],
 "\t\t*) echo \"无效的选择！\"; return ;;": [
 "\t\t*) echo \"잘못된 선택입니다!\"; return ;;"
@@ -3640,6 +3859,15 @@
 ],
 "\t\t*) echo \"错误: 请输入有效的选项！\" ; return ;;": [
 "\t\t*) echo \"오류: 유효한 옵션을 입력하십시오!\" ; return ;;"
+],
+"\t\t1) cron_time=\"$random_minute * * * *\" ;;  # 每小时，随机分钟执行": [
+"\t\t1) cron_time=\"$random_minute * * * *\" ;;  # 每小时，随机分钟执行"
+],
+"\t\t2) cron_time=\"$random_minute 0 * * *\" ;;  # 每天，随机分钟执行": [
+"\t\t2) cron_time=\"$random_minute 0 * * *\" ;;  # 每天，随机分钟执行"
+],
+"\t\t3) cron_time=\"$random_minute 0 * * 1\" ;;  # 每周，随机分钟执行": [
+"\t\t3) cron_time=\"$random_minute 0 * * 1\" ;;  # 每周，随机分钟执行"
 ],
 "\t\tCFmessage=\" cf模式已开启\"": [
 "\t\tCFmessage=\"cf 모드가 켜져 있습니다\""
@@ -3692,6 +3920,9 @@
 "\t\tarchive_path=$(openclaw_read_import_path \"请输入 OpenClaw 项目备份包路径\")": [
 "\t\tarchive_path=$(openclaw_read_import_path \"OpenClaw 프로젝트 백업 패키지 경로를 입력해주세요\")"
 ],
+"\t\tbackup|bf|备份)": [
+"\t\tbackup|bf|备份)"
+],
 "\t\tbr_status=\" br压缩已开启\"": [
 "\t\tbr_status=\"br압축이 켜져 있습니다\""
 ],
@@ -3706,6 +3937,15 @@
 ],
 "\t\tcheck_f2b_status=\"${gl_lv}已安装${gl_bai}\"": [
 "\t\tcheck_f2b_status=\"${gl_lv}설치됨${gl_bai}\""
+],
+"\t\tclean|清理)": [
+"\t\tclean|清理)"
+],
+"\t\tdd|重装)": [
+"\t\tdd|重装)"
+],
+"\t\tdisk|硬盘管理)": [
+"\t\tdisk|硬盘管理)"
 ],
 "\t\techo \"  Exec 限制: ${current_sec:-(unset)}\"": [
 "\t\techo \"실행 제한: ${current_sec:-(unset)}\""
@@ -3794,6 +4034,9 @@
 "\t\techo \"1. 挂载分区        2. 卸载分区        3. 查看已挂载分区\"": [
 "\t\techo \"1. 파티션 마운트 2. 파티션 마운트 해제 3. 마운트된 파티션 보기\""
 ],
+"\t\techo \"1. 查看当前常用环境变量\"": [
+"\t\techo \"1. 查看当前常用环境变量\""
+],
 "\t\techo \"1. 查看最近系统日志（journal）\"": [
 "\t\techo \"1. 최신 시스템 로그(일지)를 확인하세요.\""
 ],
@@ -3851,6 +4094,9 @@
 "\t\techo \"2. 查看指定服务日志\"": [
 "\t\techo \"2. 지정된 서비스 로그 보기\""
 ],
+"\t\techo \"2. 禁用网卡\"": [
+"\t\techo \"2. 禁用网卡\""
+],
 "\t\techo \"2. 远程主机是否可访问\"": [
 "\t\techo \"2. 원격 호스트에 접근 가능한지 여부\""
 ],
@@ -3875,6 +4121,9 @@
 "\t\techo \"3. 执行本地同步到远端         4. 执行远端同步到本地\"": [
 "\t\techo \"3. 원격 사이트에 대한 로컬 동기화 수행 4. 로컬 사이트에 대한 원격 동기화 수행\""
 ],
+"\t\techo \"3. 查看 ~/.profile\"": [
+"\t\techo \"3. 查看 ~/.profile\""
+],
 "\t\techo \"3. 查看登录/安全日志\"": [
 "\t\techo \"3. 로그인/보안 로그 보기\""
 ],
@@ -3889,6 +4138,9 @@
 ],
 "\t\techo \"4. 刷新网卡信息\"": [
 "\t\techo \"4. 네트워크 카드 정보 새로 고침\""
+],
+"\t\techo \"4. 实时跟踪日志\"": [
+"\t\techo \"4. 实时跟踪日志\""
 ],
 "\t\techo \"4. 本地和远程目录是否有正确的访问权限\"": [
 "\t\techo \"4. 로컬 및 원격 디렉터리에 올바른 액세스 권한이 있습니까?\""
@@ -3925,6 +4177,9 @@
 ],
 "\t\techo \"5. 添加域名访问     6. 删除域名访问\"": [
 "\t\techo \"5. 도메인 이름 액세스 추가 6. 도메인 이름 액세스 삭제\""
+],
+"\t\techo \"5. 清理旧 journal 日志\"": [
+"\t\techo \"5. 清理旧 journal 日志\""
 ],
 "\t\techo \"5. 编辑 ~/.profile\"": [
 "\t\techo \"5. ~/.profile 편집\""
@@ -3967,6 +4222,9 @@
 ],
 "\t\techo \"========== 当前已生效环境变量（节选） ==========\"": [
 "\t\techo \"========== 현재 적용되는 환경변수(발췌) ==========\""
+],
+"\t\techo \"========== 配置文件中定义的变量（解析） ==========\"": [
+"\t\techo \"========== 配置文件中定义的变量（解析） ==========\""
 ],
 "\t\techo \"=========== 系统日志管理菜单 ===========\"": [
 "\t\techo \"=========== 시스템 로그 관리 메뉴 ===========\""
@@ -4070,8 +4328,14 @@
 "\t\techo \"❌ 未找到配置文件: $config_file\"": [
 "\t\techo \"❌ 구성 파일을 찾을 수 없습니다:$config_file\""
 ],
+"\t\techo \"❌ 未检测到 curl 或 wget，无法下载。\"": [
+"\t\techo \"❌ 未检测到 curl 或 wget，无法下载。\""
+],
 "\t\techo \"❌ 未识别的包管理器\"": [
 "\t\techo \"❌ 인식할 수 없는 패키지 관리자\""
+],
+"\t\techo \"⬇️ 安装 bun...\"": [
+"\t\techo \"⬇️ 安装 bun...\""
 ],
 "\t\techo \"⬇️ 通过 npm 安装 qmd: @tobilu/qmd\"": [
 "\t\techo \"⬇️ npm을 통해 qmd 설치: @tobilu/qmd\""
@@ -4100,6 +4364,9 @@
 "\t\techo \"使用国内镜像源...\"": [
 "\t\techo \"국내 미러 소스를 사용하세요...\""
 ],
+"\t\techo \"使用海外镜像源...\"": [
+"\t\techo \"使用海外镜像源...\""
+],
 "\t\techo \"修改选项（留空跳过）：\"": [
 "\t\techo \"옵션 수정(건너뛰려면 비워 두세요):\""
 ],
@@ -4120,6 +4387,9 @@
 ],
 "\t\techo \"分区卸载成功: $MOUNT_POINT\"": [
 "\t\techo \"파티션이 성공적으로 제거되었습니다:$MOUNT_POINT\""
+],
+"\t\techo \"分区已经挂载！\"": [
+"\t\techo \"分区已经挂载！\""
 ],
 "\t\techo \"分区已经挂载，请先卸载！\"": [
 "\t\techo \"파티션이 마운트되었습니다. 먼저 마운트를 해제하세요!\""
@@ -4277,6 +4547,21 @@
 "\t\techo \"成功添加 ${added} 条新的公钥到 ${authorized_keys}\"": [
 "\t\techo \"성공적으로 추가되었습니다${added}새로운 공개 키가 도착합니다${authorized_keys}\""
 ],
+"\t\techo \"拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH\"": [
+"\t\techo \"拒绝写入符号链接备份路径: $PROJECT_BACKUP_PATH\""
+],
+"\t\techo \"拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖符号链接主脚本路径: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非普通文件主脚本路径: $PROJECT_HOME_PATH\"": [
+"\t\techo \"拒绝覆盖非普通文件主脚本路径: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非本项目主脚本: $PROJECT_HOME_PATH\"": [
+"\t\techo \"프로젝트가 아닌 기본 스크립트 덮어쓰기 거부: $PROJECT_HOME_PATH\""
+],
+"\t\techo \"拒绝覆盖非本项目备份文件: $PROJECT_BACKUP_PATH\"": [
+"\t\techo \"拒绝覆盖非本项目备份文件: $PROJECT_BACKUP_PATH\""
+],
 "\t\techo \"按任意键返回...\"": [
 "\t\techo \"돌아가려면 아무 키나 누르세요...\""
 ],
@@ -4313,6 +4598,9 @@
 "\t\techo \"无法获取文件系统类型！\"": [
 "\t\techo \"파일 시스템 유형을 가져올 수 없습니다!\""
 ],
+"\t\techo \"无法读取当前脚本，拒绝安装快捷命令。\"": [
+"\t\techo \"无法读取当前脚本，拒绝安装快捷命令。\""
+],
 "\t\techo \"更新 OpenClaw...\"": [
 "\t\techo \"오픈클로 업데이트...\""
 ],
@@ -4344,7 +4632,7 @@
 "\t\techo \"OpenClaw 상태 로그 보기\""
 ],
 "\t\techo \"检查并准备 $(printf '%s\\n' \"$agent_lines\" | sed '/^\\s*$/d' | wc -l | tr -d ' ') 个智能体工作区\"": [
-"\t\techo \"$(printf '%s\\n' 확인하고 준비하세요.\"$agent_lines\"| sed '/^\\s*$/d' | 화장실 -l | tr -d ' ') 에이전트 작업공간\""
+"\t\techo \"检查并准备 $(printf '%s\\n' \"$agent_lines\" | sed '/^\\s*$/d' | wc -l | tr -d ' ') 个智能体工作区\""
 ],
 "\t\techo \"检查配置文件: ${config_file:-$(openclaw_permission_config_file)}\"": [
 "\t\techo \"구성 파일을 확인하세요: ${config_file:-$(openclaw_permission_config_file)}\""
@@ -4412,6 +4700,9 @@
 "\t\techo \"用法：create_user_with_sshkey <用户名>\"": [
 "\t\techo \"사용법: create_user_with_sshkey <사용자 이름>\""
 ],
+"\t\techo \"目标不存在: $target\"": [
+"\t\techo \"目标不存在: $target\""
+],
 "\t\techo \"目标方案: $scheme_label\"": [
 "\t\techo \"목표 계획:$scheme_label\""
 ],
@@ -4429,6 +4720,9 @@
 ],
 "\t\techo \"系统备份功能\"": [
 "\t\techo \"시스템 백업 기능\""
+],
+"\t\techo \"系统时间: $(date)\"": [
+"\t\techo \"시스템 시간: $(date)\""
 ],
 "\t\techo \"索引修复诊断\"": [
 "\t\techo \"인덱스 복구 진단\""
@@ -4534,6 +4828,9 @@
 ],
 "\t\techo \"镜像源探测: huggingface.co=${OPENCLAW_MEMORY_HF_OK:-unknown} hf-mirror.com=${OPENCLAW_MEMORY_MIRROR_OK:-unknown}\"": [
 "\t\techo \"미러 소스 감지:huggingface.co=${OPENCLAW_MEMORY_HF_OK:-unknown} hf-mirror.com=${OPENCLAW_MEMORY_MIRROR_OK:-unknown}\""
+],
+"\t\techo \"需要 curl 或 wget 才能下载脚本。\"": [
+"\t\techo \"需要 curl 或 wget 才能下载脚本。\""
 ],
 "\t\techo \"高级选项: 输入 config 仅写配置（不安装不下载、不索引、不重启）\"": [
 "\t\techo \"고급 옵션: 구성만 작성하려면 구성을 입력하세요(설치 없음, 다운로드 없음, 인덱싱 없음, 다시 시작 없음).\""
@@ -4724,14 +5021,26 @@
 "\t\techo -e \"🦞 OPENCLAW 管理工具 by ${PROJECT_NAME} 🦞\"": [
 "\t\techo -e \"🦞 ${PROJECT_NAME}의 OPENCLAW 관리 도구 🦞\""
 ],
+"\t\tenable|autostart|开机启动)": [
+"\t\tenable|autostart|开机启动)"
+],
+"\t\tfd|rp|反代)": [
+"\t\tfd|rp|反代)"
+],
 "\t\tgzip_status=\" gzip压缩已开启\"": [
 "\t\tgzip_status=\"gzip 압축이 켜져 있습니다\""
 ],
 "\t\tif [ \"$confirm_text\" != \"我已知晓高风险并继续还原\" ]; then": [
 "\t\tif [ \"$confirm_text\" != \"위험성이 높다는 것을 인지하고 복원을 계속하고 있습니다.\" ]; then"
 ],
+"\t\tinstall|add|安装)": [
+"\t\tinstall|add|安装)"
+],
 "\t\tkj_ssh_read_host_user_port \"目标服务器IP: \" \"目标服务器SSH用户名 [默认root]: \" \"目标服务器SSH端口 [默认22]: \" \"root\" \"22\"": [
 "\t\tkj_ssh_read_host_user_port \"대상 서버 IP:\" \"대상 서버 SSH 사용자 이름 [기본 루트]:\" \"대상 서버 SSH 포트 [기본값 22]:\" \"root\" \"22\""
+],
+"\t\tloadbalance|负载均衡)": [
+"\t\tloadbalance|负载均衡)"
 ],
 "\t\tlocal app_name=\"2FAuth自托管二步验证器\"": [
 "\t\tlocal app_name=\"2FAuth 자체 호스팅 2단계 인증자\""
@@ -5408,6 +5717,9 @@
 "\t\tlocal panelname=\"AMH面板\"": [
 "\t\tlocal panelname=\"AMH 패널\""
 ],
+"\t\tlocal panelname=\"AcePanel 原耗子面板\"": [
+"\t\tlocal panelname=\"AcePanel (구 Haozi 패널)\""
+],
 "\t\tlocal panelname=\"宝塔面板\"": [
 "\t\tlocal panelname=\"탑 패널\""
 ],
@@ -5429,6 +5741,18 @@
 "\t\tmode_info=\" 高性能模式\"": [
 "\t\tmode_info=\"고성능 모드\""
 ],
+"\t\tnhyh|内核优化)": [
+"\t\tnhyh|内核优化)"
+],
+"\t\topenclaw config set tools.elevated.enabled true >/dev/null 2>&1 # 允许智能体申请提权": [
+"\t\topenclaw config set tools.elevated.enabled true >/dev/null 2>&1 # 允许智能体申请提权"
+],
+"\t\topenclaw config set tools.exec.strictInlineEval true >/dev/null 2>&1  # 拦截危险的内联代码": [
+"\t\topenclaw config set tools.exec.strictInlineEval true >/dev/null 2>&1  # 拦截危险的内联代码"
+],
+"\t\topenclaw config unset commands.bash >/dev/null 2>&1 # 废弃旧版参数": [
+"\t\topenclaw config unset commands.bash >/dev/null 2>&1 # 废弃旧版参数"
+],
 "\t\topenclaw config validate || echo \"⚠️ 配置校验未通过，请检查上方输出。\"": [
 "\t\topenclaw config validate || echo \"⚠️ 구성 확인에 실패했습니다. 위의 출력을 확인하세요.\""
 ],
@@ -5449,6 +5773,9 @@
 ],
 "\t\tprintf \"请输入选项并回车: \"": [
 "\t\tprintf \"옵션을 입력하고 Enter를 누르십시오.\""
+],
+"\t\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\"": [
+"\t\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\""
 ],
 "\t\tread -e -p  \"请输入 WireGuard 网段 (默认 10.13.13.0): \" NETWORK": [
 "\t\tread -e -p  \"WireGuard 네트워크 세그먼트(기본값 10.13.13.0)를 입력하세요.\" NETWORK"
@@ -5473,6 +5800,9 @@
 ],
 "\t\tread -e -p \"  新名称: \" new_name": [
 "\t\tread -e -p \"새 이름:\" new_name"
+],
+"\t\tread -e -p \"$(echo -e \"${gl_hong}强烈建议：${gl_bai}先备份全部网站数据，再卸载LDNMP环境。确定删除所有网站数据吗？(Y/N): \")\" choice": [
+"\t\tread -e -p \"$(echo -e \"${gl_hong}强烈建议：${gl_bai}先备份全部网站数据，再卸载LDNMP环境。确定删除所有网站数据吗？(Y/N): \")\" choice"
 ],
 "\t\tread -e -p \"二次确认：输入 DELETE 执行删除: \" confirm_step2": [
 "\t\tread -e -p \"보조 확인: 삭제하려면 DELETE를 입력하세요.\" confirm_step2"
@@ -5627,17 +5957,50 @@
 "\t\tread -rsp \"请输入 API Key (输入不显示): \" api_key": [
 "\t\tread -rsp \"API 키를 입력하세요(입력은 표시되지 않습니다):\" api_key"
 ],
+"\t\tremove|del|uninstall|卸载)": [
+"\t\tremove|del|uninstall|卸载)"
+],
+"\t\trestart|重启)": [
+"\t\trestart|重启)"
+],
 "\t\trm -rf \"$tmp_unpack\"; echo \"✅ 记忆全量还原完成\"; break_end": [
 "\t\trm -rf \"$tmp_unpack\"; echo \"✅ 메모리 전체 복구 완료\"; break_end"
 ],
+"\t\trsync|远程同步)": [
+"\t\trsync|远程同步)"
+],
+"\t\tssh|远程连接)": [
+"\t\tssh|远程连接)"
+],
+"\t\tstart|启动)": [
+"\t\tstart|启动)"
+],
+"\t\tstatus|状态)": [
+"\t\tstatus|状态)"
+],
+"\t\tstop|停止)": [
+"\t\tstop|停止)"
+],
+"\t\tstream|L4负载均衡)": [
+"\t\tstream|L4负载均衡)"
+],
 "\t\ttar -xzf \"$archive_path\" -C \"$unpack_root\" || { echo \"❌ 备份包解压失败\"; return 1; }": [
 "\t\ttar -xzf \"$archive_path\" -C \"$unpack_root\" || { echo \"❌ 백업 패키지의 압축을 풀지 못했습니다.\"; return 1; }"
+],
+"\t\ttime|时区)": [
+"\t\ttime|时区)"
 ],
 "\t\ttrash_status=\"${gl_hui}未启用${gl_bai}\"": [
 "\t\ttrash_status=\"${gl_hui}활성화되지 않음${gl_bai}\""
 ],
 "\t\ttrash_status=\"${gl_lv}已启用${gl_bai}\"": [
 "\t\ttrash_status=\"${gl_lv}활성화됨${gl_bai}\""
+],
+"\t\ttrash|hsz|回收站)": [
+"\t\ttrash|hsz|回收站)"
+],
+"\t\tupdate|更新)": [
+"\t\tupdate|更新)"
 ],
 "\t\twaf_status=\" WAF已开启\"": [
 "\t\twaf_status=\"WAF가 켜져 있습니다.\""
@@ -5647,6 +6010,24 @@
 ],
 "\t\t{ [ -z \"$agent_id\" ] || [ -z \"$bind_value\" ]; } && echo \"已取消：参数不能为空。\" && return 1": [
 "\t\t{ [ -z \"$agent_id\" ] || [ -z \"$bind_value\" ]; } && echo \"취소됨: 매개변수는 비워둘 수 없습니다.\" && return 1"
+],
+"\t\t关闭端口|gbdk)": [
+"\t\t关闭端口|gbdk)"
+],
+"\t\t命令收藏夹|fav)": [
+"\t\t命令收藏夹|fav)"
+],
+"\t\t打开端口|dkdk)": [
+"\t\t打开端口|dkdk)"
+],
+"\t\t放行IP|fxip)": [
+"\t\t放行IP|fxip)"
+],
+"\t\t防火墙|fhq)": [
+"\t\t防火墙|fhq)"
+],
+"\t\t阻止IP|zzip)": [
+"\t\t阻止IP|zzip)"
 ],
 "\t  \t  IS_KEY_ENABLED=\"${gl_hui}未启用${gl_bai}\"": [
 "\t  \t  IS_KEY_ENABLED=\"${gl_hui}활성화되지 않음${gl_bai}\""
@@ -5917,6 +6298,9 @@
 ],
 "\t  echo -e \"${gl_minglan}113. ${color113}Firefox浏览器                       ${gl_minglan}114. ${color114}OpenClaw机器人管理工具${gl_huang}★${gl_bai}\"": [
 "\t  echo -e \"${gl_minglan}113. ${color113}파이어폭스 브라우저${gl_minglan}114. ${color114}OpenClaw机器人管理工具${gl_huang}★${gl_bai}\""
+],
+"\t  echo -e \"${gl_minglan}115. ${color115}Hermes机器人管理工具${gl_huang}★${gl_bai}\"": [
+"\t  echo -e \"${gl_minglan}115. ${color115}헤르메스 로봇 관리 도구${gl_huang}★${gl_bai}\""
 ],
 "\t  echo -e \"${gl_minglan}12.  ${gl_bai}mtr_trace 三网回程线路测试\"": [
 "\t  echo -e \"${gl_minglan}12.  ${gl_bai}mtr_trace 삼중 네트워크 백홀 회선 테스트\""
@@ -6414,10 +6798,13 @@
 "\t  echo -e \"시스템 도구\""
 ],
 "\t  local current_mode=$(grep \"^# 模式:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)": [
-"\t  local current_mode=$(grep \"^# 모드:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# 모드: //' | awk -F'|' '{print $1}' | xargs)"
+"\t  local current_mode=$(grep \"^# 模式:\" \"$PROJECT_OPTIMIZE_CONFIG_PATH\" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)"
 ],
 "\t  read -e -p  \"回车键还原最新的备份，输入备份文件名还原指定的备份，输入0退出：\" filename": [
 "\t  read -e -p  \"최신 백업을 복원하려면 Enter 키를 누르고, 지정된 백업을 복원하려면 백업 파일 이름을 입력하고, 종료하려면 0을 입력하세요.\" filename"
+],
+"\t  read -e -p \"$(echo -e \"输入需要安装的扩展名称，如 ${gl_huang}SourceGuardian imap ftp${gl_bai} 等等。直接回车将跳过安装 ： \")\" php_extensions": [
+"\t  read -e -p \"$(echo -e \"输入需要安装的扩展名称，如 ${gl_huang}SourceGuardian imap ftp${gl_bai} 等等。直接回车将跳过安装 ： \")\" php_extensions"
 ],
 "\t  read -e -p \"1. php最新版 | 2. php7.4 : \" pho_v": [
 "\t  read -e -p \"1. PHP 최신 버전 | 2.php7.4:\" pho_v"
@@ -6511,6 +6898,9 @@
 ],
 "\t# OpenClaw API 协议探测逻辑已移除：不再自动探测/判定 API 类型。": [
 "\t# OpenClaw API 프로토콜 감지 논리가 제거되었습니다. API 유형은 더 이상 자동으로 감지/결정되지 않습니다."
+],
+"\t# sudo 免密": [
+"\t# sudo 免密"
 ],
 "\t# ── BBR 持久化 ──": [
 "\t# ── BBR 지속성 ──"
@@ -6962,11 +7352,32 @@
 "\t# 首先获取所有端口": [
 "\t# 먼저 모든 포트를 확보하십시오."
 ],
+"\t[ ! -L \"$cache_dir\" ] || { echo \"拒绝使用符号链接缓存目录: $cache_dir\"; return 1; }": [
+"\t[ ! -L \"$cache_dir\" ] || { echo \"심볼릭 링크 캐시 디렉터리 사용을 거부합니다.$cache_dir\"; return 1; }"
+],
+"\t[ -O \"$cache_dir\" ] || { echo \"远程脚本缓存目录不属于当前用户: $cache_dir\"; return 1; }": [
+"\t[ -O \"$cache_dir\" ] || { echo \"원격 스크립트 캐시 디렉터리가 현재 사용자 소유가 아님: $cache_dir\"; return 1; }"
+],
+"\t[ -s \"$script_path\" ] || { echo \"下载结果为空。\"; rm -f -- \"$script_path\"; return 1; }": [
+"\t[ -s \"$script_path\" ] || { echo \"다운로드 결과가 비어 있습니다.\"; rm -f -- \"$script_path\"; return 1; }"
+],
+"\t_kernel_optimize_core \"${tiaoyou_moshi:-高性能优化模式}\" \"high\"": [
+"\t_kernel_optimize_core \"${tiaoyou_moshi:-高性能优化模式}\" \"high\""
+],
 "\t_kernel_optimize_core \"均衡优化模式\" \"balanced\"": [
 "\t_kernel_optimize_core \"균형 잡힌 최적화 모드\" \"balanced\""
 ],
 "\t_kernel_optimize_core \"网站搭建优化模式\" \"web\"": [
 "\t_kernel_optimize_core \"웹사이트 구축 최적화 모드\" \"web\""
+],
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火墙规则自动备份失败，继续执行关闭所有端口。${gl_bai}\"": [
+"\tbackup_iptables_rules || echo -e \"${gl_huang}경고: 방화벽 규칙의 자동 백업이 실패했습니다. 계속해서 모든 포트를 닫습니다.${gl_bai}\""
+],
+"\tbackup_iptables_rules || echo -e \"${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}\"": [
+"\tbackup_iptables_rules || echo -e \"${gl_huang}경고: 방화벽 규칙의 자동 백업이 실패했습니다. 계속해서 모든 포트를 여십시오.${gl_bai}\""
+],
+"\tbash -n \"$script_path\" || { echo \"远程脚本未通过 Bash 语法检查: $script_path\"; rm -f -- \"$script_path\"; return 1; }": [
+"\tbash -n \"$script_path\" || { echo \"원격 스크립트가 Bash 구문 검사에 실패했습니다:$script_path\"; rm -f -- \"$script_path\"; return 1; }"
 ],
 "\tcheck_frp=\"${gl_hui}未安装${gl_bai}\"": [
 "\tcheck_frp=\"${gl_hui}설치되지 않음${gl_bai}\""
@@ -7322,6 +7733,9 @@
 "\techo \"远程公钥地址：\"": [
 "\techo \"원격 공개 키 주소:\""
 ],
+"\techo \"连接已保存!\"": [
+"\techo \"연결이 저장되었습니다!\""
+],
 "\techo \"连接已删除!\"": [
 "\techo \"연결이 삭제되었습니다!\""
 ],
@@ -7393,6 +7807,9 @@
 ],
 "\techo -e \"${gl_huang}证书存放路径${gl_bai}\"": [
 "\techo -e \"${gl_huang}인증서 저장 경로${gl_bai}\""
+],
+"\techo -e \"${gl_lv}$* 扫描完成，病毒报告存放在${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}\"": [
+"\techo -e \"${gl_lv}$* 스캔 완료, 바이러스 보고서는 ${gl_huang}/home/docker/clamav/log/scan.log${gl_bai}에 있습니다\""
 ],
 "\techo -e \"${gl_lv}${mode_name} 优化完成！配置已持久化到 ${CONF}${gl_bai}\"": [
 "\techo -e \"${gl_lv}${mode_name}최적화 완료! 구성은 다음과 같이 유지되었습니다.${CONF}${gl_bai}\""
@@ -7541,6 +7958,24 @@
 "\tkj_ssh_read_port \"请输入 SSH 端口 (默认 22): \" \"22\"": [
 "\tkj_ssh_read_port \"SSH 포트(기본값 22)를 입력하세요.\" \"22\""
 ],
+"\tlocal direction=\"push\"  # 默认是推送到远端": [
+"\tlocal direction=\"push\"  # 默认是推送到远端"
+],
+"\tlocal ips=($@)  # 将传入的参数转换为数组": [
+"\tlocal ips=($@)  # 将传入的参数转换为数组"
+],
+"\tlocal new_swap=$1  # 获取传入的参数": [
+"\tlocal new_swap=$1  # 获取传入的参数"
+],
+"\tlocal ports=($@)  # 将传入的参数转换为数组": [
+"\tlocal ports=($@)  # 将传入的参数转换为数组"
+],
+"\tlocal prompt=\"${1:-请输入密码: }\"": [
+"\tlocal prompt=\"${1:-请输入密码: }\""
+],
+"\tlocal random_minute=$(shuf -i 0-59 -n 1)  # 生成 0-59 之间的随机分钟数": [
+"\tlocal random_minute=$(shuf -i 0-59 -n 1)  # 生成 0-59 之间的随机分钟数"
+],
 "\tlocal runtime=$(cat /proc/uptime | awk -F. '{run_days=int($1 / 86400);run_hours=int(($1 % 86400) / 3600);run_minutes=int(($1 % 3600) / 60); if (run_days > 0) printf(\"%d天 \", run_days); if (run_hours > 0) printf(\"%d时 \", run_hours); printf(\"%d分\\n\", run_minutes)}')": [
 "\tlocal runtime=$(cat /proc/uptime | awk -F. '{run_days=int($1 / 86400);run_hours=int(($1 % 86400) / 3600);run_minutes=int(($1% 3600) / 60); if (run_days > 0) printf(\"%d day \", run_days); if (run_hours > 0) printf(\"%d시간 \", run_hours); printf(\"%d분\\n\", run_mins)}')"
 ],
@@ -7552,6 +7987,15 @@
 ],
 "\tprintf \"%-25s %-18s %-25s %-20s\\n\" \"服务名\" \"通信类型\" \"本机地址\" \"后端地址\"": [
 "\tprintf \"%-25s %-18s %-25s %-20s\\n\" \"서비스 이름\" \"통신 유형\" \"현지 주소\" \"백엔드 주소\""
+],
+"\tprintf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\\n来源: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\"": [
+"\tprintf '원격 스크립트가 HTTPS 다운로드 및 Bash 구문 검사를 통과했으며 자동으로 실행됩니다.\\n출처: %s\\nSHA-256: %s\\n' \"$script_url\" \"$digest\""
+],
+"\tprintf '防火墙规则已自动备份到: %s\\n' \"$backup_dir\"": [
+"\tprintf '防火墙规则已自动备份到: %s\\n' \"$backup_dir\""
+],
+"\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}现在重启服务器吗？(Y/N): \")\" rboot": [
+"\tread -e -p \"$(echo -e \"${gl_huang}提示: ${gl_bai}现在重启服务器吗？(Y/N): \")\" rboot"
 ],
 "\tread -e -p \"封禁时长 bantime (秒/分钟/小时，如 3600 或 1h) [默认 1h]: \" bantime": [
 "\tread -e -p \"금지 시간 금지 시간(초/분/시간, 예: 3600 또는 1h) [기본값 1h]:\" bantime"
@@ -7694,6 +8138,9 @@
 "\tsed -i \"s/# 动态添加/$upstream_servers/g\" /home/web/stream.d/$proxy_name.conf": [
 "\tsed -i \"s/# 동적으로 추가/$upstream_servers/g\" /home/web/stream.d/$proxy_name.conf"
 ],
+"\tshift  # 去掉第一个参数，剩下的全是国家代码": [
+"\tshift  # 去掉第一个参数，剩下的全是国家代码"
+],
 "\twebname=\"Stream四层代理-负载均衡\"": [
 "\twebname=\"스트림 4계층 프록시-로드 밸런싱\""
 ],
@@ -7702,6 +8149,9 @@
 ],
 "\twebname=\"反向代理-负载均衡\"": [
 "\twebname=\"역방향 프록시-로드 밸런싱\""
+],
+"\tzhushi=1  # 0 表示执行，1 表示不执行": [
+"\tzhushi=1  # 0은 실행, 1은 실행 안 함을 의미"
 ],
 "                    latency_raw = '不可用'": [
 "                    latency_raw = '사용할 수 없음'"
@@ -8042,6 +8492,27 @@
 "  echo \"缓存清除请求已发送完毕。\"": [
 "  echo \"캐시 삭제 요청이 전송되었습니다.\""
 ],
+"  local DEBUG=\"${1:-false}\"           # 第一个参数，默认false": [
+"  local DEBUG=\"${1:-false}\"           # 第一个参数，默认false"
+],
+"  local DEBUG_DISPLAY=\"${2:-false}\"   # 第二个参数，默认false": [
+"  local DEBUG_DISPLAY=\"${2:-false}\"   # 第二个参数，默认false"
+],
+"  local DEBUG_LOG=\"${3:-false}\"       # 第三个参数，默认false": [
+"  local DEBUG_LOG=\"${3:-false}\"       # 第三个参数，默认false"
+],
+"  local MAX_MEMORY_LIMIT=\"${2:-256M}\"  # 第二个参数，默认256M": [
+"  local MAX_MEMORY_LIMIT=\"${2:-256M}\"  # 第二个参数，默认256M"
+],
+"  local MEMORY_LIMIT=\"${1:-256M}\"      # 第一个参数，默认256M": [
+"  local MEMORY_LIMIT=\"${1:-256M}\"      # 第一个参数，默认256M"
+],
+"  local TARGET_DIR=\"/home/web/html\"    # 路径写死": [
+"  local TARGET_DIR=\"/home/web/html\"    # 路径写死"
+],
+"  local TARGET_DIR=\"/home/web/html\"   # 路径写死": [
+"  local TARGET_DIR=\"/home/web/html\"   # 路径写死"
+],
 "  read -e -p \"输入你的选择: \" choice": [
 "  read -e -p \"선택 항목을 입력하세요.\" choice"
 ],
@@ -8105,6 +8576,9 @@
 "# 主菜单": [
 "# 메인 메뉴"
 ],
+"# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。": [
+"# 광범위한 grep 필터를 사용하여 관련 없는 작업을 실수로 삭제하는 것을 방지하기 위해 프로젝트 태그로 cron 작업을 관리합니다."
+],
 "# 任务管理主菜单": [
 "# 작업 관리 메인 메뉴"
 ],
@@ -8113,6 +8587,9 @@
 ],
 "# 使用连接": [
 "# 연결 사용"
+],
+"# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。": [
+"# 원래의 기본 명령 설치 동작을 유지합니다. 보안 검사에 실패하더라도 주요 기능을 차단하지 마십시오."
 ],
 "# 修复dpkg中断问题": [
 "# dpkg 중단 문제 수정"
@@ -8124,7 +8601,7 @@
 "# DDoS 방어 끄기"
 ],
 "# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')": [
-"# 메모리: ${MEM_MB}MB | 생성 시간: $(날짜 '+%Y-%m-%d %H:%M:%S')"
+"# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')"
 ],
 "# 列出可用的硬盘分区": [
 "# 사용 가능한 하드 디스크 파티션 나열"
@@ -8207,6 +8684,9 @@
 "# 查看服务状态": [
 "# 서비스 상태 확인"
 ],
+"# 标记形如 \"# ming-sh:<名称>\"：安装先按标记去重再追加，卸载按标记精确删除。": [
+"# 표시는 \"# ming-sh:<이름>\" 형식으로 되어있습니다. 설치시 표시를 누르면 중복 제거 후 추가되고, 제거시에는 표시를 누르면 정확하게 삭제됩니다."
+],
 "# 格式化分区": [
 "# 파티션 포맷"
 ],
@@ -8268,7 +8748,7 @@
 "# 서비스 다시 시작"
 ],
 "$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# numa_balancing 不支持\")": [
-"$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# numa_balancing은 지원되지 않습니다\")"
+"$([ -f /proc/sys/kernel/numa_balancing ] && echo \"kernel.numa_balancing = $NUMA\" || echo \"# numa_balancing 不支持\")"
 ],
 "[ \"$EUID\" -ne 0 ] && echo -e \"${gl_huang}提示: ${gl_bai}该功能需要root用户才能运行！\" && break_end && return_to_main_menu": [
 "[ \"$EUID\" -ne 0 ] && echo -e \"${gl_huang}힌트:${gl_bai}이 기능을 실행하려면 루트 사용자가 필요합니다!\" && break_end && return_to_main_menu"

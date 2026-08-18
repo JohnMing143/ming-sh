@@ -178,9 +178,22 @@ remote_script_sha256() {
 	fi
 }
 
-run_reviewed_remote_script() {
+# Download a remote script over HTTPS, syntax-check it, and print its
+# digest. With --install DEST the validated copy replaces DEST (0755); with
+# --run (or neither flag) it runs with any extra arguments and is removed.
+download_reviewed_remote_script() {
+	local mode="run"
+	if [ "${1:-}" = "--install" ]; then
+		mode="install"
+		shift
+	fi
 	local script_url="$1"
 	shift
+	local install_dest=""
+	if [ "$mode" = "install" ]; then
+		install_dest="$1"
+		shift
+	fi
 	local cache_dir script_path digest exit_status
 	case "$script_url" in
 		https://*) ;;
@@ -209,15 +222,26 @@ run_reviewed_remote_script() {
 		rm -f -- "$script_path"
 		return 1
 	fi
-	[ -s "$script_path" ] || { echo "下载结果为空。"; rm -f -- "$script_path"; return 1; }
-	bash -n "$script_path" || { echo "远程脚本未通过 Bash 语法检查: $script_path"; rm -f -- "$script_path"; return 1; }
+	[ -s "$script_path" ] || { echo "ダウンロード結果は空です。 "; rm -f -- "$script_path"; return 1; }
+	bash -n "$script_path" || { echo "リモート スクリプトは Bash 構文チェックに失敗しました:$script_path"; rm -f -- "$script_path"; return 1; }
 	digest=$(remote_script_sha256 "$script_path" 2>/dev/null) || digest="unavailable"
+
+	if [ "$mode" = "install" ]; then
+		printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在安装。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
+		mv -f -- "$script_path" "$install_dest" || { rm -f -- "$script_path"; return 1; }
+		chmod 0755 "$install_dest"
+		return 0
+	fi
 
 	printf '远程脚本已通过 HTTPS 下载和 Bash 语法检查，正在自动执行。\n来源: %s\nSHA-256: %s\n' "$script_url" "$digest"
 	bash "$script_path" "$@"
 	exit_status=$?
 	rm -f -- "$script_path"
 	return "$exit_status"
+}
+
+run_reviewed_remote_script() {
+	download_reviewed_remote_script "$@"
 }
 # --- end ming-sh shared lib: remote_script ---
 
@@ -338,7 +362,7 @@ UserLicenseAgreement() {
 migrate_legacy_license_acceptance || true
 CheckFirstRun_false
 
-# 保持原有的开箱即用命令安装行为；安全检查失败时不阻断主功能。
+# 元のすぐに使えるコマンドのインストール動作を維持します。セキュリティチェックが失敗した場合でも main 機能をブロックしないでください。
 if [ -r "${BASH_SOURCE[0]}" ]; then
 	install_project_entrypoint >/dev/null 2>&1 || true
 fi
@@ -931,7 +955,7 @@ install_crontab() {
 }
 
 
-# 以项目标记管理 cron 任务，避免用宽泛的 grep 过滤误删无关任务。
+# 幅広い grep フィルターを使用して無関係なタスクを誤って削除しないように、プロジェクト タグを使用して cron タスクを管理します。
 # 标记形如 "# ming-sh:<名称>"：安装先按标记去重再追加，卸载按标记精确删除。
 cron_install_tagged() {
 	local tag="# ${PROJECT_CRON_TAG}:$1"
@@ -1057,7 +1081,7 @@ backup_iptables_rules() {
 
 iptables_open() {
 	install iptables
-	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行开放所有端口。${gl_bai}"
+	backup_iptables_rules || echo -e "${gl_huang}警告: ファイアウォール ルールの自動バックアップに失敗しました。引き続きすべてのポートを開いてください。${gl_bai}"
 	iptables -P INPUT ACCEPT
 	iptables -P FORWARD ACCEPT
 	iptables -P OUTPUT ACCEPT
@@ -1077,7 +1101,7 @@ iptables_open() {
 iptables_close_all() {
 	local current_port
 	install iptables
-	backup_iptables_rules || echo -e "${gl_huang}警告：防火墙规则自动备份失败，继续执行关闭所有端口。${gl_bai}"
+	backup_iptables_rules || echo -e "${gl_huang}警告: ファイアウォール ルールの自動バックアップに失敗しました。引き続きすべてのポートを閉じます。${gl_bai}"
 	if command -v sshd >/dev/null 2>&1; then
 		current_port=$(sshd -T 2>/dev/null | awk '$1 == "port" { print $2; exit }')
 	fi
@@ -1654,8 +1678,7 @@ install_ldnmp() {
 install_certbot() {
 
 	cd ~
-	curl -sS -O ${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh
-	chmod +x auto_cert_renewal.sh
+	download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/auto_cert_renewal.sh" ~/auto_cert_renewal.sh
 
 	check_crontab_installed
 	cron_install_tagged cert-renew '0 0 * * * ~/auto_cert_renewal.sh'
@@ -2469,8 +2492,7 @@ web_security() {
 					  cd ~
 					  install jq bc
 					  check_crontab_installed
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh
-					  chmod +x CF-Under-Attack.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/CF-Under-Attack.sh" ~/CF-Under-Attack.sh
 					  sed -i "s/AAAA/$cfuser/g" ~/CF-Under-Attack.sh
 					  sed -i "s/BBBB/$cftoken/g" ~/CF-Under-Attack.sh
 					  sed -i "s/CCCC/$cfzonID/g" ~/CF-Under-Attack.sh
@@ -6266,7 +6288,7 @@ net.ipv4.tcp_slow_start_after_idle = 0"
 	cat > "$CONF" << SYSCTL
 # ${PROJECT_NAME} カーネルチューニング構成
 # モード: $モード名 |シーン: $scene
-# メモリ: ${MEM_MB}MB |生成時間: $(日付 '+%Y-%m-%d %H:%M:%S')
+# 内存: ${MEM_MB}MB | 生成时间: $(date '+%Y-%m-%d %H:%M:%S')
 
 # ──TCP輻輳制御──
 net.core.default_qdisc = $QDISC
@@ -6316,7 +6338,7 @@ vm.vfs_cache_pressure = $VFS_PRESSURE
 
 # ──CPU/カーネルのスケジューリング──
 kernel.sched_autogroup_enabled = $SCHED_AUTOGROUP
-$([ -f /proc/sys/kernel/numa_balancing ] && echo "kernel.numa_balancing = $NUMA" || echo "# uma_balancing はサポートされていません")
+$([ -f /proc/sys/kernel/numa_balancing ] && echo "kernel.numa_balancing = $NUMA" || echo "# numa_balancing 不支持")
 
 # ──安全保護──
 net.ipv4.conf.all.rp_filter = 1
@@ -6442,7 +6464,7 @@ Kernel_optimize() {
 	root_use
 	while true; do
 	  clear
-	  local current_mode=$(grep "^# モード:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# モード: //' | awk -F'|' '{print $1}' | xargs)
+	  local current_mode=$(grep "^# 模式:" "$PROJECT_OPTIMIZE_CONFIG_PATH" 2>/dev/null | sed 's/# 模式: //' | awk -F'|' '{print $1}' | xargs)
 	  [ -z "$current_mode" ] && { [ -f /etc/sysctl.d/99-ming-sh-network.conf ] || [ -f /etc/sysctl.d/99-network-optimize.conf ]; } && current_mode="オートチューニングモード"
 	  echo "Linuxシステムのカーネルパラメータの最適化"
 	  if [ -n "$current_mode" ]; then
@@ -9291,9 +9313,7 @@ linux_ldnmp() {
 	  mkdir $yuming
 	  cd $yuming
 
-	  docker exec php sh -c "php -r \"copy('https://getcomposer.org/installer', 'composer-setup.php');\""
-	  docker exec php sh -c "php composer-setup.php"
-	  docker exec php sh -c "php -r \"unlink('composer-setup.php');\""
+	  docker exec php sh -c "curl -fsSL -o composer-setup.php https://getcomposer.org/installer && curl -fsSL -o composer-setup.sig https://composer.github.io/installer.sig && php -r \"exit(hash_file('sha384', 'composer-setup.php') === trim(file_get_contents('composer-setup.sig')) ? 0 : 1);\" && php composer-setup.php --quiet && rm -f composer-setup.php composer-setup.sig"
 	  docker exec php sh -c "mv composer.phar /usr/local/bin/composer"
 
 	  docker exec php composer create-project flarum/flarum /var/www/html/$yuming
@@ -11749,7 +11769,7 @@ PYTHON_EOF
 				gum style --faint "↑↓ 選択 / Enter でテスト / Esc で終了"
 				echo ""
 
-				selected_model=$(echo "$models_list" | gum filter 					--placeholder "モデルの検索 (cli-api/gpt-5.2 など)" 					--prompt "モデルを選択 >" 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
+				selected_model=$(echo "$models_list" | gum filter 					--placeholder "搜索模型（如 cli-api/gpt-5.2）" 					--prompt "选择模型 > " 					--indicator "➜ " 					--prompt.foreground "$orange" 					--indicator.foreground "$orange" 					--cursor-text.foreground "$orange" 					--match.foreground "$orange" 					--header "" 					--height 35)
 
 				if [ -z "$selected_model" ] || echo "$selected_model" | head -n 1 | grep -iqE '^(error|usage|gum:)'; then
 					echo "操作がキャンセルされました。終了しています..."
@@ -13256,7 +13276,7 @@ EOF
 		local count=0
 		local agent_lines agent_id workspace
 		agent_lines=$(openclaw_memory_list_agents)
-		echo "確認して準備します $(printf '%s\n'"$agent_lines"| sed '/^\s*$/d' |トイレ -l | tr -d ' ') エージェントワークスペース"
+		echo "检查并准备 $(printf '%s\n' "$agent_lines" | sed '/^\s*$/d' | wc -l | tr -d ' ') 个智能体工作区"
 		while IFS=$'\t' read -r agent_id workspace; do
 			[ -z "$agent_id" ] && continue
 			openclaw_memory_prepare_workspace "$agent_id"
@@ -20671,8 +20691,7 @@ EOF
 					[ "$cz_day" -ge 1 ] && [ "$cz_day" -le 31 ] || cz_day=1
 
 					cd ~
-					curl -Ss -o ~/Limiting_Shut_down.sh ${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh
-					chmod +x ~/Limiting_Shut_down.sh
+					download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/Limiting_Shut_down1.sh" ~/Limiting_Shut_down.sh
 					sed -i "s/^rx_threshold_gb=110$/rx_threshold_gb=$rx_threshold_gb/" ~/Limiting_Shut_down.sh
 					sed -i "s/^tx_threshold_gb=120$/tx_threshold_gb=$tx_threshold_gb/" ~/Limiting_Shut_down.sh
 					check_crontab_installed
@@ -20720,18 +20739,16 @@ EOF
 					  chmod +x ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  else
-					  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh
-					  chmod +x ~/TG-check-notify.sh
+					  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-check-notify.sh" ~/TG-check-notify.sh
 					  nano ~/TG-check-notify.sh
 				  fi
 				  tmux kill-session -t TG-check-notify > /dev/null 2>&1
 				  tmux new -d -s TG-check-notify "~/TG-check-notify.sh"
 				  cron_install_tagged tg-monitor "@reboot tmux new -d -s TG-check-notify '~/TG-check-notify.sh'" > /dev/null 2>&1
 
-				  curl -sS -O ${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh > /dev/null 2>&1
+				  download_reviewed_remote_script --install "${PROJECT_DOWNLOAD_BASE}/TG-SSH-check-notify.sh" ~/TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "3i$(grep '^TELEGRAM_BOT_TOKEN=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh > /dev/null 2>&1
 				  sed -i "4i$(grep '^CHAT_ID=' ~/TG-check-notify.sh)" TG-SSH-check-notify.sh
-				  chmod +x ~/TG-SSH-check-notify.sh
 
 				  # ~/.profile ファイルに追加
 				  if ! grep -q 'bash ~/TG-SSH-check-notify.sh' ~/.profile > /dev/null 2>&1; then
@@ -21238,7 +21255,7 @@ while true; do
 			  local server_port=${server_port:-22}
 			  read -e -p "サーバーのユーザー名 (root):" server_username
 			  local server_username=${server_username:-root}
-			  echo -e "${gl_hui}留空密码将使用 SSH 密钥认证（默认密钥或 ssh-agent）${gl_bai}"
+			  echo -e "${gl_hui}パスワードを空白のままにすると、SSH キー認証 (デフォルトのキーまたは ssh-agent) が使用されます。${gl_bai}"
 			  read -e -s -p "サーバーユーザーのパスワード:" server_password
 			  echo
 			  if [[ ! "$server_name" =~ ^[A-Za-z0-9._-]+$ ]] ||
